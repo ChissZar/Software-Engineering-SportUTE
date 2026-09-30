@@ -1,0 +1,12 @@
+target/
+.settings/
+.classpath
+.project
+.idea/
+*.iml
+.env
+.env.*
+!.env.example
+src/main/resources/application-local.yml
+*.log
+.DS_Store
