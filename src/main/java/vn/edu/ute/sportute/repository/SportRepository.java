@@ -1,6 +1,14 @@
 package vn.edu.ute.sportute.repository;
-/** TODO: sau khi entity hoan chinh, extends JpaRepository<Sport, Long>.
- * Chua tao Spring Data bean de tranh coi lop mau la JPA entity.
- */
-public interface SportRepository {
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import vn.edu.ute.sportute.entity.Sport;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface SportRepository extends JpaRepository<Sport, String> {
+    Optional<Sport> findByName(String name);
+    List<Sport> findByStatus(String status);
 }

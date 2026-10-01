@@ -1,6 +1,14 @@
 package vn.edu.ute.sportute.repository;
-/** TODO: sau khi entity hoan chinh, extends JpaRepository<Booking, Long>.
- * Chua tao Spring Data bean de tranh coi lop mau la JPA entity.
- */
-public interface BookingRepository {
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import vn.edu.ute.sportute.entity.Booking;
+
+import java.util.List;
+
+@Repository
+public interface BookingRepository extends JpaRepository<Booking, String> {
+    List<Booking> findByCustomer_Id(String customerId);
+    List<Booking> findByStatus(String status);
+    List<Booking> findByEmployee_Id(String employeeId);
 }

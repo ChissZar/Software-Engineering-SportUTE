@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: sportute
+  datasource:
+    url: ${DB_URL:jdbc:sqlserver://localhost:1433;databaseName=sportute;encrypt=true;trustServerCertificate=true}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  thymeleaf:
+    cache: false
+server:
+  port: ${PORT:8080}
+# JWT va Cloudinary chua duoc noi vao runtime.
+# trustServerCertificate=true chi danh cho SQL Server local.
