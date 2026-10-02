@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title}">SportUTE</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+  <!-- Mau fragment, khong phai giao dien hoan chinh hay trang dang nhap. -->
+  <th:block th:fragment="scripts">
+    <script th:src="@{/webjars/bootstrap/5.3.8/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/app.js}"></script>
+  </th:block>
+</body>
+</html>

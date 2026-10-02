@@ -1,6 +1,13 @@
 package vn.edu.ute.sportute.repository;
-/** TODO: sau khi entity hoan chinh, extends JpaRepository<Payment, Long>.
- * Chua tao Spring Data bean de tranh coi lop mau la JPA entity.
- */
-public interface PaymentRepository {
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import vn.edu.ute.sportute.entity.Payment;
+
+import java.util.List;
+
+@Repository
+public interface PaymentRepository extends JpaRepository<Payment, String> {
+    List<Payment> findByBooking_Id(String bookingId);
+    List<Payment> findByPaymentMethod(String paymentMethod);
 }

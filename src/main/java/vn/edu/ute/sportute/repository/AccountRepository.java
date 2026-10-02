@@ -1,6 +1,15 @@
 package vn.edu.ute.sportute.repository;
-/** TODO: sau khi entity hoan chinh, extends JpaRepository<Account, Long>.
- * Chua tao Spring Data bean de tranh coi lop mau la JPA entity.
- */
-public interface AccountRepository {
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import vn.edu.ute.sportute.entity.Account;
+import java.util.Optional;
+
+@Repository
+public interface AccountRepository extends JpaRepository<Account, String> {
+    Optional<Account> findByUsername(String username);
+    Optional<Account> findByEmail(String email);
+    Optional<Account> findByUsernameOrEmail(String username, String email);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }
