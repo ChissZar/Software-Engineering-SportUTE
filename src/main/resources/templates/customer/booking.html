@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportHub - Đặt sân trực tuyến</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #00a651;
+            --primary-hover: #008c44;
+            --dark-sidebar: #052316;
+            --bg-light: #f8fafc;
+        }
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+        }
+        /* Sidebar Khách hàng (Số 1 Hình 5-3) */
+        .customer-sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background-color: var(--dark-sidebar);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 14px;
+        }
+        .customer-sidebar .nav-link {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .customer-sidebar .nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        .customer-sidebar .nav-link.active {
+            color: #ffffff;
+            background-color: var(--primary-green);
+        }
+        /* Thẻ sân (Số 9 Hình 5-3) */
+        .court-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .court-card-header {
+            padding: 14px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .court-card-body {
+            padding: 18px;
+        }
+        .amenity-tag {
+            font-size: 11px;
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-right: 4px;
+            margin-bottom: 6px;
+        }
+        .time-slot-btn {
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #475569;
+            border-radius: 6px;
+            padding: 5px 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .time-slot-btn.active, .time-slot-btn:hover {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+            background-color: #ecfdf5;
+        }
+        /* Bộ lọc Pills (Số 3 Hình 5-3) */
+        .sport-pill-btn {
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #334155;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sport-pill-btn.active {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="d-flex">
+
+    <!-- 1. Thanh Sidebar Khách hàng (Số 1 Hình 5-3) -->
+    <div class="customer-sidebar">
+        <div>
+            <!-- Logo -->
+            <div class="d-flex align-items-center gap-2 mb-4 px-2">
+                <i class="fa-solid fa-shapes text-success fs-3"></i>
+                <div>
+                    <h5 class="m-0 fw-bold">SportHub</h5>
+                    <small style="font-size: 9px; letter-spacing: 1.5px; color: #86efac;">PLAY • BOOK • TOGETHER</small>
+                </div>
+            </div>
+
+            <!-- Menu Links -->
+            <nav class="d-flex flex-column gap-1">
+                <a href="/customer/dashboard" class="nav-link">
+                    <i class="fa-solid fa-border-all"></i> Tổng quan
+                </a>
+                <a href="/customer/booking" class="nav-link active">
+                    <i class="fa-regular fa-calendar-plus"></i> Đặt sân
+                </a>
+                <a href="/customer/history" class="nav-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử đặt sân
+                </a>
+                <a href="/customer/profile" class="nav-link">
+                    <i class="fa-regular fa-user"></i> Hồ sơ cá nhân
+                </a>
+            </nav>
+        </div>
+
+        <div class="px-2">
+            <h6 class="fw-bold mb-1 text-white-50" style="font-size: 13px;">Đặt nhanh</h6>
+            <p class="text-success m-0 fw-bold" style="font-size: 14px;">Chơi hết mình</p>
+        </div>
+    </div>
+
+    <!-- Nội dung chính bên phải -->
+    <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
+        
+        <!-- Header Top bar (Số 2 & Avatar) -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                <div class="input-group" style="max-width: 480px;">
+                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" form="filterForm" name="keyword" th:value="${filter.keyword}" class="form-control border-start-0" 
+                           placeholder="Tìm sân theo môn thể thao hoặc mã sân...">
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <a href="/customer/notifications" class="btn btn-light bg-white border rounded-circle p-2 text-muted" style="width: 38px; height: 38px;">
+                    <i class="fa-regular fa-bell"></i>
+                </a>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle bg-success text-white fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">MA</div>
+                    <div>
+                        <div class="fw-semibold text-dark" style="font-size: 13px;" th:text="${currentUserName}">Nguyễn Minh Anh</div>
+                        <small class="text-muted" style="font-size: 11px;">Khách hàng</small>
+                    </div>
+                </div>
+                <a href="/" class="btn btn-sm btn-outline-secondary rounded-3 px-3">&larr; Về trang chủ</a>
+            </div>
+        </div>
+
+        <!-- Tiêu đề trang -->
+        <div class="mb-4">
+            <h4 class="fw-bold mb-1">Đặt Sân Trực Tuyến</h4>
+            <small class="text-muted">Chọn sân theo môn thể thao, khung giờ mong muốn và nhận xác nhận nhanh chóng.</small>
+        </div>
+
+        <!-- Thông báo Flash Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${errorMessage}"></div>
+
+        <!-- Form Bộ lọc (Số 3, 4, 5, 6, 7, 8 Hình 5-3) -->
+        <form id="filterForm" th:action="@{/customer/booking}" th:object="${filter}" method="get" class="card p-4 border-0 shadow-sm rounded-4 mb-4 bg-white">
+            
+            <!-- Danh mục môn (Pills - Số 3 Hình 5-3) -->
+            <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+                <a th:href="@{/customer/booking(sportId='ALL', bookingDate=${filter.bookingDate}, startTime=${filter.startTime}, durationMinutes=${filter.durationMinutes})}" 
+                   class="sport-pill-btn" th:classappend="${filter.sportId == null or filter.sportId == 'ALL' ? 'active' : ''}">
+                    <i class="fa-solid fa-list"></i> Tất cả môn
+                </a>
+                <a th:each="s : ${sports}"
+                   th:href="@{/customer/booking(sportId=${s.id}, bookingDate=${filter.bookingDate}, startTime=${filter.startTime}, durationMinutes=${filter.durationMinutes})}" 
+                   class="sport-pill-btn" th:classappend="${filter.sportId == s.id ? 'active' : ''}">
+                    <i class="fa-solid fa-baseball-bat-ball"></i> <span th:text="${s.name}"></span>
+                </a>
+                <input type="hidden" th:field="*{sportId}">
+            </div>
+
+            <!-- Các ô lọc: Ngày, Giờ, Thời lượng, Loại sân (Số 4, 5, 6, 7, 8) -->
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label text-muted" style="font-size: 13px;">Ngày đặt sân (*)</label>
+                    <input type="date" th:field="*{bookingDate}" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted" style="font-size: 13px;">Giờ bắt đầu (*)</label>
+                    <input type="time" th:field="*{startTime}" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-muted" style="font-size: 13px;">Thời lượng thuê</label>
+                    <select th:field="*{durationMinutes}" class="form-select">
+                        <option value="60">1 Giờ (60 phút)</option>
+                        <option value="90">1 Giờ 30 phút (90 phút)</option>
+                        <option value="120">2 Giờ (120 phút)</option>
+                        <option value="180">3 Giờ (180 phút)</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted" style="font-size: 13px;">Loại sân</label>
+                    <select th:field="*{courtType}" class="form-select">
+                        <option value="Tất cả loại sân">Tất cả loại sân</option>
+                        <option value="Trong nhà">Trong nhà máy lạnh</option>
+                        <option value="Ngoài trời">Ngoài trời có mái che</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100 fw-semibold" style="padding: 10px;">
+                        <i class="fa-solid fa-filter me-1"></i> Lọc sân trống
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Danh sách thẻ sân trống (Số 9 Hình 5-3) -->
+        <div class="row g-4">
+            <div class="col-md-4" th:each="court : ${availableCourts}">
+                <div class="court-card">
+                    <div>
+                        <!-- Header thẻ có màu theo môn -->
+                        <div class="court-card-header" th:classappend="${court.colorHeaderClass}">
+                            <span><i class="fa-solid fa-medal me-1"></i> <span th:text="${court.sportName}"></span></span>
+                            <span class="badge bg-light text-dark rounded-pill px-2">Sẵn sàng</span>
+                        </div>
+
+                        <div class="court-card-body">
+                            <!-- Tên sân -->
+                            <h5 class="fw-bold mb-2 text-dark" th:text="${court.name}">Sân bóng đá mini 1</h5>
+                            
+                            <!-- Tags Tiện ích -->
+                            <div class="mb-3">
+                                <span class="amenity-tag" th:each="am : ${court.amenities}">
+                                    <i class="fa-solid fa-check text-success me-1"></i><span th:text="${am}"></span>
+                                </span>
+                            </div>
+
+                            <!-- Đơn giá thuê -->
+                            <div class="d-flex align-items-baseline gap-1 mb-3">
+                                <h4 class="text-success fw-bold m-0" th:text="${#numbers.formatDecimal(court.pricePerHour, 0, 'COMMA', 0, 'POINT')} + 'đ'">350.000đ</h4>
+                                <small class="text-muted">/ giờ thuê</small>
+                            </div>
+
+                            <!-- Chọn khung giờ gợi ý -->
+                            <div class="mb-2">
+                                <small class="text-muted d-block mb-1" style="font-size: 11px;">Khung giờ khả dụng:</small>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <button type="button" class="time-slot-btn" 
+                                            th:each="slot, stat : ${court.timeSlots}"
+                                            th:classappend="${stat.index == 2} ? 'active' : ''"
+                                            th:text="${slot}">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút Đặt sân này (kích hoạt Modal) -->
+                    <div class="p-3 pt-0">
+                        <button type="button" class="btn btn-success w-100 fw-semibold"
+                                th:data-id="${court.id}"
+                                th:data-name="${court.name}"
+                                th:data-sport="${court.sportName}"
+                                th:data-price="${court.pricePerHour}"
+                                onclick="openBookingModal(this)">
+                            Đặt sân này
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khi không có sân nào trống -->
+            <div class="col-12" th:if="${#lists.isEmpty(availableCourts)}">
+                <div class="card p-5 text-center border-0 rounded-4 bg-white">
+                    <i class="fa-regular fa-face-frown fs-1 text-muted mb-3"></i>
+                    <h5 class="fw-bold text-muted">Không tìm thấy sân trống phù hợp</h5>
+                    <p class="text-muted" style="font-size: 14px;">Tất cả các sân trong môn này đã có lịch đặt hoặc bảo trì vào khung giờ bạn chọn. Vui lòng đổi ngày, giờ hoặc chọn môn khác!</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal Xác nhận đặt sân trực tuyến (UC41) -->
+    <div class="modal fade" id="confirmBookingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-4 border-0">
+                <form th:action="@{/customer/booking/confirm}" method="post">
+                    
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold">Xác nhận đặt sân trực tuyến</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Thông tin ẩn truyền đi -->
+                        <input type="hidden" name="courtId" id="modalCourtId">
+                        <input type="hidden" name="bookingDate" th:value="${filter.bookingDate}">
+                        <input type="hidden" name="startTime" th:value="${filter.startTime}">
+                        <input type="hidden" name="durationMinutes" th:value="${filter.durationMinutes}">
+                        <input type="hidden" name="totalAmount" id="modalTotalAmount">
+
+                        <div class="bg-light p-3 rounded-3 mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted" style="font-size: 13px;">Sân thể thao:</span>
+                                <strong id="modalCourtName" class="text-dark">Sân bóng đá 1</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted" style="font-size: 13px;">Môn:</span>
+                                <span id="modalCourtSport" class="badge bg-success">Bóng đá</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted" style="font-size: 13px;">Ngày thuê:</span>
+                                <strong th:text="${#temporals.format(filter.bookingDate, 'dd/MM/yyyy')}">02/10/2026</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted" style="font-size: 13px;">Khung giờ:</span>
+                                <strong class="text-primary" th:text="${filter.startTime} + ' (' + ${filter.durationMinutes} + ' phút)'">18:00 (120 phút)</strong>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold" style="font-size: 14px;">Tổng tiền tạm tính:</span>
+                                <h4 class="text-success fw-bold m-0" id="modalDisplayAmount">0 đ</h4>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted" style="font-size: 13px;">Ghi chú cho trung tâm (nếu có)</label>
+                            <textarea name="note" class="form-control" rows="2" placeholder="Ví dụ: Cần mượn thêm bóng tập..."></textarea>
+                        </div>
+
+                        <div class="alert alert-info py-2" style="font-size: 12px;">
+                            <i class="fa-solid fa-circle-info me-1"></i> Phiếu đặt sân sẽ được trung tâm lưu ở trạng thái <b>Chờ xác nhận</b>. Bạn có thể theo dõi và thực hiện thanh toán cọc theo quy định.
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-success fw-semibold px-4">Xác nhận đặt sân</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts an toàn chống lỗi XSS Thymeleaf -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openBookingModal(button) {
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const sport = button.getAttribute('data-sport');
+            const price = parseFloat(button.getAttribute('data-price')) || 0;
+            const duration = parseInt('[[${filter.durationMinutes}]]') || 120;
+
+            // Tính tổng tiền = đơn giá * (số phút / 60)[cite: 3]
+            const total = Math.round(price * (duration / 60));
+
+            document.getElementById('modalCourtId').value = id;
+            document.getElementById('modalCourtName').innerText = name;
+            document.getElementById('modalCourtSport').innerText = sport;
+            document.getElementById('modalTotalAmount').value = total;
+            document.getElementById('modalDisplayAmount').innerText = total.toLocaleString('vi-VN') + ' đ';
+
+            new bootstrap.Modal(document.getElementById('confirmBookingModal')).show();
+        }
+    </script>
+</body>
+</html>

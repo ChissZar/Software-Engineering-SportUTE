@@ -1,4 +1,11 @@
 package vn.edu.ute.sportute.service;
-/** Bang gia thue san. TODO: khai bao hop dong nghiep vu bang DTO. */
+
+import vn.edu.ute.sportute.dto.request.PriceDTO;
+import java.util.List;
+
 public interface PriceService {
+    List<PriceDTO> getAllPrices();
+    PriceDTO getPriceById(String id);
+    void savePrice(PriceDTO dto);
+    void deletePrice(String id);
 }

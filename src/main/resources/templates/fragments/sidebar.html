@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="sidebar(activeMenu)" class="sidebar-wrapper d-flex flex-column justify-content-between p-3"
+     style="width: 260px; min-height: 100vh; background: #072a1a; color: #fff;">
+    <div>
+        <!-- Brand -->
+        <div class="d-flex align-items-center gap-2 mb-4 px-2">
+            <i class="fa-solid fa-shapes fs-3 text-success"></i>
+            <div>
+                <h5 class="m-0 fw-bold tracking-tight">SportHub</h5>
+                <small class="text-secondary" style="font-size: 10px; letter-spacing: 1px;">PLAY • BOOK • TOGETHER</small>
+            </div>
+        </div>
+
+        <!-- Menu Navigation -->
+        <div class="nav flex-column gap-1">
+            <a href="/admin/dashboard" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
+               th:classappend="${activeMenu == 'dashboard' ? 'active bg-success text-white' : ''}">
+                <i class="fa-solid fa-chart-pie"></i> Tổng quan
+            </a>
+            <a href="/admin/sports" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
+               th:classappend="${activeMenu == 'sports' ? 'active bg-success text-white' : ''}">
+                <i class="fa-solid fa-volleyball"></i> Môn thể thao
+            </a>
+            <a href="/admin/courts" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
+               th:classappend="${activeMenu == 'courts' ? 'active bg-success text-white' : ''}">
+                <i class="fa-solid fa-table-cells-large"></i> Sân thể thao
+            </a>
+            <a href="/admin/prices" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
+               th:classappend="${activeMenu == 'prices' ? 'active bg-success text-white' : ''}">
+                <i class="fa-solid fa-tags"></i> Bảng giá
+            </a>
+            <a href="/admin/maintenance" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
+               th:classappend="${activeMenu == 'maintenance' ? 'active bg-success text-white' : ''}">
+                <i class="fa-solid fa-wrench"></i> Lịch bảo trì
+            </a>
+            <a href="/admin/bookings" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
+               th:classappend="${activeMenu == 'bookings' ? 'active bg-success text-white' : ''}">
+                <i class="fa-regular fa-calendar-check"></i> Đặt sân
+            </a>
+        </div>
+    </div>
+
+    <!-- User / Logout -->
+    <div class="border-top border-secondary pt-3 px-2">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center text-white fw-bold"
+                     style="width: 36px; height: 36px;">QL</div>
+                <div>
+                    <div class="fw-semibold text-white" style="font-size: 13px;">Quản lý trung tâm</div>
+                    <div class="text-white-50" style="font-size: 11px;">Quản trị viên</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                    <i class="fa-solid fa-arrow-right-from-bracket fs-5"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
