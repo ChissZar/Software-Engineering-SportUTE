@@ -7,12 +7,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
         default_schema: dbo
-  thymeleaf:
-    cache: false
 server:
   port: ${PORT:8080}
 # JWT va Cloudinary chua duoc noi vao runtime.

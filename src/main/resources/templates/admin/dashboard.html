@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SportHub - Dashboard Quản lý trung tâm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-green: #00a651;
+            --bg-light: #f4f6f8;
+        }
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+        }
+        .dashboard-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            padding: 20px;
+        }
+        .kpi-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .court-preview-card {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            background: #fff;
+            transition: transform 0.2s;
+        }
+        .court-preview-card:hover {
+            transform: translateY(-2px);
+        }
+        .badge-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-active { background-color: #dcfce7; color: #15803d; }
+        .badge-inuse { background-color: #dbeafe; color: #1d4ed8; }
+        .badge-maint { background-color: #fef3c7; color: #b45309; }
+        .badge-confirmed { background-color: #e0f2fe; color: #0284c7; }
+        .schedule-timeline-item {
+            border-left: 3px solid var(--primary-green);
+            padding-left: 12px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body class="d-flex">
+
+    <!-- Sidebar dùng chung -->
+    <div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+
+    <!-- Khu vực nội dung chính -->
+    <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
+        
+        <!-- Header Top bar (Số 2, 3, 4, 5, 6, 7) -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <span class="fw-bold fs-5 text-dark">Trung tâm Thể thao SportHub</span>
+                <div class="input-group" style="width: 320px;">
+                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0" placeholder="Tìm kiếm khách hàng, sân, mã đặt...">
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <a href="/admin/bookings" class="btn btn-success rounded-3 px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-plus me-1"></i> Tạo đặt sân
+                </a>
+                <a href="/admin/courts" class="btn btn-outline-secondary bg-white rounded-3 px-3 py-2">
+                    <i class="fa-solid fa-user-plus me-1"></i> Thêm khách hàng
+                </a>
+                <a href="/admin/prices" class="btn btn-outline-secondary bg-white rounded-3 px-3 py-2">
+                    <i class="fa-solid fa-file-export me-1"></i> Xuất báo cáo
+                </a>
+            </div>
+        </div>
+
+        <!-- 4 Thẻ KPI Chỉ số (Số 8 - Hình 5-1) -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="dashboard-card d-flex align-items-center gap-3">
+                    <div class="kpi-icon-wrapper bg-success-subtle text-success">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size: 13px;">Tổng lượt đặt</div>
+                        <h4 class="fw-bold m-0" th:text="${data.totalBookings}">248</h4>
+                        <small class="text-success"><i class="fa-solid fa-arrow-trend-up"></i> +12% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card d-flex align-items-center gap-3">
+                    <div class="kpi-icon-wrapper bg-primary-subtle text-primary">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size: 13px;">Doanh thu hôm nay</div>
+                        <h4 class="fw-bold m-0" th:text="${#numbers.formatDecimal(data.revenueToday, 0, 'COMMA', 0, 'POINT')} + ' đ'">12.450.000 đ</h4>
+                        <small class="text-success"><i class="fa-solid fa-arrow-trend-up"></i> +18% so với hôm qua</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card d-flex align-items-center gap-3">
+                    <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
+                        <i class="fa-solid fa-pie-chart"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size: 13px;">Tỷ lệ lấp đầy</div>
+                        <h4 class="fw-bold m-0" th:text="${data.occupancyRate} + '%'">78%</h4>
+                        <small class="text-success"><i class="fa-solid fa-arrow-trend-up"></i> +6% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card d-flex align-items-center gap-3">
+                    <div class="kpi-icon-wrapper bg-info-subtle text-info">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size: 13px;">Khách hàng</div>
+                        <h4 class="fw-bold m-0" th:text="${data.newCustomers}">36</h4>
+                        <small class="text-success"><i class="fa-solid fa-arrow-trend-up"></i> +20% so với tuần trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ & Lịch hôm nay (Số 9, 10, 11, 12, 13) -->
+        <div class="row g-4 mb-4">
+            <!-- Biểu đồ Lượt đặt & Doanh thu theo ngày (Số 10) -->
+            <div class="col-lg-5">
+                <div class="dashboard-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0">Lượt đặt sân & Doanh thu theo ngày</h6>
+                        <span class="badge bg-light text-muted border">7 ngày qua</span>
+                    </div>
+                    <canvas id="revenueChart" style="max-height: 240px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Cơ cấu đặt sân theo môn thể thao (Số 12) -->
+            <div class="col-lg-3">
+                <div class="dashboard-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0">Cơ cấu theo môn</h6>
+                        <span class="badge bg-light text-muted border">Tháng này</span>
+                    </div>
+                    <canvas id="sportDonutChart" style="max-height: 220px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Lịch sân hôm nay (Số 13) -->
+            <div class="col-lg-4">
+                <div class="dashboard-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0">Lịch sân hôm nay</h6>
+                        <small class="text-muted">Thứ sáu, 02/10/2026</small>
+                    </div>
+                    <div class="schedule-timeline">
+                        <div class="schedule-timeline-item">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold" style="font-size: 13px;">Sân bóng đá 1</span>
+                                <span class="badge badge-active">Trống</span>
+                            </div>
+                            <small class="text-muted">07:00 - 08:30</small>
+                        </div>
+                        <div class="schedule-timeline-item" style="border-left-color: #3b82f6;">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold" style="font-size: 13px;">Sân cầu lông 2</span>
+                                <span class="badge badge-inuse">Đang sử dụng</span>
+                            </div>
+                            <small class="text-muted">08:00 - 10:00 • Nguyễn Hoàng Nam</small>
+                        </div>
+                        <div class="schedule-timeline-item" style="border-left-color: #f59e0b;">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold" style="font-size: 13px;">Sân bóng rổ 1</span>
+                                <span class="badge badge-maint">Bảo trì</span>
+                            </div>
+                            <small class="text-muted">Bảo dưỡng và thay bóng đèn LED</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hàng dưới: Trạng thái sân thể thao & Đặt sân gần đây (Số 14, 15) -->
+        <div class="row g-4">
+            <!-- Trạng thái sân thể thao (Số 14) -->
+            <div class="col-lg-7">
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0">Trạng thái sân thể thao</h6>
+                        <a href="/admin/courts" class="text-success text-decoration-none" style="font-size: 13px;">Xem tất cả &rarr;</a>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6" th:each="c : ${data.courts}">
+                            <div class="court-preview-card p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="fw-bold m-0" th:text="${c.name}">Sân bóng đá 1</h6>
+                                        <small class="text-muted" th:text="${c.sportName}">Bóng đá</small>
+                                    </div>
+                                    <span class="badge-status"
+                                          th:classappend="${c.status == 'Hoạt động' ? 'badge-active' : (c.status == 'Đang sử dụng' ? 'badge-inuse' : 'badge-maint')}"
+                                          th:text="${c.status}">
+                                    </span>
+                                </div>
+                                <div class="text-muted" style="font-size: 12px;">
+                                    <i class="fa-regular fa-clock me-1"></i> <span th:text="${c.timeSlot}">05:00 - 23:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Đặt sân gần đây (Số 15) -->
+            <div class="col-lg-5">
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold m-0">Đặt sân gần đây</h6>
+                        <a href="/admin/bookings" class="text-success text-decoration-none" style="font-size: 13px;">Xem tất cả &rarr;</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 13px;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Khách hàng</th>
+                                    <th>Sân</th>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="rb : ${data.recentBookings}">
+                                    <td class="fw-semibold" th:text="${rb.customerName}">Trần Quốc Huy</td>
+                                    <td th:text="${rb.courtName}">Bóng đá 1</td>
+                                    <td th:text="${rb.time}">02/10 18:00</td>
+                                    <td>
+                                        <span class="badge-status badge-confirmed" th:text="${rb.status}">Đã xác nhận</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(data.recentBookings)}">
+                                    <td colspan="4" class="text-center py-3 text-muted">Chưa có lượt đặt sân nào.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script vẽ biểu đồ (Chart.js) -->
+    <script>
+        // 1. Biểu đồ Doanh thu & Lượt đặt theo ngày
+        const ctxRev = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctxRev, {
+            type: 'bar',
+            data: {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                datasets: [
+                    {
+                        type: 'line',
+                        label: 'Doanh thu (triệu đ)',
+                        data: [8, 9, 11, 10, 14, 18, 16],
+                        borderColor: '#0284c7',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        type: 'bar',
+                        label: 'Lượt đặt sân',
+                        data: [22, 28, 32, 30, 42, 50, 44],
+                        backgroundColor: '#86efac',
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, position: 'left' },
+                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
+                }
+            }
+        });
+
+        // 2. Biểu đồ Donut cơ cấu môn
+        const ctxDonut = document.getElementById('sportDonutChart').getContext('2d');
+        new Chart(ctxDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bóng đá', 'Cầu lông', 'Bóng rổ', 'Pickleball'],
+                datasets: [{
+                    data: [45, 25, 18, 12],
+                    backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#a855f7']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

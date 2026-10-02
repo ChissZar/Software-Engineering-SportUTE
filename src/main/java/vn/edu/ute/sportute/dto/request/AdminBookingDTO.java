@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingRequest {
+public class AdminBookingDTO {
     // 7. Mã đặt sân (Chỉ đọc)
     private String id;
 

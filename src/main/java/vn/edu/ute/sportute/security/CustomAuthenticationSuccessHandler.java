@@ -18,11 +18,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                                         Authentication authentication) throws IOException {
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             String role = authority.getAuthority();
+            // Nếu là quản trị hoặc nhân viên, chuyển về admin dashboard
             if (role.equals("ROLE_ADMIN") || role.equals("ROLE_MANAGER") || role.equals("ROLE_STAFF")) {
                 response.sendRedirect("/admin/dashboard");
                 return;
             }
         }
-        response.sendRedirect("/customer/dashboard");
+
+        // Khách hàng mặc định (ROLE_CUSTOMER) chuyển thẳng đến trang đặt sân trực tuyến
+        response.sendRedirect("/customer/booking");
     }
 }

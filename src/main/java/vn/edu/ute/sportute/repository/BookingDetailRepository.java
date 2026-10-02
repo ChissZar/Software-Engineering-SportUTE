@@ -13,8 +13,8 @@ import java.util.List;
 public interface BookingDetailRepository extends JpaRepository<BookingDetail, String> {
 
     List<BookingDetail> findByBooking_Id(String bookingId);
-    List<BookingDetail> findByCourt_Id(String courtId);
 
+    // 1. Kiểm tra trùng lịch khi TẠO MỚI (không có excludeBookingId)[cite: 3]
     @Query("SELECT COUNT(ct) > 0 FROM BookingDetail ct " +
            "WHERE ct.court.id = :courtId " +
            "AND ct.booking.status <> 'Đã hủy' " +
@@ -22,4 +22,15 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, St
     boolean existsOverlappingBooking(@Param("courtId") String courtId,
                                     @Param("startTime") LocalDateTime startTime,
                                     @Param("endTime") LocalDateTime endTime);
+
+    // 2. Kiểm tra trùng lịch khi CẬP NHẬT (loại trừ chính mã phiếu đang chỉnh sửa)[cite: 3]
+    @Query("SELECT COUNT(ct) > 0 FROM BookingDetail ct " +
+           "WHERE ct.court.id = :courtId " +
+           "AND ct.booking.status <> 'Đã hủy' " +
+           "AND ct.booking.id <> :excludeBookingId " +
+           "AND ct.startTime < :endTime AND ct.endTime > :startTime")
+    boolean existsOverlappingBookingExceptSelf(@Param("courtId") String courtId,
+                                              @Param("startTime") LocalDateTime startTime,
+                                              @Param("endTime") LocalDateTime endTime,
+                                              @Param("excludeBookingId") String excludeBookingId);
 }
