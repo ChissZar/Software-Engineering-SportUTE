@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SportHub — Dashboard Khách hàng</title>
+<style>
+:root{
+  --nav:#062b2d;--nav2:#031f24;--green:#17a75d;--green2:#0b8249;
+  --green-soft:#e8f8ef;--blue:#2f83df;--blue-soft:#eaf4ff;
+  --orange:#e99627;--orange-soft:#fff4e2;--purple:#7156dc;
+  --ink:#122235;--muted:#748196;--bg:#f2f6f8;--line:#e1e8ec;
+  --card:#fff;--shadow:0 8px 24px rgba(20,45,55,.07)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{
+  height:100vh;position:sticky;top:0;overflow:hidden;
+  background:linear-gradient(180deg,var(--nav2),var(--nav));color:#fff;
+  padding:20px 14px;display:flex;flex-direction:column
+}
+.brand-card{
+  height:74px;border-radius:14px;background:#f5faf7;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.2);margin:2px 8px 14px;
+  text-decoration:none;gap:10px;padding:0 12px;
+}
+.brand-logo-icon{
+  width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0b8249,#17a75d);
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:16px;flex:none;
+}
+.brand-text b{font-size:15px;color:#062b2d;display:block;letter-spacing:-.3px;line-height:1.2}
+.brand-text small{font-size:8px;color:#0b8249;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.nav{border-top:1px solid rgba(255,255,255,.08);padding-top:11px}
+.nav a{
+  height:43px;display:flex;align-items:center;gap:12px;
+  color:#c8d8da;text-decoration:none;border-radius:10px;
+  padding:0 12px;margin:4px 0;font-size:12px;transition:.18s
+}
+.nav a:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav a.active{
+  background:linear-gradient(90deg,#119352,#1caf63);color:#fff;
+  box-shadow:inset 3px 0 #70f0a9
+}
+.nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+.side-note{
+  margin-top:auto;margin-left:-14px;margin-right:-14px;margin-bottom:-20px;
+  height:160px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 70% 25%,rgba(45,214,127,.22),transparent 35%),
+    linear-gradient(180deg,transparent,#043037 92%)
+}
+.side-note:before{
+  content:"";position:absolute;left:-10%;right:-10%;bottom:18px;height:70px;
+  background:linear-gradient(150deg,transparent 20%,rgba(27,164,95,.17));
+  transform:skewY(-8deg)
+}
+.side-note strong{
+  position:absolute;left:25px;bottom:36px;font-size:18px;line-height:1.15;
+  font-style:italic
+}
+.side-note strong:after{
+  content:"";display:block;width:34px;height:3px;background:#31d77c;margin-top:12px
+}
+main{min-width:0}
+.topbar{
+  height:64px;background:#fff;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:300px minmax(320px,640px) 1fr;
+  align-items:center;gap:20px;padding:0 24px;position:sticky;top:0;z-index:5
+}
+.app-title{display:flex;align-items:center;gap:10px}
+.app-title .mini{
+  width:30px;height:30px;border-radius:9px;background:var(--green-soft);
+  color:var(--green2);display:grid;place-items:center;font-weight:900;font-size:11px
+}
+.app-title b{font-size:12px}
+.app-title small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+.search{position:relative}
+.search input{
+  width:100%;height:38px;border:1px solid #dce5e9;border-radius:10px;
+  background:#f8fafb;padding:0 13px 0 37px;font-size:10.5px;outline:none
+}
+.search input:focus{border-color:#97d6b5;box-shadow:0 0 0 3px rgba(23,167,93,.08)}
+.search svg{
+  position:absolute;left:12px;top:10px;width:16px;height:16px;stroke:#8591a2;fill:none
+}
+.account{justify-self:end;display:flex;align-items:center;gap:10px}
+.icon-btn{width:34px;height:34px;border:0;background:#f5f8f9;border-radius:10px;display:grid;place-items:center}
+.icon-btn svg{width:16px;height:16px;stroke:#243449;fill:none;stroke-width:1.8}
+.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#0e4b36;color:#fff;font-size:11px;font-weight:900}
+.account b{font-size:10.5px}
+.account small{display:block;color:var(--muted);font-size:8.5px;margin-top:2px}
+.content{max-width:1600px;margin:auto;padding:14px 18px 24px}
+.welcome{
+  min-height:104px;background:linear-gradient(108deg,#fff 0%,#f8fffb 48%,#e5f7ed 100%);
+  border:1px solid #dfe9e4;border-radius:15px;box-shadow:var(--shadow);
+  padding:19px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden
+}
+.welcome:after{
+  content:"";position:absolute;width:250px;height:250px;border-radius:50%;
+  right:-90px;top:-120px;background:linear-gradient(135deg,rgba(24,178,100,.20),rgba(47,131,223,.08))
+}
+.welcome-copy{position:relative;z-index:1}
+.eyebrow{font-size:9px;font-weight:900;letter-spacing:1.4px;color:var(--green2);text-transform:uppercase}
+.welcome h1{font-size:22px;margin:5px 0 5px}
+.welcome p{font-size:10.5px;color:#68786f;margin:0}
+.welcome-actions{position:relative;z-index:1;display:flex;gap:8px}
+.btn{
+  height:36px;border-radius:9px;border:1px solid #d9e5df;background:#fff;
+  color:#345047;padding:0 14px;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;text-decoration:none
+}
+.btn.primary{border:0;background:linear-gradient(90deg,var(--green2),var(--green));color:#fff;box-shadow:0 7px 18px rgba(23,167,93,.22)}
+.btn:hover{transform:translateY(-1px)}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+.metric{
+  height:92px;background:#fff;border:1px solid var(--line);border-radius:13px;
+  box-shadow:var(--shadow);padding:13px 15px;display:flex;align-items:center;gap:12px
+}
+.metric-icon{width:42px;height:42px;border-radius:12px;background:var(--green-soft);display:grid;place-items:center;color:var(--green2)}
+.metric:nth-child(2) .metric-icon{background:var(--orange-soft);color:#c47814}
+.metric:nth-child(3) .metric-icon{background:var(--blue-soft);color:var(--blue)}
+.metric:nth-child(4) .metric-icon{background:#f0ebff;color:var(--purple)}
+.metric-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.metric label{font-size:9px;color:var(--muted);font-weight:700;display:block}
+.metric strong{font-size:21px;display:block;margin:2px 0}
+.metric small{font-size:8.5px;color:#8a97a5}
+.grid-main{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(330px,.8fr);gap:12px;margin-top:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:15px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.head h2{font-size:13px;margin:0}
+.head a{font-size:9px;color:var(--green2);font-weight:800;text-decoration:none}
+.booking-list{display:grid;gap:8px}
+.booking{
+  min-height:68px;border:1px solid #e4ece8;border-radius:11px;padding:9px 10px;
+  display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:10px;
+  background:#fdfefe
+}
+.datebox{width:46px;height:46px;border-radius:10px;background:var(--green-soft);color:var(--green2);display:grid;place-items:center;text-align:center}
+.datebox b{font-size:16px;line-height:15px;display:block}
+.datebox small{font-size:7.5px;font-weight:900}
+.booking h3{font-size:10.5px;margin:0 0 4px}
+.meta{font-size:8.5px;color:#7c8998;display:flex;gap:10px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:4px 7px;border-radius:999px;background:#e4f7ec;color:#087d48;font-size:8px;font-weight:900;white-space:nowrap}
+.badge.wait{background:#fff3dc;color:#a56b14}
+.badge.done{background:#edf1f4;color:#687382}
+.badge.cancel{background:#fff0f0;color:#b54e4e}
+.booking-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.booking-actions button{border:0;background:transparent;color:var(--green2);font-size:8.5px;font-weight:800;padding:0}
+.finder{padding:15px}
+.sports{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.sport{
+  height:34px;border:1px solid #dce7e2;background:#fbfdfc;border-radius:9px;
+  font-size:8.8px;color:#5c6b63
+}
+.sport.active{border-color:#6bc897;background:#ecfaf2;color:var(--green2);font-weight:900}
+.formrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.formrow.three{grid-template-columns:1.2fr 1fr .8fr}
+.field label{display:block;font-size:8px;font-weight:800;color:#6f7d8c;margin-bottom:4px}
+.field input,.field select{width:100%;height:33px;border:1px solid #dfe7e3;border-radius:8px;background:#fff;padding:0 8px;font-size:9px;outline:none}
+.finder .btn{width:100%;margin-top:10px}
+.quick-note{margin-top:10px;padding:9px;border-radius:9px;background:#f6faf8;font-size:8.5px;color:#64746b;line-height:1.45}
+.bottom-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(360px,.85fr);gap:12px;margin-top:12px}
+.courtgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.court{border:1px solid #e4ece8;border-radius:11px;overflow:hidden;background:#fff}
+.court-top{height:54px;padding:8px;display:flex;align-items:flex-end;position:relative;color:#fff}
+.court-top.football{background:linear-gradient(135deg,#0b4b36,#1da65f)}
+.court-top.badminton{background:linear-gradient(135deg,#1d4f75,#368fd5)}
+.court-top.basket{background:linear-gradient(135deg,#744819,#e49a31)}
+.court-top.pick{background:linear-gradient(135deg,#47336e,#7a5ee0)}
+.court-top:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 20%,rgba(255,255,255,.28),transparent 38%)}
+.court-top span{position:relative;z-index:1;background:rgba(255,255,255,.95);color:#087d48;padding:4px 6px;border-radius:999px;font-size:7.5px;font-weight:900}
+.court-body{padding:8px}
+.court-body b{font-size:9px}
+.court-body p{margin:3px 0;color:#7c8795;font-size:8px}
+.court-body small{font-size:7.5px;color:#667586}
+.court button{margin:0 8px 8px;width:calc(100% - 16px);height:26px;border:0;border-radius:7px;background:#eef9f3;color:#087d48;font-size:8px;font-weight:900}
+.history-list{display:grid;gap:7px}
+.history-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px 0;border-bottom:1px solid #edf1f3}
+.history-item:last-child{border-bottom:0}
+.history-item b{font-size:9px}
+.history-item p{margin:3px 0 0;color:#7c8998;font-size:8px}
+.history-item .right{text-align:right}
+.history-item .money{font-size:8.5px;font-weight:900;margin-bottom:4px}
+.footer-tip{margin-top:8px;padding-top:8px;border-top:1px solid #edf1f3;font-size:8px;color:#8793a1}
+
+/* Top banner navigation switcher */
+.top-notice{
+  background:#062b2d;color:#fff;padding:8px 24px;font-size:11px;display:flex;
+  align-items:center;justify-content:space-between;border-bottom:1px solid #0d464a
+}
+.top-notice a{color:#31d77c;font-weight:800;text-decoration:none;margin-left:8px}
+.top-notice a:hover{text-decoration:underline}
+
+@media(max-width:1100px){
+  .app{grid-template-columns:76px 1fr}
+  .brand-card{height:58px;margin:2px 0 12px;padding:0}
+  .brand-text,.nav span,.side-note{display:none}
+  .nav a{justify-content:center;padding:0}
+  .topbar{grid-template-columns:1fr minmax(260px,1fr) auto}
+  .app-title small,.account .account-text{display:none}
+  .summary{grid-template-columns:1fr 1fr}
+  .bottom-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .app{display:block}aside{display:none}
+  .topbar{height:auto;padding:10px 14px;grid-template-columns:1fr auto}
+  .search{grid-column:1/-1;grid-row:2}
+  .content{padding:12px}
+  .welcome{align-items:flex-start;gap:14px;flex-direction:column}
+  .summary{grid-template-columns:1fr 1fr}
+  .grid-main,.bottom-grid{grid-template-columns:1fr}
+  .courtgrid{grid-template-columns:1fr 1fr}
+  .formrow.three{grid-template-columns:1fr 1fr}
+  .formrow.three .field:last-child{grid-column:1/-1}
+  .booking{grid-template-columns:45px 1fr}
+  .booking-actions{grid-column:2;align-items:flex-start;flex-direction:row}
+}
+</style>
+</head>
+<body>
+<!-- Switcher bar between Customer & Admin RBAC -->
+<div class="top-notice">
+  <div>
+    <span>📍 Bạn đang xem: <b>Khu vực Khách hàng (Portal Đặt sân)</b></span>
+  </div>
+  <div>
+    <span>Chuyển sang:</span>
+    <a href="/admin/permissions">🛡️ Dashboard Phân quyền User (RBAC)</a>
+    <a href="/admin/dashboard" style="margin-left:14px">📊 Dashboard Quản trị</a>
+  </div>
+</div>
+
+<div class="app">
+<aside>
+  <a href="/customer/dashboard" class="brand-card">
+    <div class="brand-logo-icon">SH</div>
+    <div class="brand-text">
+      <b>SportHub</b>
+      <small>Khách hàng</small>
+    </div>
+  </a>
+  <nav class="nav">
+    <a class="active" href="/customer/dashboard">
+      <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+      <span>Tổng quan</span>
+    </a>
+    <a href="/customer/booking">
+      <svg viewBox="0 0 24 24"><path d="M5 16l3-8 4 4 4-7 3 11M4 19h16"/></svg>
+      <span>Đặt sân</span>
+    </a>
+    <a href="#lich-su">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 9h16M8 3v4M16 3v4"/></svg>
+      <span>Lịch sử đặt sân</span>
+    </a>
+    <a href="/admin/permissions" style="color:#78f0b0;">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Phân quyền (RBAC)</span>
+    </a>
+  </nav>
+  <div class="side-note"><strong>Đặt nhanh<br>Chơi hết mình</strong></div>
+</aside>
+
+<main>
+<header class="topbar">
+  <div class="app-title">
+    <div class="mini">KH</div>
+    <div><b>Khu vực khách hàng SportHub</b><small>Đặt sân trực tuyến & quản lý lịch sử</small></div>
+  </div>
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg>
+    <input placeholder="Tìm sân theo môn thể thao hoặc mã sân...">
+  </div>
+  <div class="account">
+    <button class="icon-btn" aria-label="Thông báo"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7M10 19h4"/></svg></button>
+    <div class="avatar">MA</div>
+    <div class="account-text">
+      <b th:text="${currentUserName != null ? currentUserName : 'Nguyễn Minh Anh'}">Nguyễn Minh Anh</b>
+      <small>Khách hàng (ROLE_CUSTOMER)</small>
+    </div>
+  </div>
+</header>
+
+<div class="content">
+  <section class="welcome">
+    <div class="welcome-copy">
+      <div class="eyebrow">SPORT HUB • CUSTOMER DASHBOARD</div>
+      <h1 th:text="'Chào ' + ${currentUserName != null ? currentUserName : 'Minh Anh'} + ', sẵn sàng cho trận tiếp theo?'">Chào Minh Anh, sẵn sàng cho trận tiếp theo?</h1>
+      <p>Xem lịch đặt sắp tới, kiểm tra sân trống và quản lý các phiếu đặt của bạn ngay tại đây.</p>
+    </div>
+    <div class="welcome-actions">
+      <a class="btn primary" href="/customer/booking">＋ Đặt sân ngay</a>
+      <button class="btn" onclick="document.getElementById('lich-su').scrollIntoView()">Xem lịch sử</button>
+    </div>
+  </section>
+
+  <section class="summary">
+    <div class="metric">
+      <div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg></div>
+      <div><label>Đã xác nhận</label><strong>02</strong><small>Lịch đặt sắp tới</small></div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></div>
+      <div><label>Chờ xác nhận</label><strong>01</strong><small>Đang chờ xử lý</small></div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6zM9 9h6M9 13h6"/></svg></div>
+      <div><label>Đã hoàn tất</label><strong>18</strong><small>Lượt thuê đã sử dụng</small></div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M9 9l6 6M15 9l-6 6"/></svg></div>
+      <div><label>Đã hủy</label><strong>03</strong><small>Phiếu đã hủy trước đây</small></div>
+    </div>
+  </section>
+
+  <section class="grid-main">
+    <div class="card">
+      <div class="head"><h2>Lịch đặt sắp tới</h2><a href="#lich-su">Xem tất cả</a></div>
+      <div class="booking-list">
+        <div class="booking">
+          <div class="datebox"><div><b>26</b><small>THG 09</small></div></div>
+          <div><h3>Sân cầu lông 2</h3><div class="meta"><span>18:00 – 20:00</span><span>#SH2489</span><span>Đã cọc</span></div></div>
+          <div class="booking-actions"><span class="badge">Đã xác nhận</span><button>Chi tiết</button></div>
+        </div>
+        <div class="booking">
+          <div class="datebox"><div><b>28</b><small>THG 09</small></div></div>
+          <div><h3>Sân bóng đá 1</h3><div class="meta"><span>19:00 – 21:00</span><span>#SH2491</span><span>Cần cọc</span></div></div>
+          <div class="booking-actions"><span class="badge wait">Chờ xác nhận</span><button>Chi tiết</button></div>
+        </div>
+        <div class="booking">
+          <div class="datebox"><div><b>03</b><small>THG 10</small></div></div>
+          <div><h3>Sân pickleball 1</h3><div class="meta"><span>07:00 – 08:30</span><span>#SH2504</span><span>Đã cọc</span></div></div>
+          <div class="booking-actions"><span class="badge">Đã xác nhận</span><button>Chi tiết</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card finder" id="tim-san">
+      <div class="head"><h2>Tìm sân trống nhanh</h2><a href="/customer/booking">Lịch sân chi tiết</a></div>
+      <div class="sports">
+        <button class="sport active" type="button" data-sport="Bóng đá" aria-pressed="true">⚽ Bóng đá</button>
+        <button class="sport" type="button" data-sport="Cầu lông" aria-pressed="false">🏸 Cầu lông</button>
+        <button class="sport" type="button" data-sport="Bóng rổ" aria-pressed="false">🏀 Bóng rổ</button>
+        <button class="sport" type="button" data-sport="Pickleball" aria-pressed="false">🏓 Pickleball</button>
+      </div>
+      <div class="formrow three">
+        <div class="field"><label>Ngày thuê</label><input type="date" value="2026-10-05"></div>
+        <div class="field"><label>Giờ bắt đầu</label><input type="time" value="18:00"></div>
+        <div class="field"><label>Thời lượng</label><select><option>1 giờ</option><option selected>2 giờ</option><option>3 giờ</option></select></div>
+      </div>
+      <a class="btn primary" href="/customer/booking">⌕ Kiểm tra sân trống trên lịch</a>
+      <div class="quick-note">Hệ thống sẽ kiểm tra lịch đặt và lịch bảo trì trước khi hiển thị sân có thể đặt.</div>
+    </div>
+  </section>
+
+  <section class="bottom-grid">
+    <div class="card">
+      <div class="head"><h2>Sân đang trống hôm nay</h2><a href="/customer/booking">Xem tất cả</a></div>
+      <div class="courtgrid">
+        <div class="court">
+          <div class="court-top football"><span>Trống</span></div>
+          <div class="court-body"><b>Sân bóng đá 1</b><p>Sân 5 người • Cỏ FIFA</p><small>18:00–20:00 • 250.000đ/giờ</small></div>
+          <button onclick="location.href='/customer/booking'">Chọn sân</button>
+        </div>
+        <div class="court">
+          <div class="court-top badminton"><span>Trống</span></div>
+          <div class="court-body"><b>Sân cầu lông 1</b><p>Sân tiêu chuẩn BWF</p><small>18:00–20:00 • 90.000đ/giờ</small></div>
+          <button onclick="location.href='/customer/booking'">Chọn sân</button>
+        </div>
+        <div class="court">
+          <div class="court-top basket"><span>Trống</span></div>
+          <div class="court-body"><b>Sân bóng rổ 2</b><p>Sân thi đấu FIBA</p><small>18:00–20:00 • 280.000đ/giờ</small></div>
+          <button onclick="location.href='/customer/booking'">Chọn sân</button>
+        </div>
+        <div class="court">
+          <div class="court-top pick"><span>Trống</span></div>
+          <div class="court-body"><b>Sân pickleball 1</b><p>Sân tiêu chuẩn quốc tế</p><small>18:00–20:00 • 100.000đ/giờ</small></div>
+          <button onclick="location.href='/customer/booking'">Chọn sân</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="lich-su">
+      <div class="head"><h2>Lịch sử gần đây</h2><a href="#">Xem toàn bộ</a></div>
+      <div class="history-list">
+        <div class="history-item">
+          <div><b>#SH2472 • Sân bóng đá 2</b><p>21/09/2026 • 18:00–20:00</p></div>
+          <div class="right"><div class="money">800.000đ</div><span class="badge done">Hoàn tất</span></div>
+        </div>
+        <div class="history-item">
+          <div><b>#SH2445 • Sân cầu lông 1</b><p>17/09/2026 • 19:00–20:00</p></div>
+          <div class="right"><div class="money">120.000đ</div><span class="badge done">Hoàn tất</span></div>
+        </div>
+        <div class="history-item">
+          <div><b>#SH2419 • Sân pickleball 1</b><p>12/09/2026 • 07:00–08:30</p></div>
+          <div class="right"><div class="money">270.000đ</div><span class="badge cancel">Đã hủy</span></div>
+        </div>
+      </div>
+      <div class="footer-tip">Bạn chỉ có thể xem và thao tác với các phiếu đặt thuộc tài khoản của mình.</div>
+    </div>
+  </section>
+</div>
+</main>
+</div>
+<script>
+document.querySelectorAll('.sport').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.sport').forEach(x => {
+    x.classList.remove('active');
+    x.setAttribute('aria-pressed', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
+}));
+</script>
+</body>
+</html>

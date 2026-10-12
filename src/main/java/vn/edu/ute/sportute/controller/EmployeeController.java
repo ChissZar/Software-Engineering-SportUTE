@@ -1,7 +1,16 @@
 package vn.edu.ute.sportute.controller;
-/** Ho so nhan vien.
- * TODO: them @Controller, route, validation va goi EmployeeService.
- * Khong truy cap repository truc tiep; chua co endpoint hoat dong.
- */
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/** Ho so nhan vien. */
+@Controller
+@RequestMapping("/admin/employees")
 public class EmployeeController {
+
+    @GetMapping
+    public String index() {
+        return "employees/index";
+    }
 }

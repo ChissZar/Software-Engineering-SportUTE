@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SportHub — Quản lý đặt sân</title>
+<style>
+:root{
+  --nav:#082c2f;--nav2:#061f25;--green:#1aaa62;--green2:#087d48;
+  --mint:#dff7e8;--blue:#1684ef;--orange:#ef9a28;--purple:#7958e9;
+  --ink:#132337;--muted:#728096;--bg:#f2f6f8;--line:#e2e9ed;
+  --card:#fff;--shadow:0 6px 22px rgba(15,42,52,.07);--shadow-sm:0 2px 8px rgba(15,42,52,.04)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
+button,input,select{font:inherit}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{
+  height:100vh;position:sticky;top:0;background:linear-gradient(180deg,var(--nav2),var(--nav));
+  color:#fff;padding:20px 14px;display:flex;flex-direction:column;overflow-y:auto;z-index:10
+}
+.brand{
+  min-height:64px;padding:6px 10px 12px;margin:0 0 10px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none
+}
+.brand-icon{
+  width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green2),var(--green));
+  color:#fff;display:grid;place-items:center;font-weight:900;font-size:16px;flex:none;
+  box-shadow:0 4px 12px rgba(26,170,98,.3)
+}
+.brand-text b{font-size:15px;color:#fff;display:block;letter-spacing:-.3px;line-height:1.2}
+.brand-text small{font-size:8.5px;color:#38e28c;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-title{font-size:8.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px;font-weight:800;padding:10px 12px 4px}
+.nav a{
+  height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;color:#c7d8da;
+  text-decoration:none;border-radius:9px;font-size:12px;font-weight:600;transition:.18s
+}
+.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav a.active{
+  background:linear-gradient(90deg,#138e4f,#1ca35d);color:#fff;
+  box-shadow:inset 3px 0 #68f3a5,0 4px 14px rgba(26,170,98,.2)
+}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+.side-art{
+  margin-top:auto;height:140px;margin-left:-14px;margin-right:-14px;margin-bottom:-20px;
+  background:linear-gradient(180deg,transparent 0,#052a2d 88%),linear-gradient(135deg,#0c553caa,#061f25 65%);
+  position:relative;overflow:hidden
+}
+.side-art:before{
+  content:"";position:absolute;left:-10%;right:-10%;bottom:14px;height:60px;
+  background:linear-gradient(150deg,transparent 20%,rgba(27,164,95,.2));transform:skewY(-8deg)
+}
+.side-copy{position:absolute;left:22px;bottom:28px;font-size:16px;line-height:1.2;font-weight:800;font-style:italic;color:#e8f8ef}
+.side-copy:after{content:"";display:block;width:32px;height:3px;background:#31d77c;margin-top:10px}
+
+main{min-width:0}
+.topbar{
+  height:60px;background:#fff;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:300px minmax(260px,560px) 1fr;
+  align-items:center;gap:20px;padding:0 24px;position:sticky;top:0;z-index:9
+}
+.centername{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:10px}
+.centername .badge-org{
+  width:28px;height:28px;border-radius:8px;background:var(--mint);color:var(--green2);
+  display:grid;place-items:center;font-weight:900;font-size:11px
+}
+.search{position:relative}
+.search input{
+  width:100%;height:38px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:9px;
+  padding:0 14px 0 38px;font-size:12px;outline:none;transition:.2s
+}
+.search input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
+.search svg{position:absolute;left:13px;top:11px;width:15px;height:15px;fill:none;stroke:#748297;stroke-width:1.8}
+.account{justify-self:end;display:flex;align-items:center;gap:11px}
+.avatar{
+  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0e4b36,#199c58);
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:11.5px;
+  box-shadow:0 3px 10px rgba(14,75,54,.2)
+}
+.account b{font-size:12px;color:var(--ink);display:block}
+.account small{display:block;color:var(--green2);font-size:9.5px;font-weight:700;margin-top:1px}
+
+.content{max-width:1540px;margin:auto;padding:16px 22px 30px}
+.pagehead{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;
+  padding:18px 24px;border-radius:14px;
+  background:linear-gradient(90deg,#fff 0%,#f8fffb 55%,#dff7e8 100%);
+  border:1px solid var(--line);box-shadow:var(--shadow-sm)
+}
+.crumb{font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:700;letter-spacing:.3px}
+.pagehead h1{margin:0 0 3px;font-size:24px;letter-spacing:-.6px;color:#0b3b28}
+.pagehead p{margin:0;color:#5a6e64;font-size:12px}
+.btn{
+  height:36px;padding:0 16px;border:1px solid #d8e3dc;background:#fff;border-radius:8px;
+  font-weight:800;font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;gap:6px;transition:.18s
+}
+.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.btn.primary{
+  background:linear-gradient(90deg,#087a42,#17a45b);color:#fff;border:0;
+  box-shadow:0 6px 16px rgba(26,170,98,.25)
+}
+.btn.primary:hover{box-shadow:0 8px 20px rgba(26,170,98,.35)}
+.btn.danger{color:#c0392b;border-color:#fecaca}
+.btn.danger:hover{background:#feecec;border-color:#f87171}
+
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
+.metric{
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+  display:flex;gap:13px;align-items:center;box-shadow:var(--shadow-sm);min-height:86px;
+  transition:.2s
+}
+.metric:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.metric-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex:none}
+.g{background:var(--mint);color:#0d8a4e}
+.b{background:#bfe0ff;color:#096bc4}
+.o{background:#ffe1a8;color:#bb6e00}
+.p{background:#ddcfff;color:#6642c6}
+.metric label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.metric strong{display:block;font-size:22px;margin-top:2px;color:var(--ink);letter-spacing:-.5px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow-sm)}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.head h2{font-size:13.5px;margin:0;font-weight:800;color:var(--ink)}
+.tools{display:flex;align-items:center;gap:10px}
+.tools select{border:1px solid var(--line);border-radius:7px;padding:6px 10px;background:#fbfcfd;color:#536176;font-size:11.5px;outline:none}
+.count{font-size:10.5px;color:var(--muted);font-weight:700}
+
+.tablewrap{overflow:auto;border:1px solid #edf1f3;border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th{
+  text-align:left;background:#f5f8fa;color:#617084;font-size:10.5px;font-weight:800;
+  padding:10px 12px;white-space:nowrap;border-bottom:1px solid #e5ebef;text-transform:uppercase;letter-spacing:.5px
+}
+td{font-size:12px;padding:10px 12px;border-bottom:1px solid #edf1f3;white-space:nowrap}
+tbody tr{cursor:pointer;transition:.15s}
+tbody tr:hover{background:#f7fbf9}
+tbody tr.sel{background:#e8f8ee;box-shadow:inset 3px 0 var(--green)}
+.empty{text-align:center;color:var(--muted);padding:28px;font-size:12px}
+
+.badge{padding:4px 9px;border-radius:7px;font-size:10px;font-weight:800;background:#c9f1d5;color:#087a42;display:inline-block}
+.badge.blue{background:#cbe5ff;color:#0e6fc4}
+.badge.orange{background:#ffe1b7;color:#b86e0d}
+.badge.gray{background:#e7edf0;color:#667384}
+.badge.purple{background:#e3d9ff;color:#6642c6}
+
+.formcard{position:sticky;top:74px}
+.mode{font-size:10px;font-weight:800;padding:4px 8px;border-radius:6px;background:var(--mint);color:var(--green2)}
+.fields{display:grid;gap:10px}
+.field label{display:block;font-size:10.5px;font-weight:800;color:#4b5a6e;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.field input,.field select{
+  width:100%;height:36px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:8px;
+  padding:0 11px;font-size:12px;outline:none;transition:.18s
+}
+.field input:focus,.field select:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
+.field input[readonly]{color:#7c8c9e;background:#edf2f5}
+.actions{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;margin-top:14px}
+.actions .btn{padding:0}
+
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);
+  background:#082c2f;color:#fff;padding:11px 22px;border-radius:9px;font-size:12px;
+  font-weight:700;opacity:0;pointer-events:none;transition:.25s cubic-bezier(.16,1,.3,1);
+  box-shadow:var(--shadow);border:1px solid rgba(26,170,98,.4);z-index:99
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:1200px){.layout{grid-template-columns:1fr}.formcard{position:static}}
+@media(max-width:880px){
+  .app{grid-template-columns:72px 1fr}
+  .nav span,.nav-title,.side-art,.brand-text{display:none}
+  .brand{justify-content:center;padding:0 0 10px}
+  .nav a{justify-content:center;padding:0}
+  .topbar{grid-template-columns:1fr auto}
+  .centername,.account>div:last-child{display:none}
+  .summary{grid-template-columns:1fr 1fr}
+}
+@media(max-width:580px){
+  .app{display:block}aside{display:none}
+  .content{padding:12px}
+  .topbar{padding:0 12px;grid-template-columns:1fr auto}
+  .search{grid-column:1/-1;grid-row:2}
+  .pagehead{flex-direction:column;align-items:flex-start;gap:10px}
+  .summary{grid-template-columns:1fr 1fr}
+}
+
+/* --- UNIFIED COMPACT SIDEBAR (SportHub Compact Logo v2) --- */
+:root{
+  --nav:#082c2f;--nav2:#061f25;--green:#1aaa62;--green2:#087d48;
+  --mint:#dff7e8;--blue:#1684ef;--orange:#ef9a28;--purple:#7958e9;
+  --ink:#132337;--muted:#728096;--bg:#f2f6f8;--line:#e2e9ed;
+  --card:#fff;--shadow:0 6px 22px rgba(15,42,52,.07);--shadow-sm:0 2px 8px rgba(15,42,52,.04)
+}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{
+  height:100vh;position:sticky;top:0;
+  background:linear-gradient(180deg,var(--nav2, #061f25),var(--nav, #082c2f));
+  color:#fff;padding:20px 13px;display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;z-index:10;box-sizing:border-box;
+}
+.brand{
+  min-height:68px;padding:8px 8px 10px;margin:0 2px 9px;
+  display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none;
+}
+.brand-logo{
+  display:block;width:100%;max-width:176px;height:auto;
+  object-fit:contain;box-sizing:border-box;padding:7px 10px;
+  border:1px solid rgba(96,243,165,.18);border-radius:11px;
+  background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(238,251,245,.92));
+  box-shadow:0 5px 14px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.7);
+  filter:none;
+}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{
+  height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;margin:2px 0;
+  color:#c7d8da;text-decoration:none;border-radius:9px;font-size:11.5px;font-weight:600;
+  transition:.18s;box-sizing:border-box;
+}
+.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav a.active{
+  background:linear-gradient(90deg,#138e4f,#1ca35d);color:#fff;
+  box-shadow:inset 3px 0 #68f3a5, 0 4px 14px rgba(26,170,98,.2)
+}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+.side-art{
+  margin-top:auto;height:150px;margin-left:-13px;margin-right:-13px;margin-bottom:-20px;
+  background:linear-gradient(180deg,transparent 0,#052a2d 88%),linear-gradient(135deg,#0c553caa,#061f25 65%);
+  position:relative;overflow:hidden;flex-shrink:0
+}
+.side-art:before{
+  content:"";position:absolute;inset:20px -30px -15px;
+  background:radial-gradient(circle at 60% 50%,#2ac77733,transparent 40%);
+  transform:skewY(-12deg)
+}
+.side-copy{
+  position:absolute;left:25px;bottom:26px;font-size:17px;line-height:1.12;font-weight:800;font-style:italic
+}
+.side-copy:after{
+  content:"";display:block;width:35px;height:3px;background:#31d77c;margin-top:12px
+}
+@media(max-width:880px){
+  .app{grid-template-columns:70px 1fr}
+  .brand-logo{max-width:48px;padding:4px}
+  .nav span,.side-art,.brand-text{display:none}
+  .brand{justify-content:center}
+  .nav a{justify-content:center;padding:0}
+}
+@media(max-width:580px){
+  .app{display:block}
+  aside{display:none}
+}
+
+/* --- UNIFIED COMPACT SIDEBAR & TOPBAR (from SportHub_Dashboard_Compact_Sidebar_Logo_v2.html) --- */
+/* --- UNIFIED COMPACT SIDEBAR & TOPBAR (from SportHub_Dashboard_Compact_Sidebar_Logo_v2.html) --- */
+:root {
+  --nav: #082c2f;
+  --nav2: #061f25;
+  --green: #1aaa62;
+  --green2: #087d48;
+  --mint: #dff7e8;
+  --blue: #1684ef;
+  --orange: #ef9a28;
+  --purple: #7958e9;
+  --ink: #132337;
+  --muted: #728096;
+  --bg: #f2f6f8;
+  --line: #e2e9ed;
+  --card: #fff;
+  --shadow: 0 6px 22px rgba(15,42,52,.07);
+  --shadow-sm: 0 2px 8px rgba(15,42,52,.04);
+}
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+aside {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, var(--nav2, #061f25), var(--nav, #082c2f));
+  color: #fff;
+  padding: 20px 13px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10;
+  box-sizing: border-box;
+}
+.brand {
+  min-height: 68px;
+  padding: 8px 8px 10px;
+  margin: 0 2px 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  text-decoration: none;
+}
+.brand-logo {
+  display: block;
+  width: 100%;
+  max-width: 176px;
+  height: auto;
+  object-fit: contain;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: 1px solid rgba(96, 243, 165, .18);
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .97), rgba(238, 251, 245, .92));
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .7);
+  filter: none;
+}
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav a {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 12px;
+  margin: 2px 0;
+  color: #c7d8da;
+  text-decoration: none;
+  border-radius: 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  transition: .18s;
+  box-sizing: border-box;
+}
+.nav a:hover {
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+}
+.nav a.active {
+  background: linear-gradient(90deg, #138e4f, #1ca35d);
+  color: #fff;
+  box-shadow: inset 3px 0 #68f3a5, 0 4px 14px rgba(26, 170, 98, .2);
+}
+.nav svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  flex: none;
+}
+.side-art {
+  margin-top: auto;
+  height: 150px;
+  margin-left: -13px;
+  margin-right: -13px;
+  margin-bottom: -20px;
+  background: linear-gradient(180deg, transparent 0, #052a2d 88%), linear-gradient(135deg, #0c553caa, #061f25 65%);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.side-art:before {
+  content: "";
+  position: absolute;
+  inset: 20px -30px -15px;
+  background: radial-gradient(circle at 60% 50%, #2ac77733, transparent 40%);
+  transform: skewY(-12deg);
+}
+.side-copy {
+  position: absolute;
+  left: 25px;
+  bottom: 26px;
+  font-size: 17px;
+  line-height: 1.12;
+  font-weight: 800;
+  font-style: italic;
+}
+.side-copy:after {
+  content: "";
+  display: block;
+  width: 35px;
+  height: 3px;
+  background: #31d77c;
+  margin-top: 12px;
+}
+main {
+  min-width: 0;
+}
+.topbar {
+  height: 58px;
+  background: #fff;
+  border-bottom: 1px solid var(--line, #e2e9ed);
+  display: grid;
+  grid-template-columns: 280px minmax(260px, 540px) 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 0 22px;
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  box-sizing: border-box;
+}
+.centername {
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mini-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: #dff7e8;
+  color: #0d8b4f;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 11px;
+  flex: none;
+}
+.search {
+  position: relative;
+}
+.search input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid #dce5ea;
+  background: #f7f9fb;
+  border-radius: 8px;
+  padding: 0 13px 0 35px;
+  font-size: 9.5px;
+  outline: none;
+  box-sizing: border-box;
+}
+.search svg {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: #748297;
+}
+.account {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bell {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  font-size: 17px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: background .2s;
+  padding: 0;
+}
+.bell:hover {
+  background: #f0f4f7;
+}
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #173d2c;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 10px;
+  flex: none;
+}
+.account b {
+  font-size: 10px;
+  color: var(--ink, #132337);
+  display: block;
+}
+.account small {
+  display: block;
+  color: #7f8b9d;
+  font-size: 8px;
+  margin-top: 2px;
+}
+@media(max-width:880px) {
+  .app { grid-template-columns: 70px 1fr; }
+  .brand-logo { max-width: 48px; padding: 4px; }
+  .nav span, .side-art, .brand-text { display: none; }
+  .brand { justify-content: center; }
+  .nav a { justify-content: center; padding: 0; }
+  .topbar { grid-template-columns: 1fr 1.5fr auto; }
+  .centername span, .account>div:last-child { display: none; }
+}
+@media(max-width:580px) {
+  .app { display: block; }
+  aside { display: none; }
+  .topbar { padding: 0 12px; grid-template-columns: 1fr auto; }
+  .centername { display: none; }
+  .search { grid-column: 1; }
+}
+
+/* --- END UNIFIED COMPACT SIDEBAR & TOPBAR --- */
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <a href="SportHub_Dashboard_Compact_Sidebar_Logo_v2.html" class="brand">
+    <img class="brand-logo" src="assets/sporthub-logo.png" alt="SportHub Logo">
+  </a>
+
+  <nav class="nav">
+    <a href="SportHub_Dashboard_Compact_Sidebar_Logo_v2.html"><svg viewBox="0 0 24 24"><path d="M5 5h14v15H5zM8 2v5M16 2v5M8 11h8"/></svg><span>Tổng quan</span></a>
+    <a class="active" href="QuanLyDatSan.html"><svg viewBox="0 0 24 24"><path d="M5 16l3-8 4 4 4-7 3 11M4 19h16"/></svg><span>Đặt sân</span></a>
+    <a href="QuanLyDatSan.html#lich-san"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 9h16M8 3v4M16 3v4"/></svg><span>Lịch sân</span></a>
+    <a href="QuanLySan.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4v16"/></svg><span>Sân thể thao</span></a>
+    <a href="QuanLyKhachHang.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg><span>Khách hàng</span></a>
+    <a href="QuanLyNhanVien.html"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 20c.8-3.6 3.2-5.5 5.5-5.5S13.7 16.4 14.5 20"/><path d="M13 19c.6-2.3 2.2-3.8 4.2-3.8 1.8 0 3.2 1 3.8 2.8"/></svg><span>Nhân viên</span></a>
+    <a href="QuanLyThanhToan.html"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5zM8 4h8v3M8 12h8"/></svg><span>Thanh toán</span></a>
+    <a href="SportHub_QuanLy_KhuyenMai_OneScreen (1).html"><svg viewBox="0 0 24 24"><path d="M4 12l8-8 8 8-8 8zM8 8h.01M16 16h.01M8 16l8-8"/></svg><span>Khuyến mãi</span></a>
+    <a href="SportHub_QuanLy_LichBaoTri_Compact.html"><svg viewBox="0 0 24 24"><path d="M14.7 6.3l3 3m-9.4 8.1l-3.6.7.7-3.6 8.8-8.8 2.9 2.9-8.8 8.8z"/><path d="M12 20h8"/></svg><span>Bảo trì</span></a>
+    <a href="SportHub_BaoCao_ThongKe_Compact_v2.html"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Báo cáo</span></a>
+    <a href="user-permission-dashboard.html"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg><span>Phân quyền</span></a>
+  </nav>
+
+  <div class="side-art"><div class="side-copy">Thể thao<br>kết nối<br>cuộc sống</div></div>
+</aside>
+
+<main>
+<header class="topbar">
+  <div class="centername">
+    <div class="mini-logo">SH</div>
+    <span>Trung tâm Thể thao SportHub</span>
+  </div>
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
+    <input id="q" placeholder="Tìm theo mã đặt sân, tên khách hàng, tên sân...">
+  </div>
+  <div class="account">
+    <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">🔔</button>
+    <div class="avatar">QL</div>
+    <div>
+      <b>Quản lý trung tâm</b>
+      <small>Quản trị viên</small>
+    </div>
+  </div>
+</header>
+
+<div class="content">
+  <div class="pagehead">
+    <div>
+      <div class="crumb">Trang chủ › Dịch vụ đặt sân › Lịch đặt sân</div>
+      <h1>Quản lý đặt sân</h1>
+      <p>Tiếp nhận lịch đặt, xác nhận lịch, quản lý giờ nhận/trả sân và điều phối sân thể thao</p>
+    </div>
+    <button class="btn primary" id="btnNew">＋ Tạo đặt sân</button>
+  </div>
+
+  <section class="summary" id="stats"></section>
+
+  <section class="layout">
+    <div class="card">
+      <div class="head">
+        <h2>Danh sách đặt sân</h2>
+        <div class="tools">
+          <select id="flt"></select>
+          <span class="count" id="cnt"></span>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead id="th"></thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card formcard">
+      <div class="head">
+        <h2>Phiếu đặt sân</h2>
+        <span class="mode" id="mode">Thêm mới</span>
+      </div>
+      <div id="prev"></div>
+      <div class="fields" id="fm"></div>
+      <div class="actions">
+        <button class="btn primary" id="btnSave">Lưu</button>
+        <button class="btn" id="btnClear">Làm mới</button>
+        <button class="btn danger" id="btnDel">Xóa</button>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CFG = {
+  "pk": "MaDat", "prefix": "DS", "status": "TrangThai", "filterk": "TrangThai",
+  "filter": ["Chờ xác nhận", "Đã xác nhận", "Hoàn thành", "Đã hủy"],
+  "cols": [
+    ["MaDat", "Mã đặt"], ["TenKH", "Khách hàng"], ["TenSan", "Sân"],
+    ["NgayDat", "Ngày"], ["Gio", "Khung giờ"],
+    ["TongTien", "Tổng tiền (đ)", "money"], ["TrangThai", "Trạng thái", "badge"]
+  ],
+  "form": [
+    ["MaDat", "Mã đặt sân", "text", true],
+    ["TenKH", "Khách hàng (tìm kiếm)", "search", [
+      "KH001 - Nguyễn Hoàng Nam", "KH002 - Lê Minh Đức", "KH003 - Trần Thanh Hằng",
+      "KH004 - Phạm Gia Huy", "KH005 - Võ Thị Mai Anh", "KH006 - Đỗ Quang Vinh", "KH007 - Bùi Khánh Linh"
+    ]],
+    ["TenSan", "Sân (tìm kiếm)", "search", [
+      "Sân bóng đá 1", "Sân bóng đá 2", "Sân cầu lông 1", "Sân cầu lông 2",
+      "Sân bóng rổ 1", "Sân bóng rổ 2", "Sân pickleball 1", "Sân pickleball 2"
+    ]],
+    ["NgayDat", "Ngày đặt", "date"],
+    ["GioBatDau", "Giờ bắt đầu", "select", [
+      "05:00","05:30","06:00","06:30","07:00","07:30","08:00","08:30","09:00","09:30","10:00",
+      "15:00","16:00","17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30","21:00"
+    ]],
+    ["GioKetThuc", "Giờ kết thúc", "select", [
+      "06:00","06:30","07:00","07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00",
+      "16:00","17:00","18:00","18:30","19:00","19:30","20:00","20:30","21:00","21:30","22:00"
+    ]],
+    ["TongTien", "Tổng tiền (đ)", "number"],
+    ["TrangThai", "Trạng thái", "select", ["Chờ xác nhận", "Đã xác nhận", "Hoàn thành", "Đã hủy"]]
+  ],
+  "rows": [
+    {"MaDat": "DS0101", "TenKH": "Nguyễn Hoàng Nam", "TenSan": "Sân cầu lông 2", "NgayDat": "2026-09-25", "Gio": "08:00 – 10:00", "GioBatDau": "08:00", "GioKetThuc": "10:00", "TongTien": 180000, "TrangThai": "Đã xác nhận"},
+    {"MaDat": "DS0102", "TenKH": "Lê Minh Đức", "TenSan": "Sân bóng rổ 2", "NgayDat": "2026-09-25", "Gio": "09:00 – 10:00", "GioBatDau": "09:00", "GioKetThuc": "10:00", "TongTien": 280000, "TrangThai": "Hoàn thành"},
+    {"MaDat": "DS0103", "TenKH": "Phạm Gia Huy", "TenSan": "Sân bóng đá 2", "NgayDat": "2026-09-25", "Gio": "18:00 – 20:00", "GioBatDau": "18:00", "GioKetThuc": "20:00", "TongTien": 900000, "TrangThai": "Đã xác nhận"},
+    {"MaDat": "DS0104", "TenKH": "Võ Thị Mai Anh", "TenSan": "Sân pickleball 1", "NgayDat": "2026-09-25", "Gio": "19:00 – 20:00", "GioBatDau": "19:00", "GioKetThuc": "20:00", "TongTien": 120000, "TrangThai": "Chờ xác nhận"},
+    {"MaDat": "DS0105", "TenKH": "Trần Thanh Hằng", "TenSan": "Sân cầu lông 1", "NgayDat": "2026-09-26", "Gio": "17:00 – 18:00", "GioBatDau": "17:00", "GioKetThuc": "18:00", "TongTien": 90000, "TrangThai": "Chờ xác nhận"},
+    {"MaDat": "DS0106", "TenKH": "Bùi Khánh Linh", "TenSan": "Sân bóng đá 1", "NgayDat": "2026-09-26", "Gio": "20:00 – 22:00", "GioBatDau": "20:00", "GioKetThuc": "22:00", "TongTien": 600000, "TrangThai": "Đã xác nhận"},
+    {"MaDat": "DS0107", "TenKH": "Đỗ Quang Vinh", "TenSan": "Sân bóng rổ 1", "NgayDat": "2026-09-24", "Gio": "15:00 – 16:00", "GioBatDau": "15:00", "GioKetThuc": "16:00", "TongTien": 200000, "TrangThai": "Đã hủy"}
+  ],
+  "stats": [
+    ["Tổng lượt đặt", "g", "▦", "count", ""],
+    ["Chờ xác nhận", "o", "◷", "if:TrangThai=Chờ xác nhận", ""],
+    ["Đã xác nhận", "b", "✔", "if:TrangThai=Đã xác nhận", ""],
+    ["Tạm tính (đ)", "p", "₫", "sum:TongTien", ""]
+  ],
+  "img": null, "add": "Tạo đặt sân"
+};
+
+const $ = i => document.getElementById(i), C = CFG;
+const BC = {
+  "Trống": "", "Đang sử dụng": "blue", "Bảo trì": "orange",
+  "Đang làm": "", "Nghỉ phép": "orange", "Đã nghỉ": "gray",
+  "Thường": "gray", "Thân thiết": "blue", "VIP": "purple",
+  "Chờ xác nhận": "orange", "Đã xác nhận": "blue", "Hoàn thành": "", "Đã hủy": "gray",
+  "Đã thanh toán": "", "Chờ thanh toán": "orange", "Hoàn tiền": "gray"
+};
+
+let rows = C.rows.slice(), sel = null;
+const money = v => Number(v).toLocaleString('vi-VN');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function fmt(c, v) {
+  if (v == null) return '';
+  if (c[2] == 'money') return money(v) + ' đ';
+  if (c[0] == 'NgayDat' || c[0] == 'NgayTT') return v.split('-').reverse().join('/');
+  if (c[2] == 'badge') return '<span class="badge ' + (BC[v] || '') + '">' + esc(v) + '</span>';
+  return esc(v);
+}
+
+function initHeaders() {
+  if ($('th')) {
+    $('th').innerHTML = '<tr>' + C.cols.map(c => '<th>' + esc(c[1]) + '</th>').join('') + '</tr>';
+  }
+}
+
+function stats() {
+  $('stats').innerHTML = C.stats.map(s => {
+    let [l, cl, ic, calc] = s, v;
+    if (calc == 'count') v = rows.length;
+    else if (calc.startsWith('if:')) {
+      let [k, x] = calc.slice(3).split('=');
+      v = rows.filter(r => r[k] == x).length;
+    } else if (calc.startsWith('sumif:')) {
+      let [, k, f] = calc.split(':'), [fk, fv] = f.split('=');
+      v = money(rows.filter(r => r[fk] == fv).reduce((a, r) => a + Number(r[k] || 0), 0)) + ' đ';
+    } else {
+      v = money(rows.reduce((a, r) => a + Number(r[calc.slice(4)] || 0), 0)) + ' đ';
+    }
+    return '<div class="metric"><div class="metric-icon ' + cl + '">' + ic + '</div><div><label>' + l + '</label><strong>' + v + '</strong></div></div>';
+  }).join('');
+}
+
+function draw() {
+  const q = $('q').value.toLowerCase().trim(), f = $('flt').value;
+  const list = rows.filter(r => (!f || r[C.filterk] == f) && (!q || Object.values(r).join(' ').toLowerCase().includes(q)));
+  $('tb').innerHTML = list.length
+    ? list.map(r => '<tr data-id="' + r[C.pk] + '" class="' + (r[C.pk] == sel ? 'sel' : '') + '">' + C.cols.map(c => '<td>' + fmt(c, r[c[0]]) + '</td>').join('') + '</tr>').join('')
+    : '<tr><td class="empty" colspan="' + C.cols.length + '">Không có dữ liệu phù hợp</td></tr>';
+  $('cnt').textContent = list.length + ' / ' + rows.length + ' bản ghi';
+  stats();
+}
+
+function nextId() {
+  const n = rows.map(r => parseInt(String(r[C.pk]).replace(/\D/g, '')) || 0);
+  const m = Math.max(0, ...n);
+  const w = String(rows[0] ? rows[0][C.pk] : C.prefix + '00').replace(/\D/g, '').length;
+  return C.prefix + String(m + 1).padStart(w, '0');
+}
+
+function form(r) {
+  sel = r ? r[C.pk] : null;
+  const v = r ? Object.assign({}, r) : {};
+  if (!r) v[C.pk] = nextId();
+  $('mode').textContent = r ? 'Chỉnh sửa' : 'Thêm mới';
+  $('fm').innerHTML = C.form.map(([k, l, t, ro]) => {
+    const opts = Array.isArray(ro) ? ro : [];
+    const val = v[k] ?? '';
+    let inp;
+    if (t == 'select') {
+      inp = '<select id="f_' + k + '">' + opts.map(x => '<option' + (x == val ? ' selected' : '') + '>' + esc(x) + '</option>').join('') + '</select>';
+    } else if (t == 'search') {
+      inp = '<input id="f_' + k + '" list="list_' + k + '" value="' + esc(val) + '" placeholder="Nhập để tìm kiếm..."><datalist id="list_' + k + '">' + opts.map(x => '<option value="' + esc(x) + '"></option>').join('') + '</datalist>';
+    } else {
+      inp = '<input id="f_' + k + '" type="' + t + '" value="' + esc(val) + '"' + (ro === true ? ' readonly' : '') + '>';
+    }
+    return '<div class="field"><label>' + l + '</label>' + inp + '</div>';
+  }).join('');
+  draw();
+}
+
+function toast(m) {
+  const t = $('toast');
+  t.textContent = m;
+  t.classList.add('on');
+  clearTimeout(t.h);
+  t.h = setTimeout(() => t.classList.remove('on'), 2000);
+}
+
+$('flt').innerHTML = '<option value="">Tất cả trạng thái đặt</option>' + C.filter.map(x => '<option>' + x + '</option>').join('');
+$('q').oninput = $('flt').onchange = draw;
+$('tb').onclick = e => {
+  const tr = e.target.closest('tr[data-id]');
+  if (tr) form(rows.find(r => r[C.pk] == tr.dataset.id));
+};
+
+$('btnNew').onclick = $('btnClear').onclick = () => form(null);
+
+$('btnSave').onclick = () => {
+  const o = {};
+  C.form.forEach(([k,, t]) => {
+    let v = $('f_' + k).value;
+    o[k] = t == 'number' ? Number(v) : v;
+  });
+  const req = C.form[1][0];
+  if (!String(o[req]).trim()) {
+    toast('Vui lòng chọn khách hàng');
+    return;
+  }
+  // Auto format Gio display
+  if (o.GioBatDau && o.GioKetThuc) {
+    o.Gio = o.GioBatDau + ' – ' + o.GioKetThuc;
+  }
+  // Normalize clean TenKH if from datalist
+  if (o.TenKH && o.TenKH.includes(' - ')) {
+    o.TenKH = o.TenKH.split(' - ')[1];
+  }
+  const i = rows.findIndex(r => r[C.pk] == o[C.pk]);
+  if (i >= 0) {
+    rows[i] = o;
+    toast('Đã cập nhật phiếu đặt ' + o[C.pk]);
+  } else {
+    rows.push(o);
+    toast('Đã tạo thành công phiếu đặt ' + o[C.pk]);
+  }
+  sel = o[C.pk];
+  form(o);
+};
+
+$('btnDel').onclick = () => {
+  if (!sel) {
+    toast('Vui lòng chọn một phiếu đặt sân để xóa');
+    return;
+  }
+  if (confirm('Bạn có chắc muốn xóa phiếu đặt ' + sel + '?')) {
+    rows = rows.filter(r => r[C.pk] != sel);
+    toast('Đã xóa phiếu đặt ' + sel);
+    form(null);
+  }
+};
+
+initHeaders();
+form(null);
+</script>
+
+<script>
+// Sync active tab between Đặt sân & Lịch sân
+(function(){
+  function syncActiveTab(){
+    var isLich = window.location.hash === '#lich-san';
+    var navLinks = document.querySelectorAll('aside .nav a');
+    navLinks.forEach(function(a){ a.classList.remove('active'); });
+    if(isLich){
+      var lichLink = document.querySelector('aside .nav a[href*="#lich-san"]');
+      if(lichLink) lichLink.classList.add('active');
+    } else {
+      var datLink = document.querySelector('aside .nav a[href="QuanLyDatSan.html"]');
+      if(datLink) datLink.classList.add('active');
+    }
+  }
+  window.addEventListener('hashchange', syncActiveTab);
+  syncActiveTab();
+})();
+</script>
+
+</body>
+</html>

@@ -56,12 +56,12 @@ INSERT INTO [dbo].[VAITROCHUCNANG] ([MaVaiTro], [MaCN]) VALUES
 -- 2. TÀI KHOẢN NGƯỜI DÙNG (MẬT KHẨU: 12345678)
 -- ========================================================
 INSERT INTO [dbo].[TAIKHOAN] ([MaTK], [TenDangNhap], [MatKhau], [Email], [TrangThai]) VALUES
-('TK001', 'admin',     '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi58cvs4xX1k42G3sBfO95vL.fK/k2q', 'admin@sporthub.vn',    N'Hoạt động'),
-('VT001', 'manager',   '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi58cvs4xX1k42G3sBfO95vL.fK/k2q', 'manager@sporthub.vn',  N'Hoạt động'),
-('TK002', 'letan01',   '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi58cvs4xX1k42G3sBfO95vL.fK/k2q', 'letan@sporthub.vn',    N'Hoạt động'),
-('TK003', 'vanhanh01', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi58cvs4xX1k42G3sBfO95vL.fK/k2q', 'vanhanh@sporthub.vn',  N'Hoạt động'),
-('TK004', 'minhanh',   '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi58cvs4xX1k42G3sBfO95vL.fK/k2q', 'minhanh@gmail.com',    N'Hoạt động'),
-('TK005', 'quocthuy',  '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi58cvs4xX1k42G3sBfO95vL.fK/k2q', 'quocthuy@gmail.com',   N'Hoạt động');
+('TK001', 'admin',     '$2a$10$5mj9bFipI7qxCmW8HsHqGeOlynJMCCBb4xRA7PpU1zRaGrz6h3m0C', 'admin@sporthub.vn',    N'Hoạt động'),
+('VT001', 'manager',   '$2a$10$5mj9bFipI7qxCmW8HsHqGeOlynJMCCBb4xRA7PpU1zRaGrz6h3m0C', 'manager@sporthub.vn',  N'Hoạt động'),
+('TK002', 'letan01',   '$2a$10$5mj9bFipI7qxCmW8HsHqGeOlynJMCCBb4xRA7PpU1zRaGrz6h3m0C', 'letan@sporthub.vn',    N'Hoạt động'),
+('TK003', 'vanhanh01', '$2a$10$5mj9bFipI7qxCmW8HsHqGeOlynJMCCBb4xRA7PpU1zRaGrz6h3m0C', 'vanhanh@sporthub.vn',  N'Hoạt động'),
+('TK004', 'minhanh',   '$2a$10$5mj9bFipI7qxCmW8HsHqGeOlynJMCCBb4xRA7PpU1zRaGrz6h3m0C', 'minhanh@gmail.com',    N'Hoạt động'),
+('TK005', 'quocthuy',  '$2a$10$5mj9bFipI7qxCmW8HsHqGeOlynJMCCBb4xRA7PpU1zRaGrz6h3m0C', 'quocthuy@gmail.com',   N'Hoạt động');
 
 INSERT INTO [dbo].[TAIKHOANVAITRO] ([MaTK], [MaVaiTro]) VALUES
 ('TK001', 'VT_ADMIN'),

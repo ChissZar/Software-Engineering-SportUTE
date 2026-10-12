@@ -22,6 +22,14 @@ public class CustomerBookingController {
         this.sportService = sportService;
     }
 
+    @GetMapping({"", "/", "/dashboard"})
+    public String dashboardPage(Model model, Authentication authentication) {
+        String customerName = (authentication != null) ? authentication.getName() : "Nguyễn Minh Anh";
+        model.addAttribute("currentUserName", customerName);
+        model.addAttribute("sports", sportService.getAllSports());
+        return "customer/dashboard";
+    }
+
     @GetMapping("/booking")
     public String bookingPage(@ModelAttribute("filter") CustomerCourtFilterDTO filter,
                               Model model,

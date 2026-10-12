@@ -1,7 +1,16 @@
 package vn.edu.ute.sportute.controller;
-/** Ho so khach hang; khach tai quay co the khong co tai khoan.
- * TODO: them @Controller, route, validation va goi CustomerService.
- * Khong truy cap repository truc tiep; chua co endpoint hoat dong.
- */
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/** Ho so khach hang. */
+@Controller
+@RequestMapping("/admin/customers")
 public class CustomerController {
+
+    @GetMapping
+    public String index() {
+        return "customers/index";
+    }
 }

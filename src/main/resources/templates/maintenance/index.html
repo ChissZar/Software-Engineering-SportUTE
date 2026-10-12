@@ -1,151 +1,614 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>SportHub - Quản lý lịch bảo trì</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; }
-        .card-panel { border: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SportHub — Quản lý lịch bảo trì</title>
+<style>
+:root{
+  --nav:#082c2f;--nav2:#061f25;--green:#1aaa62;--green2:#087d48;
+  --mint:#dff7e8;--blue:#1684ef;--orange:#ef9a28;--purple:#7958e9;
+  --ink:#132337;--muted:#728096;--bg:#f2f6f8;--line:#e2e9ed;
+  --card:#fff;--shadow:0 6px 22px rgba(15,42,52,.07);--shadow-sm:0 2px 8px rgba(15,42,52,.04)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
+button,input,select,textarea{font:inherit}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{
+  height:100vh;position:sticky;top:0;background:linear-gradient(180deg,var(--nav2),var(--nav));
+  color:#fff;padding:20px 13px;display:flex;flex-direction:column;overflow-y:auto;z-index:10;box-sizing:border-box
+}
+.brand{
+  min-height:64px;padding:6px 10px 12px;margin:0 0 10px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none
+}
+.brand-icon{
+  width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green2),var(--green));
+  color:#fff;display:grid;place-items:center;font-weight:900;font-size:16px;flex:none;
+  box-shadow:0 4px 12px rgba(26,170,98,.3)
+}
+.brand-text b{font-size:15px;color:#fff;display:block;letter-spacing:-.3px;line-height:1.2}
+.brand-text small{font-size:8.5px;color:#38e28c;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-title{font-size:8.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px;font-weight:800;padding:10px 12px 4px}
+.nav a{
+  height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;margin:2px 0;color:#c7d8da;
+  text-decoration:none;border-radius:9px;font-size:12px;font-weight:600;transition:.18s
+}
+.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav a.active{
+  background:linear-gradient(90deg,#138e4f,#1ca35d);color:#fff;
+  box-shadow:inset 3px 0 #68f3a5,0 4px 14px rgba(26,170,98,.2)
+}
+.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+.side-art{
+  margin-top:auto;height:140px;margin-left:-13px;margin-right:-13px;margin-bottom:-20px;
+  background:linear-gradient(180deg,transparent 0,#052a2d 88%),linear-gradient(135deg,#0c553caa,#061f25 65%);
+  position:relative;overflow:hidden;flex-shrink:0
+}
+.side-art:before{
+  content:"";position:absolute;inset:20px -30px -15px;
+  background:radial-gradient(circle at 60% 50%,#2ac77733,transparent 40%);transform:skewY(-12deg)
+}
+.side-copy{position:absolute;left:22px;bottom:26px;font-size:16px;line-height:1.2;font-weight:800;font-style:italic;color:#e8f8ef}
+.side-copy:after{content:"";display:block;width:32px;height:3px;background:#31d77c;margin-top:10px}
+
+main{min-width:0}
+.topbar{
+  height:60px;background:#fff;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:300px minmax(260px,560px) 1fr;
+  align-items:center;gap:20px;padding:0 24px;position:sticky;top:0;z-index:9
+}
+.centername{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:10px}
+.centername .badge-org{
+  width:28px;height:28px;border-radius:8px;background:var(--mint);color:var(--green2);
+  display:grid;place-items:center;font-weight:900;font-size:11px
+}
+.search{position:relative}
+.search input{
+  width:100%;height:38px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:9px;
+  padding:0 14px 0 38px;font-size:12px;outline:none;transition:.2s
+}
+.search input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
+.search svg{position:absolute;left:13px;top:11px;width:15px;height:15px;fill:none;stroke:#748297;stroke-width:1.8}
+.account{justify-self:end;display:flex;align-items:center;gap:11px}
+.avatar{
+  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0e4b36,#199c58);
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:11.5px;
+  box-shadow:0 3px 10px rgba(14,75,54,.2)
+}
+.account b{font-size:12px;color:var(--ink);display:block}
+.account small{display:block;color:var(--green2);font-size:9.5px;font-weight:700;margin-top:1px}
+
+.content{max-width:1540px;margin:auto;padding:16px 22px 30px}
+.pagehead{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;
+  padding:18px 24px;border-radius:14px;
+  background:linear-gradient(90deg,#fff 0%,#f8fffb 55%,#dff7e8 100%);
+  border:1px solid var(--line);box-shadow:var(--shadow-sm)
+}
+.crumb{font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:700;letter-spacing:.3px}
+.pagehead h1{margin:0 0 3px;font-size:24px;letter-spacing:-.6px;color:#0b3b28}
+.pagehead p{margin:0;color:#5a6e64;font-size:12px}
+
+.btn{
+  height:36px;padding:0 16px;border:1px solid #d8e3dc;background:#fff;border-radius:8px;
+  font-weight:800;font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;gap:6px;transition:.18s;text-decoration:none;color:var(--ink)
+}
+.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.btn.primary{
+  background:linear-gradient(90deg,#087a42,#17a45b);color:#fff;border:0;
+  box-shadow:0 6px 16px rgba(26,170,98,.25)
+}
+.btn.primary:hover{box-shadow:0 8px 20px rgba(26,170,98,.35)}
+.btn.danger{color:#c0392b;border-color:#fecaca}
+.btn.danger:hover{background:#feecec;border-color:#f87171}
+.btn.danger-sm{background:#feecec;color:#c0392b;border-color:#fecaca;padding:0 10px;height:28px;font-size:11px}
+
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
+.metric{
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+  display:flex;gap:13px;align-items:center;box-shadow:var(--shadow-sm);min-height:86px;
+  transition:.2s
+}
+.metric:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.metric-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex:none}
+.g{background:var(--mint);color:#0d8a4e}
+.b{background:#bfe0ff;color:#096bc4}
+.o{background:#ffe1a8;color:#bb6e00}
+.p{background:#ddcfff;color:#6642c6}
+.metric label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.metric strong{display:block;font-size:22px;margin-top:2px;color:var(--ink);letter-spacing:-.5px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow-sm)}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.head h2{font-size:13.5px;margin:0;font-weight:800;color:var(--ink)}
+.tools{display:flex;align-items:center;gap:10px}
+.tools select{border:1px solid var(--line);border-radius:7px;padding:6px 10px;background:#fbfcfd;color:#536176;font-size:11.5px;outline:none}
+.count{font-size:10.5px;color:var(--muted);font-weight:700}
+
+.tablewrap{overflow:auto;border:1px solid #edf1f3;border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:620px}
+th{
+  text-align:left;background:#f5f8fa;color:#617084;font-size:10.5px;font-weight:800;
+  padding:10px 12px;white-space:nowrap;border-bottom:1px solid #e5ebef;text-transform:uppercase;letter-spacing:.5px
+}
+td{font-size:12px;padding:10px 12px;border-bottom:1px solid #edf1f3;white-space:nowrap}
+tbody tr{cursor:pointer;transition:.15s}
+tbody tr:hover{background:#f7fbf9}
+.empty{text-align:center;color:var(--muted);padding:28px;font-size:12px}
+
+.badge{padding:4px 9px;border-radius:7px;font-size:10px;font-weight:800;display:inline-block}
+.status-maint{background:#ffe1b7;color:#b86e0d}
+.status-done{background:#c9f1d5;color:#087a42}
+
+.formcard{position:sticky;top:74px}
+.mode{font-size:10px;font-weight:800;padding:4px 8px;border-radius:6px;background:var(--mint);color:var(--green2)}
+.fields{display:grid;gap:10px}
+.field label{display:block;font-size:10.5px;font-weight:800;color:#4b5a6e;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.field input,.field select,.field textarea{
+  width:100%;border:1px solid #dce5ea;background:#f7f9fb;border-radius:8px;
+  padding:8px 11px;font-size:12px;outline:none;transition:.18s;box-sizing:border-box
+}
+.field input,.field select{height:36px}
+.field textarea{height:70px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
+.actions{display:grid;grid-template-columns:1.5fr 1fr;gap:8px;margin-top:14px}
+.actions .btn{padding:0}
+
+.alert{padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;font-weight:700}
+.alert-success{background:#e8f8ef;color:#087a42;border:1px solid #b9eecd}
+.alert-danger{background:#feecec;color:#c0392b;border:1px solid #fecaca}
+
+@media(max-width:980px){.layout{grid-template-columns:1fr}.formcard{position:static}}
+@media(max-width:580px){.app{display:block}aside{display:none}.content{padding:12px}.summary{grid-template-columns:1fr 1fr}}
+/* --- UNIFIED COMPACT SIDEBAR & TOPBAR (from SportHub_Dashboard_Compact_Sidebar_Logo_v2.html) --- */
+/* --- UNIFIED COMPACT SIDEBAR & TOPBAR (from SportHub_Dashboard_Compact_Sidebar_Logo_v2.html) --- */
+:root {
+  --nav: #082c2f;
+  --nav2: #061f25;
+  --green: #1aaa62;
+  --green2: #087d48;
+  --mint: #dff7e8;
+  --blue: #1684ef;
+  --orange: #ef9a28;
+  --purple: #7958e9;
+  --ink: #132337;
+  --muted: #728096;
+  --bg: #f2f6f8;
+  --line: #e2e9ed;
+  --card: #fff;
+  --shadow: 0 6px 22px rgba(15,42,52,.07);
+  --shadow-sm: 0 2px 8px rgba(15,42,52,.04);
+}
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+aside {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, var(--nav2, #061f25), var(--nav, #082c2f));
+  color: #fff;
+  padding: 20px 13px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10;
+  box-sizing: border-box;
+}
+.brand {
+  min-height: 68px;
+  padding: 8px 8px 10px;
+  margin: 0 2px 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  text-decoration: none;
+}
+.brand-logo {
+  display: block;
+  width: 100%;
+  max-width: 176px;
+  height: auto;
+  object-fit: contain;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: 1px solid rgba(96, 243, 165, .18);
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .97), rgba(238, 251, 245, .92));
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .7);
+  filter: none;
+}
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav a {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 12px;
+  margin: 2px 0;
+  color: #c7d8da;
+  text-decoration: none;
+  border-radius: 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  transition: .18s;
+  box-sizing: border-box;
+}
+.nav a:hover {
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+}
+.nav a.active {
+  background: linear-gradient(90deg, #138e4f, #1ca35d);
+  color: #fff;
+  box-shadow: inset 3px 0 #68f3a5, 0 4px 14px rgba(26, 170, 98, .2);
+}
+.nav svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  flex: none;
+}
+.side-art {
+  margin-top: auto;
+  height: 150px;
+  margin-left: -13px;
+  margin-right: -13px;
+  margin-bottom: -20px;
+  background: linear-gradient(180deg, transparent 0, #052a2d 88%), linear-gradient(135deg, #0c553caa, #061f25 65%);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.side-art:before {
+  content: "";
+  position: absolute;
+  inset: 20px -30px -15px;
+  background: radial-gradient(circle at 60% 50%, #2ac77733, transparent 40%);
+  transform: skewY(-12deg);
+}
+.side-copy {
+  position: absolute;
+  left: 25px;
+  bottom: 26px;
+  font-size: 17px;
+  line-height: 1.12;
+  font-weight: 800;
+  font-style: italic;
+}
+.side-copy:after {
+  content: "";
+  display: block;
+  width: 35px;
+  height: 3px;
+  background: #31d77c;
+  margin-top: 12px;
+}
+main {
+  min-width: 0;
+}
+.topbar {
+  height: 58px;
+  background: #fff;
+  border-bottom: 1px solid var(--line, #e2e9ed);
+  display: grid;
+  grid-template-columns: 280px minmax(260px, 540px) 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 0 22px;
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  box-sizing: border-box;
+}
+.centername {
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mini-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: #dff7e8;
+  color: #0d8b4f;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 11px;
+  flex: none;
+}
+.search {
+  position: relative;
+}
+.search input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid #dce5ea;
+  background: #f7f9fb;
+  border-radius: 8px;
+  padding: 0 13px 0 35px;
+  font-size: 9.5px;
+  outline: none;
+  box-sizing: border-box;
+}
+.search svg {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: #748297;
+}
+.account {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bell {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  font-size: 17px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: background .2s;
+  padding: 0;
+}
+.bell:hover {
+  background: #f0f4f7;
+}
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #173d2c;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 10px;
+  flex: none;
+}
+.account b {
+  font-size: 10px;
+  color: var(--ink, #132337);
+  display: block;
+}
+.account small {
+  display: block;
+  color: #7f8b9d;
+  font-size: 8px;
+  margin-top: 2px;
+}
+@media(max-width:880px) {
+  .app { grid-template-columns: 70px 1fr; }
+  .brand-logo { max-width: 48px; padding: 4px; }
+  .nav span, .side-art, .brand-text { display: none; }
+  .brand { justify-content: center; }
+  .nav a { justify-content: center; padding: 0; }
+  .topbar { grid-template-columns: 1fr 1.5fr auto; }
+  .centername span, .account>div:last-child { display: none; }
+}
+@media(max-width:580px) {
+  .app { display: block; }
+  aside { display: none; }
+  .topbar { padding: 0 12px; grid-template-columns: 1fr auto; }
+  .centername { display: none; }
+  .search { grid-column: 1; }
+}
+
+/* --- END UNIFIED COMPACT SIDEBAR & TOPBAR --- */
+</style>
 </head>
-<body class="d-flex">
+<body>
+<div class="app">
+<aside>
+  <a href="/admin/dashboard" class="brand">
+    <img class="brand-logo" src="/images/sporthub-logo.png" alt="SportHub Logo">
+  </a>
 
-    <!-- Sidebar -->
-    <div th:replace="~{fragments/sidebar :: sidebar('maintenance')}"></div>
+  <nav class="nav">
+    <a href="/admin/dashboard"><svg viewBox="0 0 24 24"><path d="M5 5h14v15H5zM8 2v5M16 2v5M8 11h8"/></svg><span>Tổng quan</span></a>
+    <a href="/admin/bookings"><svg viewBox="0 0 24 24"><path d="M5 16l3-8 4 4 4-7 3 11M4 19h16"/></svg><span>Đặt sân</span></a>
+    <a href="/admin/bookings?view=schedule"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 9h16M8 3v4M16 3v4"/></svg><span>Lịch sân</span></a>
+    <a href="/admin/courts"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4v16"/></svg><span>Sân thể thao</span></a>
+    <a href="/admin/customers"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg><span>Khách hàng</span></a>
+    <a href="/admin/employees"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 20c.8-3.6 3.2-5.5 5.5-5.5S13.7 16.4 14.5 20"/><path d="M13 19c.6-2.3 2.2-3.8 4.2-3.8 1.8 0 3.2 1 3.8 2.8"/></svg><span>Nhân viên</span></a>
+    <a href="/admin/payments"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5zM8 4h8v3M8 12h8"/></svg><span>Thanh toán</span></a>
+    <a href="/admin/promotions"><svg viewBox="0 0 24 24"><path d="M4 12l8-8 8 8-8 8zM8 8h.01M16 16h.01M8 16l8-8"/></svg><span>Khuyến mãi</span></a>
+    <a class="active" href="/admin/maintenance"><svg viewBox="0 0 24 24"><path d="M14.7 6.3l3 3m-9.4 8.1l-3.6.7.7-3.6 8.8-8.8 2.9 2.9-8.8 8.8z"/><path d="M12 20h8"/></svg><span>Bảo trì</span></a>
+    <a href="/admin/reports"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Báo cáo</span></a>
+    <a href="/admin/permissions"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg><span>Phân quyền</span></a>
+  </nav>
 
-    <!-- Nội dung chính -->
-    <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
-        
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4 class="fw-bold mb-0">Quản lý lịch bảo trì</h4>
-                <small class="text-muted">Lập kế hoạch, theo dõi và quản lý các khoảng thời gian bảo dưỡng sân</small>
-            </div>
-            <button type="button" class="btn btn-success rounded-3" data-bs-toggle="modal" data-bs-target="#createMaintenanceModal">
-                <i class="fa-solid fa-plus me-1"></i> Tạo lịch bảo trì
-            </button>
-        </div>
+  <div class="side-art"><div class="side-copy">Thể thao<br>kết nối<br>cuộc sống</div></div>
+</aside>
 
-        <!-- Thông báo Flash Messages -->
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${errorMessage}"></div>
-
-        <!-- KPI / Thống kê -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <div class="card card-panel p-3 bg-white d-flex flex-row align-items-center gap-3">
-                    <div class="p-3 bg-light rounded-circle text-primary fs-4"><i class="fa-solid fa-list-check"></i></div>
-                    <div>
-                        <div class="text-muted" style="font-size: 13px;">Tổng số lịch</div>
-                        <h4 class="fw-bold m-0" th:text="${stats.total}">0</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card card-panel p-3 bg-white d-flex flex-row align-items-center gap-3">
-                    <div class="p-3 bg-light rounded-circle text-warning fs-4"><i class="fa-solid fa-person-digging"></i></div>
-                    <div>
-                        <div class="text-muted" style="font-size: 13px;">Đang bảo trì hôm nay</div>
-                        <h4 class="fw-bold m-0" th:text="${stats.inProgress}">0</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card card-panel p-3 bg-white d-flex flex-row align-items-center gap-3">
-                    <div class="p-3 bg-light rounded-circle text-info fs-4"><i class="fa-regular fa-clock"></i></div>
-                    <div>
-                        <div class="text-muted" style="font-size: 13px;">Lịch sắp tới</div>
-                        <h4 class="fw-bold m-0" th:text="${stats.upcoming}">0</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bảng danh sách lịch bảo trì -->
-        <div class="card card-panel bg-white p-3">
-            <h6 class="fw-bold mb-3">Danh sách lịch bảo trì sân</h6>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light" style="font-size: 13px;">
-                        <tr>
-                            <th>Mã bảo trì</th>
-                            <th>Sân bảo trì</th>
-                            <th>Người phụ trách</th>
-                            <th>Bắt đầu</th>
-                            <th>Kết thúc</th>
-                            <th>Lý do bảo dưỡng</th>
-                            <th class="text-end">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody style="font-size: 14px;">
-                        <tr th:each="m : ${maintenances}">
-                            <td class="fw-bold text-success" th:text="${m.id}"></td>
-                            <td th:text="${m.courtName}"></td>
-                            <td th:text="${m.employeeName}"></td>
-                            <td th:text="${#temporals.format(m.startDate, 'dd/MM/yyyy HH:mm')}"></td>
-                            <td th:text="${#temporals.format(m.endDate, 'dd/MM/yyyy HH:mm')}"></td>
-                            <td th:text="${m.reason}"></td>
-                            <td class="text-end">
-                                <form th:action="@{/admin/maintenance/delete/{id}(id=${m.id})}" method="post" class="d-inline"
-                                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy lịch bảo trì này?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fa-regular fa-trash-can"></i> Xóa
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(maintenances)}">
-                            <td colspan="7" class="text-center py-4 text-muted">Chưa có lịch bảo trì nào.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+<main>
+<header class="topbar">
+  <div class="centername">
+    <div class="mini-logo">SH</div>
+    <span>Trung tâm Thể thao SportHub</span>
+  </div>
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
+    <input id="maintSearch" placeholder="Tìm lịch bảo trì theo mã, tên sân, nhân viên, lý do..." onkeyup="filterMaint()">
+  </div>
+  <div class="account">
+    <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">🔔</button>
+    <div class="avatar">QL</div>
+    <div>
+      <b>Quản lý trung tâm</b>
+      <small>Quản trị viên</small>
     </div>
+  </div>
+</header>
 
-    <!-- Modal Tạo lịch bảo trì -->
-    <div class="modal fade" id="createMaintenanceModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form th:action="@{/admin/maintenance/save}" th:object="${maintenanceDTO}" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Tạo lịch bảo trì mới</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label" style="font-size: 13px;">Sân cần bảo dưỡng (*)</label>
-                            <select th:field="*{courtId}" class="form-select" required>
-                                <option value="" disabled selected>-- Chọn sân --</option>
-                                <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'"></option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" style="font-size: 13px;">Thời gian bắt đầu (*)</label>
-                            <input type="datetime-local" th:field="*{startDate}" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" style="font-size: 13px;">Thời gian kết thúc (*)</label>
-                            <input type="datetime-local" th:field="*{endDate}" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" style="font-size: 13px;">Lý do / Nội dung bảo trì (*)</label>
-                            <textarea th:field="*{reason}" class="form-control" rows="3" placeholder="Ví dụ: Thay thảm, bảo dưỡng đèn chiếu..." required></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-success">Xác nhận tạo lịch</button>
-                    </div>
+<div class="content">
+  <!-- Flash Message -->
+  <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+  <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+  <div class="pagehead">
+    <div>
+      <div class="crumb">Trang chủ › Cơ sở vật chất › Lịch bảo trì</div>
+      <h1>Quản lý lịch bảo trì</h1>
+      <p>Lập kế hoạch, theo dõi bảo dưỡng cơ sở vật chất và khóa tạm thời các sân đang sửa chữa</p>
+    </div>
+    <a href="/admin/maintenance" class="btn primary">＋ Tạo lịch bảo trì</a>
+  </div>
+
+  <!-- THỐNG KÊ -->
+  <section class="summary">
+    <div class="metric">
+      <div class="metric-icon g">📋</div>
+      <div>
+        <label>Tổng số lịch bảo trì</label>
+        <strong th:text="${stats != null and stats['total'] != null ? stats['total'] : (maintenances != null ? #lists.size(maintenances) : 0)}">0</strong>
+      </div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon o">🔧</div>
+      <div>
+        <label>Đang bảo trì</label>
+        <strong th:text="${stats != null and stats['inProgress'] != null ? stats['inProgress'] : 0}">0</strong>
+      </div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon p">⚠</div>
+      <div>
+        <label>Lịch sắp tới</label>
+        <strong th:text="${stats != null and stats['upcoming'] != null ? stats['upcoming'] : 0}">0</strong>
+      </div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon b">✓</div>
+      <div>
+        <label>Tổng số sân</label>
+        <strong style="font-size:18px;color:var(--green2)" th:text="${courts != null ? #lists.size(courts) : 0}">0</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- DANH SÁCH & FORM -->
+  <section class="layout">
+    <div class="card">
+      <div class="head">
+        <h2>Danh sách lịch bảo trì</h2>
+        <span class="count" th:text="${maintenances != null ? #lists.size(maintenances) : 0} + ' lịch ghi nhận'"></span>
+      </div>
+      <div class="tablewrap">
+        <table id="maintTable">
+          <thead>
+            <tr>
+              <th>Mã</th>
+              <th>Sân</th>
+              <th>Nhân viên</th>
+              <th>Thời gian bắt đầu</th>
+              <th>Thời gian kết thúc</th>
+              <th>Lý do bảo trì</th>
+              <th style="text-align:right">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="m : ${maintenances}">
+              <td style="font-weight:800;color:#087a42" th:text="${m.id}"></td>
+              <td style="font-weight:700" th:text="${m.courtName}"></td>
+              <td th:text="${m.employeeName}"></td>
+              <td th:text="${m.startDate != null ? #temporals.format(m.startDate, 'dd/MM/yyyy HH:mm') : ''}"></td>
+              <td th:text="${m.endDate != null ? #temporals.format(m.endDate, 'dd/MM/yyyy HH:mm') : ''}"></td>
+              <td th:text="${m.reason}"></td>
+              <td style="text-align:right">
+                <form th:action="@{/admin/maintenance/delete/{id}(id=${m.id})}" method="post" style="display:inline"
+                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch bảo trì này và mở lại sân?');">
+                  <button type="submit" class="btn danger-sm">Xóa / Hoàn tất</button>
                 </form>
-            </div>
-        </div>
+              </td>
+            </tr>
+            <tr th:if="${maintenances == null or #lists.isEmpty(maintenances)}">
+              <td colspan="7" class="empty">Hiện tại không có lịch bảo trì nào.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FORM TẠO LỊCH BẢO TRÌ -->
+    <div class="card formcard">
+      <div class="head">
+        <h2>Lập lịch bảo trì</h2>
+        <span class="mode">Tạo mới</span>
+      </div>
+
+      <form th:action="@{/admin/maintenance/save}" th:object="${maintenanceDTO}" method="post">
+        <div class="fields">
+          <div class="field">
+            <label>Sân cần bảo trì (*)</label>
+            <select th:field="*{courtId}" required>
+              <option value="" disabled selected>-- Chọn sân bảo trì --</option>
+              <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'"></option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Thời gian bắt đầu (*)</label>
+            <input type="datetime-local" th:field="*{startDate}" required>
+          </div>
+
+          <div class="field">
+            <label>Thời gian kết thúc (*)</label>
+            <input type="datetime-local" th:field="*{endDate}" required>
+          </div>
+
+          <div class="field">
+            <label>Lý do / Nội dung bảo trì (*)</label>
+            <textarea th:field="*{reason}" placeholder="Ví dụ: Thay lưới, sửa đèn chiếu sáng, vệ sinh mặt sàn..." required></textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn primary">Tạo lịch bảo trì</button>
+          <a href="/admin/maintenance" class="btn">Làm mới</a>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+</main>
+</div>
+
+<script>
+function filterMaint() {
+  const q = document.getElementById('maintSearch').value.toLowerCase().trim();
+  const rows = document.querySelectorAll('#maintTable tbody tr');
+  rows.forEach(r => {
+    const text = r.textContent.toLowerCase();
+    r.style.display = (!q || text.includes(q)) ? '' : 'none';
+  });
+}
+</script>
 </body>
 </html>

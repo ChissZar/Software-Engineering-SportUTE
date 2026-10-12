@@ -1,7 +1,16 @@
 package vn.edu.ute.sportute.controller;
-/** Bao cao thu rong, luot thue, cong suat va khach thuong xuyen.
- * TODO: them @Controller, route, validation va goi ReportService.
- * Khong truy cap repository truc tiep; chua co endpoint hoat dong.
- */
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/admin/reports")
 public class ReportController {
+
+    @GetMapping
+    public String index(Model model) {
+        return "reports/index";
+    }
 }

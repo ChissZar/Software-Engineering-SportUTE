@@ -241,19 +241,37 @@ public class AdminBookingServiceImpl implements AdminBookingService {
     }
 
     private AdminBookingDTO mapToDTO(Booking b) {
-        BookingDetail detail = b.getBookingDetails().isEmpty() ? null : b.getBookingDetails().get(0);
-        BigDecimal amount = b.getPayments().isEmpty() ? BigDecimal.ZERO : b.getPayments().get(0).getAmount();
+        BookingDetail detail = (b.getBookingDetails() != null && !b.getBookingDetails().isEmpty()) ? b.getBookingDetails().get(0) : null;
+        BigDecimal amount = BigDecimal.ZERO;
+        if (b.getPayments() != null && !b.getPayments().isEmpty()) {
+            Payment p = b.getPayments().get(0);
+            if (p != null && p.getAmount() != null) {
+                amount = p.getAmount();
+            }
+        }
+
+        LocalDate bDate = LocalDate.now();
+        LocalTime sTime = LocalTime.of(8, 0);
+        LocalTime eTime = LocalTime.of(10, 0);
+
+        if (detail != null && detail.getStartTime() != null) {
+            bDate = detail.getStartTime().toLocalDate();
+            sTime = detail.getStartTime().toLocalTime();
+        }
+        if (detail != null && detail.getEndTime() != null) {
+            eTime = detail.getEndTime().toLocalTime();
+        }
 
         return AdminBookingDTO.builder()
                 .id(b.getId())
                 .customerId(b.getCustomer() != null ? b.getCustomer().getId() : "")
                 .customerName(b.getCustomer() != null ? b.getCustomer().getFullName() : "N/A")
                 .customerPhone(b.getCustomer() != null ? b.getCustomer().getPhone() : "")
-                .courtId(detail != null ? detail.getCourt().getId() : "")
-                .courtName(detail != null ? detail.getCourt().getName() : "N/A")
-                .bookingDate(detail != null ? detail.getStartTime().toLocalDate() : LocalDate.now())
-                .startTime(detail != null ? detail.getStartTime().toLocalTime() : LocalTime.of(8, 0))
-                .endTime(detail != null ? detail.getEndTime().toLocalTime() : LocalTime.of(10, 0))
+                .courtId(detail != null && detail.getCourt() != null ? detail.getCourt().getId() : "")
+                .courtName(detail != null && detail.getCourt() != null ? detail.getCourt().getName() : "N/A")
+                .bookingDate(bDate)
+                .startTime(sTime)
+                .endTime(eTime)
                 .totalAmount(amount)
                 .status(b.getStatus() != null ? b.getStatus() : "Chờ xác nhận")
                 .build();
