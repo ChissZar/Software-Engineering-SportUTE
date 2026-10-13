@@ -442,6 +442,52 @@ main {
 }
 
 /* --- END UNIFIED COMPACT SIDEBAR & TOPBAR --- */
+
+/* Logout Button Styling */
+.logout-form {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.btn-logout {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #fee2e2;
+  background: #fff5f5;
+  color: #dc2626;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .18s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.btn-logout:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.12);
+}
+.btn-logout svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+@media(max-width: 880px) {
+  .btn-logout span { display: none; }
+  .btn-logout { padding: 0 8px; }
+}
+
 </style>
 </head>
 <body>
@@ -478,13 +524,19 @@ main {
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
     <input id="q" placeholder="Tìm nhân viên theo mã, tên, số điện thoại, tài khoản...">
   </div>
-  <div class="account">
+    <div class="account">
     <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">🔔</button>
     <div class="avatar">QL</div>
     <div>
       <b>Quản lý trung tâm</b>
       <small>Quản trị viên</small>
     </div>
+    <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống SportHub?');">
+      <button type="submit" class="btn-logout" title="Đăng xuất khỏi hệ thống">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Đăng xuất</span>
+      </button>
+    </form>
   </div>
 </header>
 

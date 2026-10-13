@@ -7,50 +7,243 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
+
         :root {
+            --nav: #082c2f;
+            --nav2: #061f25;
+            --green: #1aaa62;
+            --green2: #087d48;
+            --mint: #dff7e8;
+            --blue: #1684ef;
+            --orange: #ef9a28;
+            --purple: #7958e9;
+            --ink: #132337;
+            --muted: #728096;
+            --bg: #f2f6f8;
+            --line: #e2e9ed;
+            --card: #fff;
+            --shadow: 0 6px 22px rgba(15, 42, 52, .07);
             --primary-green: #00a651;
             --primary-hover: #008c44;
-            --dark-sidebar: #052316;
-            --bg-light: #f8fafc;
         }
+        * { box-sizing: border-box; }
         body {
-            background-color: var(--bg-light);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
+            background-color: var(--bg);
+            font-family: Inter, Segoe UI, system-ui, -apple-system, sans-serif;
+            color: var(--ink);
         }
-        /* Sidebar Khách hàng (Số 1 Hình 5-3) */
-        .customer-sidebar {
-            width: 250px;
+        .app {
+            display: grid;
+            grid-template-columns: 220px 1fr;
             min-height: 100vh;
-            background-color: var(--dark-sidebar);
-            color: #ffffff;
+        }
+        aside {
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow: hidden;
+            background: linear-gradient(180deg, var(--nav2), var(--nav));
+            color: #fff;
+            padding: 20px 13px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 20px 14px;
+            z-index: 10;
         }
-        .customer-sidebar .nav-link {
-            color: #94a3b8;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 10px 16px;
-            border-radius: 10px;
+        .brand {
+            min-height: 68px;
+            padding: 8px 8px 10px;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+        }
+        .brand-logo {
+            display: block;
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            object-fit: contain;
+            background: #ffffff;
+            padding: 8px 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            padding-top: 11px;
+        }
+        .nav a {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 12px;
+            margin: 2px 0;
+            color: #c7d8da;
             text-decoration: none;
-            transition: all 0.2s;
+            border-radius: 9px;
+            font-size: 11.5px;
+            font-weight: 500;
+            transition: all .18s;
         }
-        .customer-sidebar .nav-link:hover {
-            color: #ffffff;
-            background-color: rgba(255, 255, 255, 0.08);
+        .nav a:hover {
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
         }
-        .customer-sidebar .nav-link.active {
-            color: #ffffff;
-            background-color: var(--primary-green);
+        .nav a.active {
+            background: linear-gradient(90deg, #138e4f, #1ca35d);
+            color: #fff;
+            box-shadow: inset 3px 0 #68f3a5;
+            font-weight: 600;
         }
+        .nav svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.8;
+            flex: none;
+        }
+        .side-art {
+            margin-top: auto;
+            height: 120px;
+            margin-left: -13px;
+            margin-right: -13px;
+            margin-bottom: -20px;
+            background: linear-gradient(180deg, transparent 0%, rgba(26, 170, 98, 0.12) 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 16px 20px;
+        }
+        .side-copy {
+            font-size: 11px;
+            line-height: 1.4;
+            color: #9bb7b3;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        main { min-width: 0; }
+        .topbar {
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .app-title { display: flex; align-items: center; gap: 10px; }
+        .mini-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--green), var(--green2));
+            color: #fff;
+            font-weight: 800;
+            font-size: 13px;
+            display: grid;
+            place-items: center;
+        }
+        .app-title b { font-size: 13px; color: var(--ink); display: block; }
+        .app-title small { color: var(--muted); font-size: 10px; }
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f4f7f8;
+            padding: 7px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--line);
+            width: 380px;
+            max-width: 100%;
+        }
+        .search svg { width: 14px; height: 14px; stroke: var(--muted); fill: none; stroke-width: 2; }
+        .search input { border: none; background: transparent; outline: none; font-size: 12px; width: 100%; color: var(--ink); }
+        .account { display: flex; align-items: center; gap: 12px; }
+        .bell {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: #fff;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background .15s;
+        }
+        .bell:hover { background: #f4f7f8; }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green2), var(--green));
+            color: #fff;
+            font-weight: 700;
+            font-size: 12px;
+            display: grid;
+            place-items: center;
+        }
+        .account-text b { display: block; font-size: 12px; color: var(--ink); line-height: 1.2; }
+        .account-text small { color: var(--muted); font-size: 10.5px; }
+        .logout-form { margin: 0; display: flex; align-items: center; }
+        .btn-logout {
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid #fee2e2;
+            background: #fff5f5;
+            color: #dc2626;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .18s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .btn-logout:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(220, 38, 38, 0.12);
+        }
+        .btn-logout svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        @media(max-width:880px) {
+            .app { grid-template-columns: 70px 1fr; }
+            .brand-logo { max-width: 48px; padding: 4px; }
+            .nav span, .side-art { display: none; }
+            .brand { justify-content: center; }
+            .nav a { justify-content: center; padding: 0; }
+        }
+        @media(max-width:640px) {
+            .app { display: block; }
+            aside { display: none; }
+            .topbar { padding: 0 14px; }
+            .search { display: none; }
+        }
+
         /* Thẻ sân (Số 9 Hình 5-3) */
-        .court-card {
+.court-card {
             background: #ffffff;
             border-radius: 16px;
             border: none;
@@ -117,73 +310,165 @@
             border-color: var(--primary-green);
             color: #fff;
         }
-    </style>
+    
+    
+/* EXACT TASKBAR CSS FROM SportHub_Dashboard_User_Redesigned_v2.html */
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{
+  height:100vh;position:sticky;top:0;overflow:hidden;
+  background:linear-gradient(180deg,var(--nav2),var(--nav));color:#fff;
+  padding:20px 14px;display:flex;flex-direction:column;z-index:10;
+}
+.brand-card{
+  height:74px;border-radius:14px;background:#f5faf7;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.2);margin:2px 8px 14px;
+}
+.brand-card img{width:172px;max-height:54px;object-fit:contain}
+.nav{border-top:1px solid rgba(255,255,255,.08);padding-top:11px}
+.nav a{
+  height:43px;display:flex;align-items:center;gap:12px;
+  color:#c8d8da;text-decoration:none;border-radius:10px;
+  padding:0 12px;margin:4px 0;font-size:12px;transition:.18s
+}
+.nav a:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav a.active{
+  background:linear-gradient(90deg,#119352,#1caf63);color:#fff;
+  box-shadow:inset 3px 0 #70f0a9
+}
+.nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+.side-note{
+  margin-top:auto;margin-left:-14px;margin-right:-14px;margin-bottom:-20px;
+  height:160px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 70% 25%,rgba(45,214,127,.22),transparent 35%),
+    linear-gradient(180deg,transparent,#043037 92%)
+}
+.side-note:before{
+  content:"";position:absolute;left:-10%;right:-10%;bottom:18px;height:70px;
+  background:linear-gradient(150deg,transparent 20%,rgba(27,164,95,.17));
+  transform:skewY(-8deg)
+}
+.side-note strong{
+  position:absolute;left:25px;bottom:36px;font-size:18px;line-height:1.15;
+  font-style:italic
+}
+.side-note strong:after{
+  content:"";display:block;width:34px;height:3px;background:#31d77c;margin-top:12px
+}
+main{min-width:0}
+.topbar{
+  height:64px;background:#fff;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:300px minmax(320px,640px) 1fr;
+  align-items:center;gap:20px;padding:0 24px;position:sticky;top:0;z-index:5
+}
+.app-title{display:flex;align-items:center;gap:10px}
+.app-title .mini{
+  width:30px;height:30px;border-radius:9px;background:var(--green-soft);
+  color:var(--green2);display:grid;place-items:center;font-weight:900;font-size:11px
+}
+.app-title b{font-size:12px;color:var(--ink)}
+.app-title small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
+.search{position:relative}
+.search input{
+  width:100%;height:38px;border:1px solid #dce5e9;border-radius:10px;
+  background:#f8fafb;padding:0 13px 0 37px;font-size:10.5px;outline:none
+}
+.search input:focus{border-color:#97d6b5;box-shadow:0 0 0 3px rgba(23,167,93,.08)}
+.search svg{
+  position:absolute;left:12px;top:11px;width:16px;height:16px;stroke:#8591a2;fill:none
+}
+.account{justify-self:end;display:flex;align-items:center;gap:10px}
+.icon-btn{width:34px;height:34px;border:0;background:#f5f8f9;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.icon-btn svg{width:16px;height:16px;stroke:#243449;fill:none;stroke-width:1.8}
+.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#0e4b36;color:#fff;font-size:11px;font-weight:900}
+.account-text b{font-size:10.5px;display:block;line-height:1.2;color:var(--ink)}
+.account-text small{display:block;color:var(--muted);font-size:8.5px;margin-top:2px}
+.logout-form{margin:0;display:flex;align-items:center}
+.btn-logout{
+  height:32px;padding:0 12px;border:1px solid #fee2e2;
+  background:#fff5f5;color:#dc2626;border-radius:8px;
+  font-size:11px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  text-decoration:none;transition:all .18s ease;white-space:nowrap;font-family:inherit;
+}
+.btn-logout:hover{
+  background:#fee2e2;border-color:#fca5a5;color:#b91c1c;
+  transform:translateY(-1px);box-shadow:0 3px 8px rgba(220,38,38,0.12);
+}
+.btn-logout svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+@media(max-width:1100px){
+  .app{grid-template-columns:76px 1fr}
+  .brand-card{height:58px;margin:2px 0 12px}
+  .brand-card img{width:48px}
+  .nav span,.side-note{display:none}
+  .nav a{justify-content:center;padding:0}
+  .topbar{grid-template-columns:1fr minmax(260px,1fr) auto}
+  .app-title small,.account .account-text{display:none}
+}
+@media(max-width:760px){
+  .app{display:block}aside{display:none}
+  .topbar{height:auto;padding:10px 14px;grid-template-columns:1fr auto}
+  .search{grid-column:1/-1;grid-row:2}
+}
+
+</style>
 </head>
-<body class="d-flex">
-
-    <!-- 1. Thanh Sidebar Khách hàng (Số 1 Hình 5-3) -->
-    <div class="customer-sidebar">
-        <div>
-            <!-- Logo -->
-            <div class="d-flex align-items-center gap-2 mb-4 px-2">
-                <i class="fa-solid fa-shapes text-success fs-3"></i>
-                <div>
-                    <h5 class="m-0 fw-bold">SportHub</h5>
-                    <small style="font-size: 9px; letter-spacing: 1.5px; color: #86efac;">PLAY • BOOK • TOGETHER</small>
-                </div>
-            </div>
-
-            <!-- Menu Links -->
-            <nav class="d-flex flex-column gap-1">
-                <a href="/customer/dashboard" class="nav-link">
-                    <i class="fa-solid fa-border-all"></i> Tổng quan
-                </a>
-                <a href="/customer/booking" class="nav-link active">
-                    <i class="fa-regular fa-calendar-plus"></i> Đặt sân
-                </a>
-                <a href="/customer/history" class="nav-link">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử đặt sân
-                </a>
-                <a href="/customer/profile" class="nav-link">
-                    <i class="fa-regular fa-user"></i> Hồ sơ cá nhân
-                </a>
-            </nav>
-        </div>
-
-        <div class="px-2">
-            <h6 class="fw-bold mb-1 text-white-50" style="font-size: 13px;">Đặt nhanh</h6>
-            <p class="text-success m-0 fw-bold" style="font-size: 14px;">Chơi hết mình</p>
-        </div>
+<body>
+<div class="app">
+  <aside>
+  <div class="brand-card">
+    <a href="/customer/dashboard" style="display:flex;align-items:center;justify-content:center;width:100%;">
+      <img src="/images/sporthub-logo.png" alt="SportHub Logo" style="max-height:50px;max-width:180px;object-fit:contain;">
+    </a>
+  </div>
+  <nav class="nav">
+    <a  href="/customer/dashboard">
+      <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+      <span>Tổng quan</span>
+    </a>
+    <a class="active" href="/customer/booking">
+      <svg viewBox="0 0 24 24"><path d="M5 16l3-8 4 4 4-7 3 11M4 19h16"/></svg>
+      <span>Đặt sân</span>
+    </a>
+    <a  href="/customer/history">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 9h16M8 3v4M16 3v4"/></svg>
+      <span>Lịch sử đặt sân</span>
+    </a>
+    <a  href="/customer/profile">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg>
+      <span>Hồ sơ cá nhân</span>
+    </a>
+  </nav>
+  <div class="side-note"><strong>Đặt nhanh<br>Chơi hết mình</strong></div>
+</aside>
+  <main>
+    <header class="topbar">
+  <div class="app-title">
+    <div class="mini">KH</div>
+    <div><b>Khu vực khách hàng SportHub</b><small>Đặt sân trực tuyến & quản lý lịch sử</small></div>
+  </div>
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg>
+    <input placeholder="Tìm sân theo môn thể thao hoặc mã sân..." form="filterForm" name="keyword" th:value="${filter.keyword}">
+  </div>
+  <div class="account">
+    <button class="icon-btn" type="button" aria-label="Thông báo" onclick="alert('Không có thông báo mới')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7M10 19h4"/></svg></button>
+    <div class="avatar" th:text="${customer != null and customer.fullName != null and customer.fullName.length() >= 2 ? customer.fullName.substring(0,2).toUpperCase() : 'MA'}">MA</div>
+    <div class="account-text">
+      <b th:text="${customer != null and customer.fullName != null ? customer.fullName : (currentUserName != null ? currentUserName : 'Nguyễn Minh Anh')}">Nguyễn Minh Anh</b>
+      <small>Khách hàng</small>
     </div>
-
-    <!-- Nội dung chính bên phải -->
-    <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
-        
-        <!-- Header Top bar (Số 2 & Avatar) -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="d-flex align-items-center gap-3 flex-grow-1">
-                <div class="input-group" style="max-width: 480px;">
-                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
-                    <input type="text" form="filterForm" name="keyword" th:value="${filter.keyword}" class="form-control border-start-0" 
-                           placeholder="Tìm sân theo môn thể thao hoặc mã sân...">
-                </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-3">
-                <a href="/customer/notifications" class="btn btn-light bg-white border rounded-circle p-2 text-muted" style="width: 38px; height: 38px;">
-                    <i class="fa-regular fa-bell"></i>
-                </a>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle bg-success text-white fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">MA</div>
-                    <div>
-                        <div class="fw-semibold text-dark" style="font-size: 13px;" th:text="${currentUserName}">Nguyễn Minh Anh</div>
-                        <small class="text-muted" style="font-size: 11px;">Khách hàng</small>
-                    </div>
-                </div>
-                <a href="/" class="btn btn-sm btn-outline-secondary rounded-3 px-3">&larr; Về trang chủ</a>
-            </div>
-        </div>
-
+    <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống SportHub?');">
+      <button type="submit" class="btn-logout" title="Đăng xuất khỏi hệ thống">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Đăng xuất</span>
+      </button>
+    </form>
+  </div>
+</header>
+    <div class="p-4" style="height: calc(100vh - 60px); overflow-y: auto;">
         <!-- Tiêu đề trang -->
         <div class="mb-4">
             <h4 class="fw-bold mb-1">Đặt Sân Trực Tuyến</h4>
@@ -400,3 +685,6 @@
     </script>
 </body>
 </html>
+    </div>
+  </main>
+</div>
