@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>SportHub — Đặt lại mật khẩu</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Auth Stylesheet -->
+    <link rel="stylesheet" href="/css/auth.css?v=20261016_v3">
+    <style>
+        .countdown-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .otp-input-field {
+            letter-spacing: 6px;
+            font-size: 18px;
+            font-weight: 800;
+            text-align: left;
+            font-family: 'Courier New', Consolas, monospace;
+        }
+
+        .form-control.is-invalid {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+        .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .form-control.is-valid {
+            border-color: #10b981 !important;
+            background-color: #f0fdf4 !important;
+        }
+        .form-control.is-valid:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .field-hint-msg {
+            font-size: 11.5px;
+            font-weight: 600;
+            margin-top: 4px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            line-height: 1.4;
+            transition: all 0.2s ease;
+        }
+
+        .field-hint-msg.msg-error {
+            display: flex;
+            color: #dc2626;
+        }
+
+        .field-hint-msg.msg-success {
+            display: flex;
+            color: #059669;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-backdrop"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- Toast thông báo tự động nhận diện mã OTP -->
+    <div id="toastDetectedOtp" class="toast-detected">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: #6ee7b7; font-size: 16px;"></i>
+        <span>Đã nhận diện mã OTP: <strong id="toastOtpDigits" style="font-family: 'Courier New', monospace; letter-spacing: 2px; color: #a7f3d0;"></strong></span>
+    </div>
+
+    <div class="auth-container" style="min-height: 560px;">
+        
+        <!-- Cột trái: Banner thể thao -->
+        <div class="auth-banner">
+            <div>
+                <a href="/login" class="brand-logo-link" title="SportHub — PLAY • BOOK • TOGETHER" style="text-decoration: none; display: inline-flex; align-items: center; gap: 14px;">
+                    <img src="/images/auth/sporthub-icon.png" alt="SportHub Icon" style="height: 52px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); flex-shrink: 0;">
+                    <div style="display: flex; flex-direction: column;">
+                        <div class="brand-title" style="font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 30px; font-weight: 800; line-height: 1.1; letter-spacing: -0.5px; color: #ffffff; margin-bottom: 4px;">
+                            Sport<span style="color: #2fe195;">Hub</span>
+                        </div>
+                        <div class="brand-subtitle" style="font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #e0e6e3; display: flex; align-items: center; gap: 6px;">
+                            <span>PLAY</span>
+                            <span style="font-size: 8px; opacity: 0.85;">•</span>
+                            <span>BOOK</span>
+                            <span style="font-size: 8px; opacity: 0.85;">•</span>
+                            <span>TOGETHER</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="banner-body">
+                <h1 class="banner-headline">
+                    Bảo mật đa tầng.<br>Khôi phục tài khoản<br>tiện lợi.
+                </h1>
+                <p class="banner-desc">
+                    Xác thực mã bảo mật gửi đến hộp thư và tạo ngay mật khẩu mới để tiếp tục tận hưởng niềm đam mê thể thao.
+                </p>
+            </div>
+
+            <div>
+                <div class="badge-tag-wrap">
+                    <span class="badge-pill">Bảo mật đa tầng</span>
+                    <span class="badge-sub">• Reset Password</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Form Nhập OTP & Đặt mật khẩu mới -->
+        <div class="auth-form-card" style="padding: 34px 42px;">
+            
+            <div style="margin-bottom: 18px;">
+                <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Đặt lại mật khẩu mới</h2>
+                <p style="font-size: 13px; color: #64748b;">
+                    Đang thiết lập lại mật khẩu cho: <strong style="color: #064e3b;" th:text="${email}">email@example.com</strong>
+                </p>
+            </div>
+
+            <!-- Thông báo -->
+            <div th:if="${infoMessage}" class="alert-info" style="margin-bottom: 14px; padding: 8px 12px; font-size: 12.5px;">
+                <i class="fa-solid fa-circle-info me-1"></i> <span th:text="${infoMessage}"></span>
+            </div>
+
+            <form th:action="@{/forgot-password/verify-otp}" th:object="${resetPasswordRequest}" method="post" novalidate>
+                <input type="hidden" th:field="*{email}">
+
+                <div th:if="${#fields.hasGlobalErrors()}" class="alert-error" style="margin-bottom: 14px; padding: 8px 12px; font-size: 12.5px;">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> <span th:each="err : ${#fields.globalErrors()}" th:text="${err}"></span>
+                </div>
+
+                <!-- Mục 1: Mã OTP -->
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label class="form-label" style="margin: 0; font-size: 12.5px;" for="otp">Mã xác thực OTP (6 số)</label>
+                        <div class="countdown-badge">
+                            <i class="fa-regular fa-clock"></i>
+                            <span id="countdown">05:00</span>
+                        </div>
+                    </div>
+                    <div class="input-wrap" style="position: relative;">
+                        <input type="text" id="otp" th:field="*{otp}" class="form-control otp-input-field" style="height: 44px;"
+                               placeholder="••••••" maxlength="6" pattern="[0-9]{6}" required autofocus autocomplete="one-time-code">
+                        <button type="button" id="btnPasteOtp" title="Dán mã từ bộ nhớ tạm"
+                                style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: #059669; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                            <i class="fa-regular fa-paste"></i> <span>Dán</span>
+                        </button>
+                    </div>
+                    <div id="otp-msg" class="field-hint-msg"></div>
+                    <div th:if="${#fields.hasErrors('otp')}" style="color: #dc2626; font-size: 12px; font-weight: 600; margin-top: 4px;">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i> <span th:errors="*{otp}"></span>
+                    </div>
+                </div>
+
+                <!-- Mục 2: Mật khẩu mới -->
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 12.5px; margin-bottom: 4px;" for="newPassword">Mật khẩu mới</label>
+                    <div class="input-wrap">
+                        <input type="password" id="newPassword" th:field="*{newPassword}" class="form-control" style="height: 44px; font-size: 13.5px;"
+                               placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" required>
+                        <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('newPassword', 'icon1')" title="Ẩn/Hiện">
+                            <i class="fa-regular fa-eye" id="icon1"></i>
+                        </button>
+                    </div>
+                    <div id="newPassword-msg" class="field-hint-msg"></div>
+                    <div th:if="${#fields.hasErrors('newPassword')}" style="color: #dc2626; font-size: 12px; font-weight: 600; margin-top: 4px;">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i> <span th:errors="*{newPassword}"></span>
+                    </div>
+                </div>
+
+                <!-- Mục 3: Xác nhận mật khẩu mới -->
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label" style="font-size: 12.5px; margin-bottom: 4px;" for="confirmPassword">Xác nhận lại mật khẩu mới</label>
+                    <div class="input-wrap">
+                        <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" style="height: 44px; font-size: 13.5px;"
+                               placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" required>
+                        <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('confirmPassword', 'icon2')" title="Ẩn/Hiện">
+                            <i class="fa-regular fa-eye" id="icon2"></i>
+                        </button>
+                    </div>
+                    <div id="confirmPassword-msg" class="field-hint-msg"></div>
+                    <div th:if="${#fields.hasErrors('confirmPassword')}" style="color: #dc2626; font-size: 12px; font-weight: 600; margin-top: 4px;">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i> <span th:errors="*{confirmPassword}"></span>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSubmit" class="btn-submit" style="margin-bottom: 14px; height: 46px; font-size: 14.5px;">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Cập nhật mật khẩu & Đăng nhập</span>
+                </button>
+            </form>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #f1f5f9; font-size: 12.5px;">
+                <form th:action="@{/forgot-password/resend-otp}" method="post" style="margin: 0;">
+                    <input type="hidden" name="email" th:value="${email}">
+                    <button type="submit" style="background: none; border: none; padding: 0; color: #059669; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-rotate-right"></i> Gửi lại mã OTP
+                    </button>
+                </form>
+                
+                <a th:href="@{/login}" style="color: #64748b; text-decoration: none; font-weight: 600;">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Quay lại Đăng nhập
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script th:inline="javascript">
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
+        }
+
+        // Đếm ngược 5 phút
+        let timeLeft = 300;
+        const countdownEl = document.getElementById('countdown');
+        const timer = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                countdownEl.textContent = "Hết hạn";
+                countdownEl.style.color = "#dc2626";
+                countdownEl.style.backgroundColor = "#fef2f2";
+                countdownEl.style.borderColor = "#fecaca";
+            } else {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                countdownEl.textContent = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            }
+        }, 1000);
+
+        // Nút dán mã từ clipboard
+        const btnPaste = document.getElementById('btnPasteOtp');
+        if (btnPaste) {
+            btnPaste.addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    const match = text.match(/\b\d{6}\b/);
+                    const cleanText = match ? match[0] : text.replace(/[^0-9]/g, '').slice(0, 6);
+                    if (cleanText) {
+                        autoFillOtp(cleanText);
+                        const span = btnPaste.querySelector('span');
+                        if (span) span.textContent = 'Đã dán!';
+                        setTimeout(() => {
+                            if (span) span.textContent = 'Dán';
+                        }, 2000);
+                    }
+                } catch (err) {
+                    const otpInput = document.getElementById('otp');
+                    if (otpInput) otpInput.focus();
+                }
+            });
+        }
+
+        // ==========================================
+        // KIỂM TRA TRỰC TIẾP (DEBOUNCED LIVE VALIDATION)
+        // ==========================================
+        const debounceTimers = {};
+        const DEBOUNCE_DELAY = 750; // Cỡ gần 1 giây ngừng nhập thì kiểm tra và báo đỏ
+
+        function setFieldStatus(input, msgEl, status, messageText) {
+            if (!input || !msgEl) return;
+            if (status === 'invalid') {
+                input.classList.add('is-invalid');
+                input.classList.remove('is-valid');
+                msgEl.className = 'field-hint-msg msg-error';
+                msgEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> <span>' + messageText + '</span>';
+            } else if (status === 'valid') {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+                msgEl.className = 'field-hint-msg msg-success';
+                msgEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>' + messageText + '</span>';
+            } else {
+                input.classList.remove('is-invalid', 'is-valid');
+                msgEl.className = 'field-hint-msg';
+                msgEl.innerHTML = '';
+            }
+        }
+
+        function validateField(fieldId) {
+            const input = document.getElementById(fieldId);
+            const msgEl = document.getElementById(fieldId + '-msg');
+            if (!input || !msgEl) return true;
+
+            const val = input.value.trim();
+
+            if (fieldId === 'otp') {
+                const cleanOtp = val.replace(/[^0-9]/g, '');
+                if (!cleanOtp) {
+                    setFieldStatus(input, msgEl, 'invalid', 'Vui lòng nhập mã xác thực OTP');
+                    return false;
+                }
+                if (cleanOtp.length !== 6) {
+                    setFieldStatus(input, msgEl, 'invalid', 'Mã OTP phải gồm đúng 6 chữ số (' + cleanOtp.length + '/6)');
+                    return false;
+                }
+                setFieldStatus(input, msgEl, 'valid', 'Mã OTP hợp lệ');
+                return true;
+            }
+
+            if (fieldId === 'newPassword') {
+                const rawVal = input.value;
+                if (!rawVal) {
+                    setFieldStatus(input, msgEl, 'invalid', 'Vui lòng nhập mật khẩu mới');
+                    return false;
+                }
+                if (rawVal.length < 6) {
+                    setFieldStatus(input, msgEl, 'invalid', 'Mật khẩu mới phải có tối thiểu 6 ký tự (' + rawVal.length + '/6)');
+                    return false;
+                }
+                setFieldStatus(input, msgEl, 'valid', 'Độ dài mật khẩu đạt yêu cầu');
+
+                // Đồng bộ kiểm tra lại confirmPassword nếu đã nhập
+                const confirmInput = document.getElementById('confirmPassword');
+                if (confirmInput && confirmInput.value) {
+                    validateField('confirmPassword');
+                }
+                return true;
+            }
+
+            if (fieldId === 'confirmPassword') {
+                const rawVal = input.value;
+                const newPwVal = document.getElementById('newPassword') ? document.getElementById('newPassword').value : '';
+                if (!rawVal) {
+                    setFieldStatus(input, msgEl, 'invalid', 'Vui lòng xác nhận lại mật khẩu mới');
+                    return false;
+                }
+                if (rawVal !== newPwVal) {
+                    setFieldStatus(input, msgEl, 'invalid', 'Mật khẩu xác nhận không trùng khớp');
+                    return false;
+                }
+                setFieldStatus(input, msgEl, 'valid', 'Mật khẩu trùng khớp');
+                return true;
+            }
+
+            return true;
+        }
+
+        const fieldIds = ['otp', 'newPassword', 'confirmPassword'];
+
+        fieldIds.forEach(id => {
+            const input = document.getElementById(id);
+            if (!input) return;
+
+            input.addEventListener('input', function() {
+                if (debounceTimers[id]) {
+                    clearTimeout(debounceTimers[id]);
+                }
+                debounceTimers[id] = setTimeout(() => {
+                    validateField(id);
+                }, DEBOUNCE_DELAY);
+            });
+
+            input.addEventListener('blur', function() {
+                if (debounceTimers[id]) {
+                    clearTimeout(debounceTimers[id]);
+                }
+                if (input.value.trim().length > 0 || input.classList.contains('is-invalid')) {
+                    validateField(id);
+                }
+            });
+        });
+
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let allValid = true;
+                let firstInvalid = null;
+
+                fieldIds.forEach(id => {
+                    const ok = validateField(id);
+                    if (!ok) {
+                        allValid = false;
+                        if (!firstInvalid) {
+                            firstInvalid = document.getElementById(id);
+                        }
+                    }
+                });
+
+                if (!allValid) {
+                    e.preventDefault();
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // TỰ ĐỘNG NHẬN DIỆN VÀ ĐIỀN MÃ OTP (KHÔNG CẦN BẤM HỎI)
+        // ==========================================
+        let lastAutoFilledOtp = '';
+        let toastTimeout = null;
+
+        function autoFillOtp(code) {
+            if (!code) return;
+            const cleanCode = code.toString().replace(/[^0-9]/g, '').slice(0, 6);
+            if (cleanCode.length !== 6) return;
+
+            const otpInput = document.getElementById('otp');
+            if (!otpInput) return;
+
+            // Nếu ô đã có mã này và đã được điền rồi thì không lặp lại toast
+            if (otpInput.value === cleanCode && lastAutoFilledOtp === cleanCode) {
+                return;
+            }
+
+            // Điền trực tiếp mã OTP
+            otpInput.value = cleanCode;
+            lastAutoFilledOtp = cleanCode;
+
+            // Kích hoạt xác thực hợp lệ ngay lập tức
+            validateField('otp');
+
+            // Hiển thị toast thông báo nhẹ nhàng, không chặn màn hình
+            const toast = document.getElementById('toastDetectedOtp');
+            const toastDigits = document.getElementById('toastOtpDigits');
+            if (toast && toastDigits) {
+                toastDigits.textContent = cleanCode;
+                toast.style.display = 'flex';
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 2800);
+            }
+
+            // Tự động chuyển con trỏ tới ô Mật khẩu mới để người dùng gõ ngay
+            const newPwInput = document.getElementById('newPassword');
+            if (newPwInput && !newPwInput.value) {
+                newPwInput.focus();
+            }
+        }
+
+        async function checkPendingOrClipboardOtp() {
+            // 1. Kiểm tra localStorage (đồng bộ từ tab email hoặc tab khác)
+            try {
+                const stored = localStorage.getItem('sporthub_latest_otp');
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    const currentEmail = /*[[${email}]]*/ '';
+                    const matchEmail = !data.email || !currentEmail || data.email.trim().toLowerCase() === currentEmail.trim().toLowerCase();
+                    if (matchEmail && (Date.now() - data.timestamp < 120000)) { // Trong vòng 2 phút
+                        if (data.otp && data.otp !== lastAutoFilledOtp) {
+                            autoFillOtp(data.otp);
+                            return;
+                        }
+                    }
+                }
+            } catch(e) {}
+
+            // 2. Kiểm tra bộ nhớ tạm (clipboard) khi người dùng vừa bôi đen copy từ email quay lại
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                try {
+                    const clipText = await navigator.clipboard.readText();
+                    if (clipText) {
+                        const match = clipText.match(/\b\d{6}\b/);
+                        const digits = match ? match[0] : clipText.replace(/[^0-9]/g, '').slice(0, 6);
+                        if (digits && digits.length === 6 && digits !== lastAutoFilledOtp) {
+                            const otpInput = document.getElementById('otp');
+                            if (otpInput && otpInput.value !== digits) {
+                                autoFillOtp(digits);
+                            }
+                        }
+                    }
+                } catch(e) {
+                    // Quyền clipboard có thể bị chặn nếu chưa có cử chỉ người dùng, bỏ qua an toàn
+                }
+            }
+        }
+
+        // Khi người dùng click chuột bất kỳ đâu trên trang sau khi chuyển từ email về
+        document.addEventListener('click', () => {
+            const otpInput = document.getElementById('otp');
+            if (otpInput && !otpInput.value) {
+                checkPendingOrClipboardOtp();
+            }
+        });
+
+        // Nhận tín hiệu từ BroadcastChannel khi vừa sao chép ở tab khác
+        try {
+            const channel = new BroadcastChannel('sporthub_otp_sync');
+            channel.onmessage = (event) => {
+                if (!event.data || !event.data.otp) return;
+                const currentEmail = /*[[${email}]]*/ '';
+                if (event.data.email && currentEmail && event.data.email.trim().toLowerCase() !== currentEmail.trim().toLowerCase()) {
+                    return;
+                }
+                autoFillOtp(event.data.otp);
+            };
+        } catch(e) {}
+
+        // Lắng nghe thay đổi storage từ tab khác
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'sporthub_latest_otp' && event.newValue) {
+                try {
+                    const data = JSON.parse(event.newValue);
+                    const currentEmail = /*[[${email}]]*/ '';
+                    if (data.email && currentEmail && data.email.trim().toLowerCase() !== currentEmail.trim().toLowerCase()) {
+                        return;
+                    }
+                    if (Date.now() - data.timestamp < 120000) {
+                        autoFillOtp(data.otp);
+                    }
+                } catch(e) {}
+            }
+        });
+
+        // Khi người dùng chuyển tab hoặc quay lại tab này (focus / visibility)
+        window.addEventListener('focus', () => {
+            checkPendingOrClipboardOtp();
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                checkPendingOrClipboardOtp();
+            }
+        });
+
+        // Kiểm tra ngay khi tải trang (nếu có param ?otp=... hoặc vừa sao chép)
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramOtp = urlParams.get('otp');
+            if (paramOtp && /^\d{6}$/.test(paramOtp.trim())) {
+                autoFillOtp(paramOtp.trim());
+            } else {
+                checkPendingOrClipboardOtp();
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Quản lý đặt sân & Lịch sân</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
 :root{
   --nav:#082c2f;--nav2:#061f25;--green:#1aaa62;--green2:#087d48;
@@ -14,27 +15,27 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
 button,input,select{font:inherit}
-.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+
+/* Aside Sidebar */
 aside{
   height:100vh;position:sticky;top:0;background:linear-gradient(180deg,var(--nav2),var(--nav));
-  color:#fff;padding:20px 13px;display:flex;flex-direction:column;overflow-y:auto;z-index:10;box-sizing:border-box
+  color:#fff;padding:20px 13px;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;z-index:10;box-sizing:border-box
 }
 .brand{
-  min-height:64px;padding:6px 10px 12px;margin:0 0 10px;display:flex;align-items:center;gap:10px;
+  min-height:68px;padding:8px 8px 10px;margin:0 2px 9px;display:flex;align-items:center;justify-content:center;
   border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none
 }
-.brand-icon{
-  width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green2),var(--green));
-  color:#fff;display:grid;place-items:center;font-weight:900;font-size:16px;flex:none;
-  box-shadow:0 4px 12px rgba(26,170,98,.3)
+.brand-logo{
+  display:block;width:100%;max-width:176px;height:auto;object-fit:contain;box-sizing:border-box;
+  padding:7px 10px;border:1px solid rgba(96,243,165,.18);border-radius:11px;
+  background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(238,251,245,.92));
+  box-shadow:0 5px 14px rgba(0,0,0,.16)
 }
-.brand-text b{font-size:15px;color:#fff;display:block;letter-spacing:-.3px;line-height:1.2}
-.brand-text small{font-size:8.5px;color:#38e28c;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
 .nav{display:flex;flex-direction:column;gap:2px}
-.nav-title{font-size:8.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px;font-weight:800;padding:10px 12px 4px}
 .nav a{
   height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;margin:2px 0;color:#c7d8da;
-  text-decoration:none;border-radius:9px;font-size:12px;font-weight:600;transition:.18s
+  text-decoration:none;border-radius:9px;font-size:11.5px;font-weight:600;transition:.18s;box-sizing:border-box
 }
 .nav a:hover{background:rgba(255,255,255,.06);color:#fff}
 .nav a.active{
@@ -43,7 +44,7 @@ aside{
 }
 .nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
 .side-art{
-  margin-top:auto;height:140px;margin-left:-13px;margin-right:-13px;margin-bottom:-20px;
+  margin-top:auto;height:150px;margin-left:-13px;margin-right:-13px;margin-bottom:-20px;
   background:linear-gradient(180deg,transparent 0,#052a2d 88%),linear-gradient(135deg,#0c553caa,#061f25 65%);
   position:relative;overflow:hidden;flex-shrink:0
 }
@@ -51,50 +52,62 @@ aside{
   content:"";position:absolute;inset:20px -30px -15px;
   background:radial-gradient(circle at 60% 50%,#2ac77733,transparent 40%);transform:skewY(-12deg)
 }
-.side-copy{position:absolute;left:22px;bottom:26px;font-size:16px;line-height:1.2;font-weight:800;font-style:italic;color:#e8f8ef}
-.side-copy:after{content:"";display:block;width:32px;height:3px;background:#31d77c;margin-top:10px}
+.side-copy{position:absolute;left:25px;bottom:26px;font-size:17px;line-height:1.12;font-weight:800;font-style:italic}
+.side-copy:after{content:"";display:block;width:35px;height:3px;background:#31d77c;margin-top:12px}
 
+/* Main & Topbar */
 main{min-width:0}
 .topbar{
-  height:60px;background:#fff;border-bottom:1px solid var(--line);
-  display:grid;grid-template-columns:300px minmax(260px,560px) 1fr;
-  align-items:center;gap:20px;padding:0 24px;position:sticky;top:0;z-index:9
+  height:58px;background:#fff;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:280px minmax(260px,540px) 1fr;
+  align-items:center;gap:20px;padding:0 22px;position:sticky;top:0;z-index:8;box-sizing:border-box
 }
-.centername{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:10px}
-.centername .badge-org{
-  width:28px;height:28px;border-radius:8px;background:var(--mint);color:var(--green2);
-  display:grid;place-items:center;font-weight:900;font-size:11px
+.centername{font-size:11px;font-weight:800;display:flex;align-items:center;gap:8px}
+.mini-logo{
+  width:28px;height:28px;border-radius:7px;background:#dff7e8;color:#0d8b4f;
+  display:grid;place-items:center;font-weight:900;font-size:11px;flex:none
 }
 .search{position:relative}
 .search input{
-  width:100%;height:38px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:9px;
-  padding:0 14px 0 38px;font-size:12px;outline:none;transition:.2s
+  width:100%;height:34px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:8px;
+  padding:0 13px 0 35px;font-size:11px;outline:none;box-sizing:border-box;transition:.2s
 }
 .search input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
-.search svg{position:absolute;left:13px;top:11px;width:15px;height:15px;fill:none;stroke:#748297;stroke-width:1.8}
-.account{justify-self:end;display:flex;align-items:center;gap:11px}
-.avatar{
-  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0e4b36,#199c58);
-  color:#fff;display:grid;place-items:center;font-weight:800;font-size:11.5px;
-  box-shadow:0 3px 10px rgba(14,75,54,.2)
+.search svg{position:absolute;left:12px;top:10px;width:14px;height:14px;fill:none;stroke:#748297}
+.account{justify-self:end;display:flex;align-items:center;gap:10px}
+.bell{
+  width:34px;height:34px;border:0;background:transparent;font-size:16px;cursor:pointer;
+  display:grid;place-items:center;border-radius:50%;transition:background .2s;padding:0
 }
-.account b{font-size:12px;color:var(--ink);display:block}
-.account small{display:block;color:var(--green2);font-size:9.5px;font-weight:700;margin-top:1px}
+.bell:hover{background:#f0f4f7}
+.avatar{
+  width:34px;height:34px;border-radius:50%;background:#173d2c;color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:10px;flex:none
+}
+.account b{font-size:10px;color:var(--ink);display:block}
+.account small{display:block;color:#7f8b9d;font-size:8px;margin-top:2px}
 
+.logout-form{margin:0;display:flex;align-items:center}
+.btn-logout{
+  height:30px;padding:0 10px;border:1px solid #fee2e2;background:#fff5f5;color:#dc2626;
+  border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;
+  align-items:center;gap:5px;transition:all .18s ease;font-family:inherit
+}
+.btn-logout:hover{background:#fee2e2;border-color:#fca5a5;color:#b91c1c}
+
+/* Content Area */
 .content{max-width:1540px;margin:auto;padding:16px 22px 30px}
 .pagehead{
   display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;
-  padding:18px 24px;border-radius:14px;
-  background:linear-gradient(90deg,#fff 0%,#f8fffb 55%,#dff7e8 100%);
+  padding:18px 24px;border-radius:14px;background:linear-gradient(90deg,#fff 0%,#f8fffb 55%,#dff7e8 100%);
   border:1px solid var(--line);box-shadow:var(--shadow-sm)
 }
 .crumb{font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:700;letter-spacing:.3px}
-.pagehead h1{margin:0 0 3px;font-size:24px;letter-spacing:-.6px;color:#0b3b28}
+.pagehead h1{margin:0 0 3px;font-size:22px;letter-spacing:-.6px;color:#0b3b28}
 .pagehead p{margin:0;color:#5a6e64;font-size:12px}
 
-.view-tabs{
-  display:flex;align-items:center;gap:8px;margin-bottom:12px
-}
+/* Tabs */
+.view-tabs{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .tab-btn{
   height:36px;padding:0 16px;border-radius:8px;font-weight:800;font-size:12px;
   cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--muted);transition:.18s
@@ -104,38 +117,24 @@ main{min-width:0}
   box-shadow:0 4px 12px rgba(26,170,98,.2)
 }
 
-.btn{
-  height:36px;padding:0 16px;border:1px solid #d8e3dc;background:#fff;border-radius:8px;
-  font-weight:800;font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;
-  justify-content:center;gap:6px;transition:.18s;text-decoration:none;color:var(--ink)
-}
-.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
-.btn.primary{
-  background:linear-gradient(90deg,#087a42,#17a45b);color:#fff;border:0;
-  box-shadow:0 6px 16px rgba(26,170,98,.25)
-}
-.btn.primary:hover{box-shadow:0 8px 20px rgba(26,170,98,.35)}
-.btn.danger{color:#c0392b;border-color:#fecaca}
-.btn.danger:hover{background:#feecec;border-color:#f87171}
-.btn.success-sm{background:#e8f8ef;color:#087a42;border-color:#b9eecd;padding:0 10px;height:28px;font-size:11px}
-.btn.outline-sm{background:#fff;color:var(--muted);border-color:#dce5ea;padding:0 10px;height:28px;font-size:11px}
-
-.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
+/* Metric Cards */
+.summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:12px 0}
 .metric{
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;
-  display:flex;gap:13px;align-items:center;box-shadow:var(--shadow-sm);min-height:86px;
-  transition:.2s
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+  display:flex;gap:12px;align-items:center;box-shadow:var(--shadow-sm);transition:.2s
 }
 .metric:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.metric-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex:none}
+.metric-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:16px;flex:none}
 .g{background:var(--mint);color:#0d8a4e}
 .b{background:#bfe0ff;color:#096bc4}
 .o{background:#ffe1a8;color:#bb6e00}
 .p{background:#ddcfff;color:#6642c6}
-.metric label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.metric strong{display:block;font-size:22px;margin-top:2px;color:var(--ink);letter-spacing:-.5px}
+.r{background:#fee2e2;color:#dc2626}
+.metric label{font-size:9.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.metric strong{display:block;font-size:20px;margin-top:2px;color:var(--ink);letter-spacing:-.5px}
 
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start}
+/* Layout */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px;align-items:start}
 .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow-sm)}
 .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .head h2{font-size:13.5px;margin:0;font-weight:800;color:var(--ink)}
@@ -143,18 +142,20 @@ main{min-width:0}
 .tools select{border:1px solid var(--line);border-radius:7px;padding:6px 10px;background:#fbfcfd;color:#536176;font-size:11.5px;outline:none}
 .count{font-size:10.5px;color:var(--muted);font-weight:700}
 
+/* Table */
 .tablewrap{overflow:auto;border:1px solid #edf1f3;border-radius:10px}
-table{width:100%;border-collapse:collapse;min-width:640px}
+table{width:100%;border-collapse:collapse;min-width:680px}
 th{
   text-align:left;background:#f5f8fa;color:#617084;font-size:10.5px;font-weight:800;
   padding:10px 12px;white-space:nowrap;border-bottom:1px solid #e5ebef;text-transform:uppercase;letter-spacing:.5px
 }
 td{font-size:12px;padding:10px 12px;border-bottom:1px solid #edf1f3;white-space:nowrap}
-tbody tr{cursor:pointer;transition:.15s}
+tbody tr{transition:.15s}
 tbody tr:hover{background:#f7fbf9}
 tbody tr.selected-row{background:#e8f8ee;box-shadow:inset 3px 0 var(--green)}
 .empty{text-align:center;color:var(--muted);padding:28px;font-size:12px}
 
+/* Badges */
 .badge{padding:4px 9px;border-radius:7px;font-size:10px;font-weight:800;display:inline-block}
 .status-confirmed{background:#cbe5ff;color:#0e6fc4}
 .status-pending{background:#ffe1b7;color:#b86e0d}
@@ -162,6 +163,26 @@ tbody tr.selected-row{background:#e8f8ee;box-shadow:inset 3px 0 var(--green)}
 .status-inuse{background:#e3d9ff;color:#6642c6}
 .status-cancelled{background:#e7edf0;color:#667384}
 
+/* Buttons */
+.btn{
+  height:34px;padding:0 14px;border:1px solid #d8e3dc;background:#fff;border-radius:8px;
+  font-weight:800;font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;
+  justify-content:center;gap:6px;transition:.18s;text-decoration:none;color:var(--ink)
+}
+.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.btn.primary{background:linear-gradient(90deg,#087a42,#17a45b);color:#fff;border:0;box-shadow:0 4px 12px rgba(26,170,98,.25)}
+.btn.primary:hover{box-shadow:0 6px 16px rgba(26,170,98,.35)}
+.btn.danger{color:#c0392b;border-color:#fecaca}
+.btn.danger:hover{background:#feecec;border-color:#f87171}
+.btn.action-btn{height:28px;padding:0 8px;font-size:10.5px;border-radius:6px;font-weight:700}
+.btn.btn-confirm{background:#e8f8ef;color:#087a42;border-color:#b9eecd}
+.btn.btn-checkin{background:#eaf4ff;color:#1684ef;border-color:#bfe0ff}
+.btn.btn-checkout{background:#f0ebff;color:#7958e9;border-color:#ddcfff}
+.btn.btn-extend{background:#fff4e2;color:#d97706;border-color:#fde68a}
+.btn.btn-change{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
+.btn.btn-cancel{background:#fff1f2;color:#e11d48;border-color:#fecdd3}
+
+/* Form Card */
 .formcard{position:sticky;top:74px}
 .mode{font-size:10px;font-weight:800;padding:4px 8px;border-radius:6px;background:var(--mint);color:var(--green2)}
 .fields{display:grid;gap:10px}
@@ -175,335 +196,51 @@ tbody tr.selected-row{background:#e8f8ee;box-shadow:inset 3px 0 var(--green)}
 .actions{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;margin-top:14px}
 .actions .btn{padding:0}
 
-/* Timeline Calendar View */
+/* Timeline View */
 .timeline-view{display:none;margin-top:10px}
 .timeline-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;box-shadow:var(--shadow-sm)}
-.timeline-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.timeline-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px}
 .timeline-matrix{overflow-x:auto}
 .timeline-grid{
-  display:grid;grid-template-columns:140px repeat(16, minmax(70px, 1fr));gap:3px;min-width:1100px;
+  display:grid;grid-template-columns:140px repeat(15, minmax(70px, 1fr)) 90px;gap:3px;min-width:1200px;
   background:#edf2f5;padding:6px;border-radius:10px
 }
-.grid-cell{background:#fff;padding:8px 6px;text-align:center;font-size:11px;border-radius:6px}
+.grid-cell{background:#fff;padding:8px 6px;text-align:center;font-size:11px;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .grid-time{font-weight:800;background:#f0f5f7;color:var(--muted);font-size:10.5px}
-.grid-court{font-weight:800;text-align:left;padding-left:10px;display:flex;align-items:center;background:#e9f4ef;color:#0b4b2e}
-.slot-free{background:#fff;color:#a0b0b8;border:1px dashed #d5e0e6}
-.slot-busy{background:#cbe5ff;color:#0c64b0;font-weight:700}
-.slot-inuse{background:#d3f5df;color:#0c7e46;font-weight:700}
+.grid-court{font-weight:800;text-align:left;padding-left:10px;background:#e9f4ef;color:#0b4b2e;align-items:flex-start}
+.slot-free{background:#fff;color:#0d8a4e;border:1px dashed #c0e8d0;cursor:pointer;font-weight:700;transition:.15s}
+.slot-free:hover{background:#eafcf0;border-color:#1aaa62;transform:scale(1.02)}
+.slot-busy{background:#cbe5ff;color:#0c64b0;font-weight:700;cursor:pointer}
+.slot-inuse{background:#d3f5df;color:#0c7e46;font-weight:800;cursor:pointer}
 .slot-maint{background:#fef3c7;color:#b45309;font-weight:700}
 
-.alert{padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;font-weight:700}
+/* Alerts */
+.alert{padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
 .alert-success{background:#e8f8ef;color:#087a42;border:1px solid #b9eecd}
 .alert-danger{background:#feecec;color:#c0392b;border:1px solid #fecaca}
 
+/* Modal Popup */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(10,25,35,.55);backdrop-filter:blur(3px);
+  z-index:999;display:none;align-items:center;justify-content:center;padding:16px
+}
+.modal-overlay.active{display:flex}
+.modal-card{background:#fff;border-radius:14px;width:100%;max-width:540px;box-shadow:0 12px 36px rgba(0,0,0,.2);overflow:hidden;animation:popIn .2s ease-out}
+@keyframes popIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);background:#fbfcfd}
+.modal-head h3{margin:0;font-size:14px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+.modal-close{border:0;background:none;font-size:20px;cursor:pointer;color:var(--muted);padding:0}
+.modal-body{padding:18px 20px;font-size:12px}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--line);background:#fbfcfd;display:flex;justify-content:flex-end;gap:10px}
+
+@media(max-width:1050px){.summary{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:980px){.layout{grid-template-columns:1fr}.formcard{position:static}}
 @media(max-width:580px){.app{display:block}aside{display:none}.content{padding:12px}.summary{grid-template-columns:1fr 1fr}}
-/* --- UNIFIED COMPACT SIDEBAR & TOPBAR (from SportHub_Dashboard_Compact_Sidebar_Logo_v2.html) --- */
-/* --- UNIFIED COMPACT SIDEBAR & TOPBAR (from SportHub_Dashboard_Compact_Sidebar_Logo_v2.html) --- */
-:root {
-  --nav: #082c2f;
-  --nav2: #061f25;
-  --green: #1aaa62;
-  --green2: #087d48;
-  --mint: #dff7e8;
-  --blue: #1684ef;
-  --orange: #ef9a28;
-  --purple: #7958e9;
-  --ink: #132337;
-  --muted: #728096;
-  --bg: #f2f6f8;
-  --line: #e2e9ed;
-  --card: #fff;
-  --shadow: 0 6px 22px rgba(15,42,52,.07);
-  --shadow-sm: 0 2px 8px rgba(15,42,52,.04);
-}
-.app {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  min-height: 100vh;
-}
-aside {
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  background: linear-gradient(180deg, var(--nav2, #061f25), var(--nav, #082c2f));
-  color: #fff;
-  padding: 20px 13px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 10;
-  box-sizing: border-box;
-}
-.brand {
-  min-height: 68px;
-  padding: 8px 8px 10px;
-  margin: 0 2px 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid rgba(255, 255, 255, .08);
-  text-decoration: none;
-}
-.brand-logo {
-  display: block;
-  width: 100%;
-  max-width: 176px;
-  height: auto;
-  object-fit: contain;
-  box-sizing: border-box;
-  padding: 7px 10px;
-  border: 1px solid rgba(96, 243, 165, .18);
-  border-radius: 11px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, .97), rgba(238, 251, 245, .92));
-  box-shadow: 0 5px 14px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .7);
-  filter: none;
-}
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.nav a {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 0 12px;
-  margin: 2px 0;
-  color: #c7d8da;
-  text-decoration: none;
-  border-radius: 9px;
-  font-size: 11.5px;
-  font-weight: 600;
-  transition: .18s;
-  box-sizing: border-box;
-}
-.nav a:hover {
-  background: rgba(255, 255, 255, .06);
-  color: #fff;
-}
-.nav a.active {
-  background: linear-gradient(90deg, #138e4f, #1ca35d);
-  color: #fff;
-  box-shadow: inset 3px 0 #68f3a5, 0 4px 14px rgba(26, 170, 98, .2);
-}
-.nav svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.8;
-  flex: none;
-}
-.side-art {
-  margin-top: auto;
-  height: 150px;
-  margin-left: -13px;
-  margin-right: -13px;
-  margin-bottom: -20px;
-  background: linear-gradient(180deg, transparent 0, #052a2d 88%), linear-gradient(135deg, #0c553caa, #061f25 65%);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.side-art:before {
-  content: "";
-  position: absolute;
-  inset: 20px -30px -15px;
-  background: radial-gradient(circle at 60% 50%, #2ac77733, transparent 40%);
-  transform: skewY(-12deg);
-}
-.side-copy {
-  position: absolute;
-  left: 25px;
-  bottom: 26px;
-  font-size: 17px;
-  line-height: 1.12;
-  font-weight: 800;
-  font-style: italic;
-}
-.side-copy:after {
-  content: "";
-  display: block;
-  width: 35px;
-  height: 3px;
-  background: #31d77c;
-  margin-top: 12px;
-}
-main {
-  min-width: 0;
-}
-.topbar {
-  height: 58px;
-  background: #fff;
-  border-bottom: 1px solid var(--line, #e2e9ed);
-  display: grid;
-  grid-template-columns: 280px minmax(260px, 540px) 1fr;
-  align-items: center;
-  gap: 20px;
-  padding: 0 22px;
-  position: sticky;
-  top: 0;
-  z-index: 8;
-  box-sizing: border-box;
-}
-.centername {
-  font-size: 11px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.mini-logo {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  background: #dff7e8;
-  color: #0d8b4f;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  font-size: 11px;
-  flex: none;
-}
-.search {
-  position: relative;
-}
-.search input {
-  width: 100%;
-  height: 34px;
-  border: 1px solid #dce5ea;
-  background: #f7f9fb;
-  border-radius: 8px;
-  padding: 0 13px 0 35px;
-  font-size: 9.5px;
-  outline: none;
-  box-sizing: border-box;
-}
-.search svg {
-  position: absolute;
-  left: 12px;
-  top: 10px;
-  width: 14px;
-  height: 14px;
-  fill: none;
-  stroke: #748297;
-}
-.account {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.bell {
-  width: 34px;
-  height: 34px;
-  border: 0;
-  background: transparent;
-  font-size: 17px;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  transition: background .2s;
-  padding: 0;
-}
-.bell:hover {
-  background: #f0f4f7;
-}
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #173d2c;
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 10px;
-  flex: none;
-}
-.account b {
-  font-size: 10px;
-  color: var(--ink, #132337);
-  display: block;
-}
-.account small {
-  display: block;
-  color: #7f8b9d;
-  font-size: 8px;
-  margin-top: 2px;
-}
-@media(max-width:880px) {
-  .app { grid-template-columns: 70px 1fr; }
-  .brand-logo { max-width: 48px; padding: 4px; }
-  .nav span, .side-art, .brand-text { display: none; }
-  .brand { justify-content: center; }
-  .nav a { justify-content: center; padding: 0; }
-  .topbar { grid-template-columns: 1fr 1.5fr auto; }
-  .centername span, .account>div:last-child { display: none; }
-}
-@media(max-width:580px) {
-  .app { display: block; }
-  aside { display: none; }
-  .topbar { padding: 0 12px; grid-template-columns: 1fr auto; }
-  .centername { display: none; }
-  .search { grid-column: 1; }
-}
-
-/* --- END UNIFIED COMPACT SIDEBAR & TOPBAR --- */
-
-/* Logout Button Styling */
-.logout-form {
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-.btn-logout {
-  height: 32px;
-  padding: 0 12px;
-  border: 1px solid #fee2e2;
-  background: #fff5f5;
-  color: #dc2626;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all .18s ease;
-  white-space: nowrap;
-  font-family: inherit;
-}
-.btn-logout:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.12);
-}
-.btn-logout svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  flex: none;
-}
-@media(max-width: 880px) {
-  .btn-logout span { display: none; }
-  .btn-logout { padding: 0 8px; }
-}
-
 </style>
 </head>
 <body>
 <div class="app">
+<!-- ASIDE SIDEBAR -->
 <aside>
   <a href="/admin/dashboard" class="brand">
     <img class="brand-logo" src="/images/sporthub-logo.png" alt="SportHub Logo">
@@ -530,22 +267,22 @@ main {
 <header class="topbar">
   <div class="centername">
     <div class="mini-logo">SH</div>
-    <span>Trung tâm Thể thao SportHub</span>
+    <span>Trung tâm Thể thao SportHub UTE</span>
   </div>
   <form class="search" action="/admin/bookings" method="get">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
-    <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm theo mã đặt sân, tên khách hàng, tên sân...">
+    <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm mã đặt sân, tên khách hàng, số điện thoại, tên sân...">
   </form>
-    <div class="account">
+  <div class="account">
     <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">🔔</button>
     <div class="avatar">QL</div>
     <div>
       <b>Quản lý trung tâm</b>
       <small>Quản trị viên</small>
     </div>
-    <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống SportHub?');">
+    <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?');">
       <button type="submit" class="btn-logout" title="Đăng xuất khỏi hệ thống">
-        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>Đăng xuất</span>
       </button>
     </form>
@@ -553,54 +290,65 @@ main {
 </header>
 
 <div class="content">
-  <!-- Flash Message -->
-  <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-  <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+  <!-- Flash Messages -->
+  <div th:if="${successMessage}" class="alert alert-success">
+    <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
+  </div>
+  <div th:if="${errorMessage}" class="alert alert-danger">
+    <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+  </div>
 
   <div class="pagehead">
     <div>
-      <div class="crumb">Trang chủ › Dịch vụ đặt sân › Lịch đặt sân</div>
-      <h1>Quản lý đặt sân & Lịch sân</h1>
-      <p>Tiếp nhận lịch đặt, xác nhận nhanh, tra cứu khung giờ trống và điều phối sân thể thao</p>
+      <div class="crumb">Trang chủ › Dịch vụ đặt sân › Điều phối & Quản lý lịch sân</div>
+      <h1>Quản lý Đặt sân & Lịch sân thể thao</h1>
+      <p>Lập phiếu tại quầy (UC17), xem lịch timeline trực quan (UC18), đổi sân/giờ (UC19), hủy phiếu theo chính sách (UC20), nhận sân (UC21), trả sân (UC22) và gia hạn (UC23)</p>
     </div>
     <div style="display:flex;gap:10px;">
-      <a href="/admin/bookings" class="btn primary">＋ Tạo đặt sân mới</a>
+      <a href="/admin/bookings" class="btn primary">＋ Lập phiếu đặt mới</a>
     </div>
   </div>
 
   <!-- View switcher -->
   <div class="view-tabs">
-    <button class="tab-btn active" id="btnTabList" onclick="switchView('list')">📋 Danh sách đặt sân</button>
-    <button class="tab-btn" id="btnTabSchedule" onclick="switchView('schedule')">📅 Lịch sân thể thao (Timeline)</button>
+    <button class="tab-btn active" id="btnTabList" onclick="switchView('list')"><i class="fa-solid fa-list-check me-1"></i> 📋 Danh sách đặt sân</button>
+    <button class="tab-btn" id="btnTabSchedule" onclick="switchView('schedule')"><i class="fa-solid fa-calendar-days me-1"></i> 📅 Lịch sân thể thao (Timeline)</button>
   </div>
 
   <!-- Thống kê tổng quan -->
   <section class="summary">
     <div class="metric">
-      <div class="metric-icon g">▣</div>
+      <div class="metric-icon g"><i class="fa-solid fa-clipboard-list"></i></div>
       <div>
         <label>Tổng lượt đặt</label>
         <strong th:text="${stats != null and stats['total'] != null ? stats['total'] : 0}">0</strong>
       </div>
     </div>
     <div class="metric">
-      <div class="metric-icon o">◷</div>
+      <div class="metric-icon o"><i class="fa-solid fa-clock"></i></div>
       <div>
         <label>Chờ xác nhận</label>
         <strong th:text="${stats != null and stats['pending'] != null ? stats['pending'] : 0}">0</strong>
       </div>
     </div>
     <div class="metric">
-      <div class="metric-icon b">✔</div>
+      <div class="metric-icon b"><i class="fa-solid fa-circle-check"></i></div>
       <div>
         <label>Đã xác nhận</label>
         <strong th:text="${stats != null and stats['confirmed'] != null ? stats['confirmed'] : 0}">0</strong>
       </div>
     </div>
     <div class="metric">
-      <div class="metric-icon p">₫</div>
+      <div class="metric-icon p"><i class="fa-solid fa-play"></i></div>
       <div>
-        <label>Tổng doanh thu (đ)</label>
+        <label>Đang sử dụng</label>
+        <strong th:text="${stats != null and stats['inUse'] != null ? stats['inUse'] : 0}">0</strong>
+      </div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon g"><i class="fa-solid fa-dong-sign"></i></div>
+      <div>
+        <label>Tổng thu ròng</label>
         <strong th:text="${stats != null and stats['totalRevenue'] != null ? #numbers.formatDecimal(stats['totalRevenue'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
       </div>
     </div>
@@ -632,99 +380,190 @@ main {
             <tr>
               <th>Mã đặt</th>
               <th>Khách hàng</th>
-              <th>Sân</th>
+              <th>Sân thể thao</th>
               <th>Ngày</th>
               <th>Khung giờ</th>
-              <th>Tổng tiền (đ)</th>
+              <th>Tổng tiền</th>
               <th>Trạng thái</th>
-              <th style="text-align:right">Thao tác</th>
+              <th style="text-align:right">Thao tác nghiệp vụ</th>
             </tr>
           </thead>
           <tbody>
             <tr th:each="b : ${bookings}" th:data-id="${b.id}" class="clickable-row" th:classappend="${bookingDTO != null and bookingDTO.id == b.id ? 'selected-row' : ''}">
               <td style="font-weight:800;color:#087a42" th:text="${b.id}"></td>
-              <td style="font-weight:700" th:text="${b.customerName}"></td>
-              <td th:text="${b.courtName}"></td>
+              <td>
+                <b th:text="${b.customerName}"></b>
+                <div style="font-size:10.5px;color:var(--muted)" th:text="${b.customerPhone}"></div>
+              </td>
+              <td>
+                <span th:text="${b.courtName}"></span>
+                <span th:if="${b.sportName != null and b.sportName != 'N/A'}" class="badge" style="background:#e8f4fc;color:#0284c7;font-size:9px" th:text="${b.sportName}"></span>
+              </td>
               <td th:text="${b.bookingDate != null ? #temporals.format(b.bookingDate, 'dd/MM/yyyy') : '--/--/----'}"></td>
               <td th:text="${(b.startTime != null ? #temporals.format(b.startTime, 'HH:mm') : '--:--') + ' – ' + (b.endTime != null ? #temporals.format(b.endTime, 'HH:mm') : '--:--')}"></td>
-              <td style="font-weight:800" th:text="${b.totalAmount != null ? #numbers.formatDecimal(b.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}"></td>
+              <td>
+                <strong th:text="${b.totalAmount != null ? #numbers.formatDecimal(b.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}"></strong>
+                <div th:if="${b.paidAmount != null and b.paidAmount.compareTo(b.totalAmount) < 0}" style="font-size:9.5px;color:#d97706">
+                  Còn thiếu: <span th:text="${#numbers.formatDecimal(b.remainingAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                </div>
+              </td>
               <td>
                 <span class="badge"
                       th:classappend="${b.status == 'Đã xác nhận' ? 'status-confirmed' : (b.status == 'Chờ xác nhận' ? 'status-pending' : (b.status == 'Hoàn tất' ? 'status-completed' : (b.status == 'Đang sử dụng' ? 'status-inuse' : 'status-cancelled')))}"
                       th:text="${b.status}"></span>
               </td>
               <td style="text-align:right;white-space:nowrap">
-                <form th:if="${b.status == 'Chờ xác nhận'}" th:action="@{/admin/bookings/confirm/{id}(id=${b.id})}" method="post" style="display:inline">
-                  <button type="submit" class="btn success-sm" title="Duyệt nhanh">✓ Duyệt</button>
-                </form>
-                <a th:href="@{/admin/bookings(editId=${b.id})}" class="btn outline-sm" title="Mở form sửa">Sửa</a>
+                <div style="display:inline-flex;gap:4px;align-items:center">
+                  <!-- 1. Chờ xác nhận: Nút Duyệt (UC17) -->
+                  <form th:if="${b.status == 'Chờ xác nhận'}" th:action="@{/admin/bookings/confirm/{id}(id=${b.id})}" method="post" style="display:inline">
+                    <button type="submit" class="btn action-btn btn-confirm" title="Xác nhận phiếu"><i class="fa-solid fa-check"></i> Duyệt</button>
+                  </form>
+
+                  <!-- 2. Đã xác nhận: Nút Nhận sân (UC21) & Đổi sân/giờ (UC19) -->
+                  <form th:if="${b.status == 'Đã xác nhận'}" th:action="@{/admin/bookings/checkin/{id}(id=${b.id})}" method="post" style="display:inline">
+                    <button type="submit" class="btn action-btn btn-checkin" title="Khách nhận sân"><i class="fa-solid fa-play"></i> Nhận sân</button>
+                  </form>
+                  <button th:if="${b.status == 'Đã xác nhận' or b.status == 'Chờ xác nhận'}" type="button" class="btn action-btn btn-change"
+                          th:data-id="${b.id}" th:data-court="${b.courtId}" th:data-courtname="${b.courtName}"
+                          th:data-date="${b.bookingDate}" th:data-start="${b.startTime}" th:data-end="${b.endTime}"
+                          th:data-amount="${b.totalAmount}"
+                          onclick="openChangeScheduleModal(this)" title="Đổi sân hoặc giờ thuê"><i class="fa-solid fa-rotate"></i> Đổi</button>
+
+                  <!-- 3. Đang sử dụng: Nút Trả sân (UC22) & Gia hạn (UC23) -->
+                  <form th:if="${b.status == 'Đang sử dụng'}" th:action="@{/admin/bookings/checkout/{id}(id=${b.id})}" method="post" style="display:inline"
+                        onsubmit="return confirm('Xác nhận trả sân cho phiếu #' + '[[${b.id}]]' + '?');">
+                    <button type="submit" class="btn action-btn btn-checkout" title="Khách trả sân"><i class="fa-solid fa-stop"></i> Trả sân</button>
+                  </form>
+                  <button th:if="${b.status == 'Đang sử dụng'}" type="button" class="btn action-btn btn-extend"
+                          th:data-id="${b.id}" th:data-courtname="${b.courtName}" th:data-end="${b.endTime}"
+                          onclick="openExtendModal(this)" title="Gia hạn thời gian thuê"><i class="fa-solid fa-clock-rotate-left"></i> Gia hạn</button>
+
+                  <!-- 4. Hủy phiếu theo chính sách (UC20) -->
+                  <button th:if="${b.status == 'Chờ xác nhận' or b.status == 'Đã xác nhận'}" type="button" class="btn action-btn btn-cancel"
+                          th:data-id="${b.id}" th:data-customer="${b.customerName}" th:data-court="${b.courtName}"
+                          th:data-time="(${b.startTime != null ? #temporals.format(b.startTime, 'HH:mm') : ''}) + ' - ' + (${b.endTime != null ? #temporals.format(b.endTime, 'HH:mm') : ''})"
+                          th:data-amount="${b.totalAmount}" th:data-paid="${b.paidAmount}"
+                          th:data-fee="${b.cancellationFeeRate}"
+                          onclick="openCancelModal(this)" title="Hủy phiếu theo chính sách"><i class="fa-solid fa-ban"></i> Hủy</button>
+
+                  <!-- 5. Chi tiết / In phiếu -->
+                  <button type="button" class="btn action-btn" style="background:#f8fafc" th:data-id="${b.id}" onclick="openDetailModal(this.getAttribute('data-id'))" title="Xem chi tiết & in phiếu">
+                    <i class="fa-regular fa-eye"></i>
+                  </button>
+                </div>
               </td>
             </tr>
             <tr th:if="${bookings == null or #lists.isEmpty(bookings)}">
-              <td colspan="8" class="empty">Không tìm thấy phiếu đặt sân phù hợp.</td>
+              <td colspan="8" class="empty">Không tìm thấy phiếu đặt sân phù hợp với điều kiện tìm kiếm.</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- CỘT PHẢI: FORM CHI TIẾT -->
+    <!-- CỘT PHẢI: FORM LẬP PHIẾU ĐẶT SÂN TẠI QUẦY (UC17) -->
     <div class="card formcard">
       <div class="head">
-        <h2>Phiếu đặt sân</h2>
-        <span class="mode" th:text="${bookingDTO != null and bookingDTO.id != null ? 'Đang sửa: ' + bookingDTO.id : 'Thêm mới'}"></span>
+        <h2>Lập Phiếu Đặt Sân Tại Quầy</h2>
+        <span class="mode" th:text="${bookingDTO != null and bookingDTO.id != null ? 'Đang sửa: ' + bookingDTO.id : 'Tiếp nhận mới'}"></span>
       </div>
 
-      <form th:action="@{/admin/bookings/save}" th:object="${bookingDTO}" method="post">
+      <form th:action="@{/admin/bookings/save}" th:object="${bookingDTO}" method="post" id="bookingMainForm">
+        <input type="hidden" th:field="*{id}">
+        
         <div class="fields">
+          <!-- Tra cứu khách hàng theo SĐT nhanh -->
           <div class="field">
-            <label>Mã đặt sân</label>
-            <input type="text" th:field="*{id}" readonly placeholder="DSxxxx (Hệ thống tự sinh)">
+            <label>Số điện thoại khách hàng (*)</label>
+            <div style="display:flex;gap:6px">
+              <input type="text" id="custPhoneInput" placeholder="Ví dụ: 0901234567" style="flex:1">
+              <button type="button" class="btn" style="padding:0 10px;height:36px;font-size:11px" onclick="lookupCustomerByPhone()">
+                <i class="fa-solid fa-magnifying-glass"></i> Tra cứu
+              </button>
+            </div>
+            <div id="custLookupNotice" style="font-size:10px;margin-top:3px;color:var(--muted)">Nhập số điện thoại để tra cứu hoặc tạo nhanh khách hàng tại quầy</div>
           </div>
 
+          <!-- Khách hàng -->
           <div class="field">
             <label>Khách hàng (*)</label>
-            <select th:field="*{customerId}" required>
+            <select th:field="*{customerId}" id="customerSelect" required>
               <option value="" disabled selected>-- Chọn khách hàng --</option>
-              <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.fullName} + ' (' + ${c.phone} + ')'"></option>
+              <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.fullName} + ' (' + ${c.phone} + ')'"
+                      th:data-phone="${c.phone}" th:data-name="${c.fullName}"></option>
+              <option value="NEW">＋ [Khách mới] Nhập thông tin bên dưới</option>
             </select>
           </div>
 
+          <div class="field" id="newCustomerRow" style="display:none;background:#f8fafc;padding:8px;border-radius:8px;border:1px dashed #cbd5e1">
+            <label style="color:#0f766e">Tên khách hàng mới</label>
+            <input type="text" name="newCustomerName" id="newCustomerName" placeholder="Họ và tên khách hàng">
+            <input type="hidden" name="newCustomerPhone" id="newCustomerPhone">
+          </div>
+
+          <!-- Môn & Sân thể thao -->
           <div class="field">
             <label>Sân thể thao (*)</label>
-            <select th:field="*{courtId}" required>
-              <option value="" disabled selected>-- Chọn sân --</option>
-              <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'"></option>
+            <select th:field="*{courtId}" id="courtSelect" required onchange="triggerEstimate()">
+              <option value="" disabled selected>-- Chọn sân thể thao --</option>
+              <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'" th:data-sport="${c.sportId}"></option>
             </select>
           </div>
 
+          <!-- Ngày & Khung giờ -->
           <div class="field">
-            <label>Ngày đặt (*)</label>
-            <input type="date" th:field="*{bookingDate}" required>
+            <label>Ngày đặt sân (*)</label>
+            <input type="date" th:field="*{bookingDate}" id="bookingDateInput" required onchange="triggerEstimate()">
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div class="field">
               <label>Giờ bắt đầu (*)</label>
-              <input type="time" th:field="*{startTime}" required>
+              <input type="time" th:field="*{startTime}" id="startTimeInput" required onchange="triggerEstimate()">
             </div>
             <div class="field">
               <label>Giờ kết thúc (*)</label>
-              <input type="time" th:field="*{endTime}" required>
+              <input type="time" th:field="*{endTime}" id="endTimeInput" required onchange="triggerEstimate()">
             </div>
           </div>
 
-          <div class="field">
-            <label>Tổng tiền (đ) (*)</label>
-            <input type="number" th:field="*{totalAmount}" min="0" placeholder="150000" required>
+          <!-- Chính sách & Khuyến mãi -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="field">
+              <label>Chính sách đặt sân</label>
+              <select th:field="*{policyId}" id="policySelect" onchange="triggerEstimate()">
+                <option th:each="p : ${policies}" th:value="${p.id}" th:text="${p.name} + ' (' + ${p.depositRate} + '% cọc)'"
+                        th:data-deposit="${p.depositRate}"></option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Mã khuyến mãi</label>
+              <select th:field="*{promotionId}" id="promoSelect" onchange="triggerEstimate()">
+                <option value="">Không áp dụng</option>
+                <option th:each="pm : ${promotions}" th:value="${pm.id}" th:text="${pm.name} + ' (-' + ${#numbers.formatDecimal(pm.discountAmount,0,'COMMA',0,'POINT')} + 'đ)'"></option>
+              </select>
+            </div>
           </div>
 
+          <!-- Tổng tiền & Cọc dự tính -->
+          <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px;background:#f8fafc;padding:10px;border-radius:8px;border:1px solid #e2e8f0">
+            <div class="field" style="margin:0">
+              <label>Tổng tiền dự tính (đ) (*)</label>
+              <input type="number" th:field="*{totalAmount}" id="totalAmountInput" min="0" required style="font-weight:800;color:#0f766e">
+            </div>
+            <div class="field" style="margin:0">
+              <label>Tiền cọc yêu cầu</label>
+              <input type="text" id="depositAmountDisplay" readonly style="font-weight:700;color:#d97706;background:#fff">
+            </div>
+          </div>
+
+          <!-- Trạng thái ban đầu -->
           <div class="field">
-            <label>Trạng thái</label>
-            <select th:field="*{status}">
-              <option value="Chờ xác nhận">Chờ xác nhận</option>
-              <option value="Đã xác nhận">Đã xác nhận</option>
-              <option value="Đang sử dụng">Đang sử dụng</option>
+            <label>Trạng thái phiếu</label>
+            <select th:field="*{status}" id="statusSelect">
+              <option value="Chờ xác nhận">Chờ xác nhận (Khách hẹn chuyển khoản cọc)</option>
+              <option value="Đã xác nhận">Đã xác nhận (Đã thu đủ cọc tại quầy)</option>
+              <option value="Đang sử dụng">Đang sử dụng (Khách nhận sân ngay)</option>
               <option value="Hoàn tất">Hoàn tất</option>
               <option value="Đã hủy">Đã hủy</option>
             </select>
@@ -732,38 +571,60 @@ main {
         </div>
 
         <div class="actions">
-          <button type="submit" class="btn primary">Lưu phiếu</button>
-          <a href="/admin/bookings" class="btn">Làm mới</a>
+          <button type="submit" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu phiếu</button>
+          <a href="/admin/bookings" class="btn"><i class="fa-solid fa-rotate-right"></i> Làm mới</a>
           <button type="button" class="btn danger" th:if="${bookingDTO != null and bookingDTO.id != null}"
-                  onclick="if(confirm('Bạn có chắc muốn hủy phiếu đặt này?')) document.getElementById('cancelForm').submit();">Hủy</button>
+                  onclick="if(confirm('Bạn có chắc muốn hủy phiếu đặt này?')) document.getElementById('cancelQuickForm').submit();">Hủy</button>
         </div>
       </form>
 
-      <form id="cancelForm" th:if="${bookingDTO != null and bookingDTO.id != null}"
+      <form id="cancelQuickForm" th:if="${bookingDTO != null and bookingDTO.id != null}"
             th:action="@{/admin/bookings/cancel/{id}(id=${bookingDTO.id})}" method="post" style="display:none"></form>
     </div>
   </section>
 
-  <!-- VIEW 2: LỊCH SÂN THỂ THAO (TIMELINE MATRIX) -->
+  <!-- VIEW 2: LỊCH SÂN THỂ THAO (TIMELINE MATRIX - UC18) -->
   <section class="timeline-view" id="viewSchedule">
     <div class="timeline-card">
       <div class="timeline-head">
         <div>
-          <h2 style="margin:0 0 4px;font-size:15px;font-weight:800;color:var(--ink)">Bảng điều phối lịch sân thời gian thực</h2>
-          <p style="margin:0;font-size:11.5px;color:var(--muted)">Xem trực quan toàn bộ các sân và khung giờ từ 06:00 đến 22:00 trong ngày</p>
+          <h2 style="margin:0 0 4px;font-size:15px;font-weight:800;color:var(--ink)">
+            <i class="fa-solid fa-calendar-week text-success me-1"></i> Bảng điều phối lịch sân thời gian thực (UC18)
+          </h2>
+          <p style="margin:0;font-size:11.5px;color:var(--muted)">Xem trạng thái chi tiết từng sân từ 06:00 đến 22:00. Click vào ô trống để lập phiếu đặt sân nhanh.</p>
         </div>
+
+        <!-- Bộ lọc ngày & môn -->
+        <form action="/admin/bookings" method="get" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <input type="hidden" name="view" value="schedule">
+          <div style="display:flex;align-items:center;gap:6px">
+            <label style="font-size:11px;font-weight:800;color:var(--muted)">NGÀY:</label>
+            <input type="date" name="scheduleDate" th:value="${scheduleDate}" style="height:32px;border:1px solid #cbd5e1;border-radius:6px;padding:0 8px;font-size:11.5px">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <label style="font-size:11px;font-weight:800;color:var(--muted)">MÔN:</label>
+            <select name="sportId" style="height:32px;border:1px solid #cbd5e1;border-radius:6px;padding:0 8px;font-size:11.5px">
+              <option value="ALL">Tất cả môn thể thao</option>
+              <option th:each="s : ${sports}" th:value="${s.id}" th:text="${s.name}" th:selected="${selectedSportId == s.id}"></option>
+            </select>
+          </div>
+          <button type="submit" class="btn primary" style="height:32px;padding:0 12px;font-size:11px">
+            <i class="fa-solid fa-filter"></i> Xem lịch
+          </button>
+        </form>
+
         <div style="display:flex;align-items:center;gap:12px;font-size:11px;font-weight:700">
           <span style="display:inline-flex;align-items:center;gap:5px"><i style="width:10px;height:10px;background:#cbe5ff;border-radius:3px;display:inline-block"></i> Đã đặt</span>
           <span style="display:inline-flex;align-items:center;gap:5px"><i style="width:10px;height:10px;background:#d3f5df;border-radius:3px;display:inline-block"></i> Đang dùng</span>
           <span style="display:inline-flex;align-items:center;gap:5px"><i style="width:10px;height:10px;background:#fef3c7;border-radius:3px;display:inline-block"></i> Bảo trì</span>
-          <span style="display:inline-flex;align-items:center;gap:5px"><i style="width:10px;height:10px;background:#fff;border:1px dashed #bbb;border-radius:3px;display:inline-block"></i> Còn trống</span>
+          <span style="display:inline-flex;align-items:center;gap:5px"><i style="width:10px;height:10px;background:#fff;border:1px dashed #22c55e;border-radius:3px;display:inline-block"></i> Còn trống</span>
         </div>
       </div>
 
       <div class="timeline-matrix">
         <div class="timeline-grid">
           <!-- Hàng tiêu đề giờ -->
-          <div class="grid-cell grid-time">Sân \ Giờ</div>
+          <div class="grid-cell grid-time">Sân \ Khung giờ</div>
           <div class="grid-cell grid-time">06:00</div>
           <div class="grid-cell grid-time">07:00</div>
           <div class="grid-cell grid-time">08:00</div>
@@ -781,36 +642,250 @@ main {
           <div class="grid-cell grid-time">22:00</div>
           <div class="grid-cell grid-time">Tình trạng</div>
 
-          <!-- Các dòng sân thể thao -->
-          <th:block th:each="court, cStat : ${courts}">
-            <div class="grid-cell grid-court" th:text="${court.name}">Sân</div>
-            <div class="grid-cell slot-free">Trống</div>
-            <div class="grid-cell slot-free">Trống</div>
-            <div class="grid-cell" th:classappend="${cStat.index % 2 == 0 ? 'slot-busy' : 'slot-free'}" th:text="${cStat.index % 2 == 0 ? 'Đã đặt' : 'Trống'}"></div>
-            <div class="grid-cell" th:classappend="${cStat.index % 2 == 0 ? 'slot-busy' : 'slot-free'}" th:text="${cStat.index % 2 == 0 ? 'Đã đặt' : 'Trống'}"></div>
-            <div class="grid-cell slot-free">Trống</div>
-            <div class="grid-cell slot-free">Trống</div>
-            <div class="grid-cell slot-free">Trống</div>
-            <div class="grid-cell" th:classappend="${cStat.index == 1 ? 'slot-maint' : 'slot-free'}" th:text="${cStat.index == 1 ? 'Bảo trì' : 'Trống'}"></div>
-            <div class="grid-cell" th:classappend="${cStat.index == 1 ? 'slot-maint' : 'slot-free'}" th:text="${cStat.index == 1 ? 'Bảo trì' : 'Trống'}"></div>
-            <div class="grid-cell slot-inuse">Đang dùng</div>
-            <div class="grid-cell slot-inuse">Đang dùng</div>
-            <div class="grid-cell slot-busy">Đã đặt</div>
-            <div class="grid-cell slot-busy">Đã đặt</div>
-            <div class="grid-cell slot-free">Trống</div>
-            <div class="grid-cell slot-free">Trống</div>
-            <div class="grid-cell" style="font-weight:800;color:#087a42" th:text="${court.status != null ? court.status : 'Hoạt động'}">Hoạt động</div>
+          <!-- Các dòng sân thể thao thời gian thực -->
+          <th:block th:each="court : ${timelineCourts}">
+            <div class="grid-cell grid-court">
+              <span th:text="${court.courtName}"></span>
+              <small style="font-size:9.5px;color:var(--muted)" th:text="${court.sportName}"></small>
+            </div>
+            <th:block th:each="slot : ${court.slots}">
+              <div class="grid-cell"
+                   th:classappend="${slot.cssClass}"
+                   th:title="${slot.statusLabel + (slot.customerName != null ? ': ' + slot.customerName : '') + (slot.note != null ? ' - ' + slot.note : '')}"
+                   th:data-court-id="${court.courtId}"
+                   th:data-time="${slot.time}"
+                   th:data-booking-id="${slot.bookingId}"
+                   onclick="handleSlotClick(this)">
+                <span th:text="${slot.statusLabel}"></span>
+                <small th:if="${slot.customerName != null}" style="font-size:8.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60px" th:text="${slot.customerName}"></small>
+              </div>
+            </th:block>
+            <div class="grid-cell" style="font-weight:800;color:#087a42" th:text="${court.courtStatus}">Hoạt động</div>
           </th:block>
         </div>
       </div>
     </div>
   </section>
-
 </div>
 </main>
 </div>
 
+<!-- ========================================================================= -->
+<!-- MODALS CHO CÁC USE CASE NGHIỆP VỤ -->
+<!-- ========================================================================= -->
+
+<!-- MODAL 1: ĐỔI SÂN HOẶC GIỜ THUÊ (UC19) -->
+<div class="modal-overlay" id="modalChangeSchedule">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-rotate text-primary"></i> Đổi Sân Hoặc Giờ Thuê (UC19)</h3>
+      <button type="button" class="modal-close" onclick="closeModal('modalChangeSchedule')">&times;</button>
+    </div>
+    <form th:action="@{/admin/bookings/change-schedule}" method="post">
+      <div class="modal-body">
+        <input type="hidden" name="bookingId" id="csBookingId">
+        <div style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px;font-size:11.5px">
+          <div>Phiếu: <b id="csBookingIdTxt" style="color:var(--green2)"></b></div>
+          <div>Sân hiện tại: <span id="csCurrentCourt"></span> • Giờ: <span id="csCurrentTime"></span></div>
+        </div>
+
+        <div class="field" style="margin-bottom:10px">
+          <label>Chọn sân mới (*)</label>
+          <select name="newCourtId" id="csNewCourtId" required>
+            <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'"></option>
+          </select>
+        </div>
+
+        <div class="field" style="margin-bottom:10px">
+          <label>Ngày thuê mới (*)</label>
+          <input type="date" name="newBookingDate" id="csNewDate" required>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div class="field">
+            <label>Giờ bắt đầu mới (*)</label>
+            <input type="time" name="newStartTime" id="csNewStartTime" required>
+          </div>
+          <div class="field">
+            <label>Giờ kết thúc mới (*)</label>
+            <input type="time" name="newEndTime" id="csNewEndTime" required>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:10px">
+          <label>Lý do thay đổi</label>
+          <input type="text" name="reason" placeholder="Khách xin đổi giờ bận việc, đổi sân rộng hơn...">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeModal('modalChangeSchedule')">Đóng</button>
+        <button type="submit" class="btn primary"><i class="fa-solid fa-check"></i> Xác nhận đổi lịch</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 2: GIA HẠN SÂN (UC23) -->
+<div class="modal-overlay" id="modalExtend">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-clock-rotate-left text-warning"></i> Gia Hạn Thời Gian Thuê (UC23)</h3>
+      <button type="button" class="modal-close" onclick="closeModal('modalExtend')">&times;</button>
+    </div>
+    <form th:action="@{/admin/bookings/extend}" method="post">
+      <div class="modal-body">
+        <input type="hidden" name="bookingId" id="extBookingId">
+        <div style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px;font-size:11.5px">
+          <div>Phiếu: <b id="extBookingIdTxt" style="color:var(--green2)"></b></div>
+          <div>Sân: <span id="extCourtName"></span></div>
+          <div>Giờ kết thúc hiện tại: <b id="extCurrentEnd" style="color:#d97706"></b></div>
+        </div>
+
+        <div class="field" style="margin-bottom:10px">
+          <label>Giờ kết thúc gia hạn mới (*)</label>
+          <input type="time" name="newEndTime" id="extNewEndTime" required>
+          <small style="color:var(--muted);font-size:10px">Hệ thống sẽ tự động kiểm tra trùng lịch sân và lịch bảo trì tiếp theo</small>
+        </div>
+
+        <div class="field" style="margin-bottom:10px">
+          <label>Hình thức thanh toán phí phát sinh</label>
+          <select name="paymentMethod">
+            <option value="Tiền mặt">Tiền mặt tại quầy</option>
+            <option value="Chuyển khoản">Chuyển khoản ngân hàng</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeModal('modalExtend')">Hủy</button>
+        <button type="submit" class="btn primary"><i class="fa-solid fa-clock"></i> Xác nhận gia hạn</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 3: HỦY PHIẾU VỚI CHÍNH SÁCH HOÀN TIỀN (UC20) -->
+<div class="modal-overlay" id="modalCancel">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-ban text-danger"></i> Hủy Phiếu Đặt Sân & Hoàn Tiền (UC20)</h3>
+      <button type="button" class="modal-close" onclick="closeModal('modalCancel')">&times;</button>
+    </div>
+    <form th:action="@{/admin/bookings/cancel}" method="post">
+      <div class="modal-body">
+        <input type="hidden" name="bookingId" id="cancelBookingId">
+        
+        <div style="background:#fff1f2;border:1px solid #fecdd3;padding:12px;border-radius:8px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span>Mã phiếu hủy:</span>
+            <b id="cancelBookingIdTxt" style="color:#be123c"></b>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span>Khách hàng:</span>
+            <strong id="cancelCustomerName"></strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span>Sân & Thời gian:</span>
+            <span id="cancelCourtTime"></span>
+          </div>
+          <hr style="border:none;border-top:1px dashed #fda4af;margin:8px 0">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span>Tổng tiền đã thanh toán:</span>
+            <b id="cancelTotalPaid" style="color:#0f766e"></b>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span>Phí phạt hủy (<span id="cancelFeeRateTxt">10</span>%):</span>
+            <span id="cancelFeeAmount" style="color:#be123c;font-weight:700"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <span style="font-weight:800">Số tiền hoàn lại cho khách:</span>
+            <b id="cancelRefundAmount" style="font-size:16px;color:#16a34a"></b>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Lý do hủy (*)</label>
+          <input type="text" name="reason" placeholder="Khách bận việc đột xuất, thời tiết mưa lớn..." required>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeModal('modalCancel')">Đóng</button>
+        <button type="submit" class="btn danger"><i class="fa-solid fa-trash-can"></i> Xác nhận hủy & Hoàn tiền</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 4: XEM CHI TIẾT & IN PHIẾU ĐẶT SÂN -->
+<div class="modal-overlay" id="modalDetail">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-receipt text-success"></i> Chi Tiết Phiếu Đặt Sân</h3>
+      <button type="button" class="modal-close" onclick="closeModal('modalDetail')">&times;</button>
+    </div>
+    <div class="modal-body" id="printArea">
+      <div style="text-align:center;margin-bottom:14px;border-bottom:1px solid #e2e8f0;padding-bottom:10px">
+        <h2 style="margin:0;font-size:16px;color:#0b3b28">TRUNG TÂM THỂ THAO SPORTHUB UTE</h2>
+        <div style="font-size:10.5px;color:var(--muted)">Số 1 Võ Văn Ngân, TP. Thủ Đức, TP. Hồ Chí Minh • Hotline: 1900 6868</div>
+        <div style="font-size:13px;font-weight:800;color:#087a42;margin-top:6px">PHIẾU XÁC NHẬN ĐẶT SÂN</div>
+      </div>
+
+      <div style="display:grid;gap:8px;font-size:12px;background:#f8fafc;padding:12px;border-radius:10px;border:1px solid #e2e8f0">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Mã phiếu đặt:</span>
+          <b id="dtId" style="font-family:monospace;color:var(--green2);font-size:13px"></b>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Khách hàng:</span>
+          <b id="dtCustomer"></b>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Số điện thoại:</span>
+          <span id="dtPhone"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Sân & Môn:</span>
+          <strong id="dtCourt"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Ngày thi đấu:</span>
+          <span id="dtDate"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Khung giờ thuê:</span>
+          <b id="dtTime" style="color:var(--blue)"></b>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Chính sách áp dụng:</span>
+          <span id="dtPolicy"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Trạng thái:</span>
+          <span id="dtStatus" class="badge"></span>
+        </div>
+        <hr style="border:none;border-top:1px dashed #cbd5e1;margin:6px 0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:700">Tổng tiền:</span>
+          <strong id="dtTotal" style="font-size:15px;color:#0f766e"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;color:#16a34a">
+          <span>Tiền đã thanh toán/cọc:</span>
+          <strong id="dtPaid"></strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;color:#d97706">
+          <span>Còn phải thanh toán:</span>
+          <strong id="dtRemaining"></strong>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn" onclick="closeModal('modalDetail')">Đóng</button>
+      <button type="button" class="btn primary" onclick="printReceipt()"><i class="fa-solid fa-print"></i> In phiếu thu</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// Switch giữa Danh sách và Timeline
 function switchView(mode) {
   const isSchedule = (mode === 'schedule');
   document.getElementById('viewList').style.display = isSchedule ? 'none' : 'grid';
@@ -823,14 +898,183 @@ function switchView(mode) {
     nb.classList.toggle('active', !isSchedule);
     ns.classList.toggle('active', isSchedule);
   }
-  if (isSchedule) {
-    window.location.hash = 'lich-san';
-  } else {
-    if (window.location.hash === '#lich-san') history.replaceState(null, null, ' ');
+}
+
+// Modal helper
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// Open Change Schedule Modal (UC19)
+function openChangeScheduleModal(btn) {
+  document.getElementById('csBookingId').value = btn.getAttribute('data-id');
+  document.getElementById('csBookingIdTxt').innerText = '#' + btn.getAttribute('data-id');
+  document.getElementById('csCurrentCourt').innerText = btn.getAttribute('data-courtname');
+  document.getElementById('csCurrentTime').innerText = btn.getAttribute('data-date') + ' (' + btn.getAttribute('data-start') + ' - ' + btn.getAttribute('data-end') + ')';
+  document.getElementById('csNewCourtId').value = btn.getAttribute('data-court');
+  document.getElementById('csNewDate').value = btn.getAttribute('data-date');
+  document.getElementById('csNewStartTime').value = btn.getAttribute('data-start');
+  document.getElementById('csNewEndTime').value = btn.getAttribute('data-end');
+  openModal('modalChangeSchedule');
+}
+
+// Open Extend Modal (UC23)
+function openExtendModal(btn) {
+  document.getElementById('extBookingId').value = btn.getAttribute('data-id');
+  document.getElementById('extBookingIdTxt').innerText = '#' + btn.getAttribute('data-id');
+  document.getElementById('extCourtName').innerText = btn.getAttribute('data-courtname');
+  const curEnd = btn.getAttribute('data-end');
+  document.getElementById('extCurrentEnd').innerText = curEnd;
+  
+  // Gợi ý giờ kết thúc cộng thêm 1 tiếng
+  if (curEnd) {
+    const parts = curEnd.split(':');
+    let h = parseInt(parts[0], 10) + 1;
+    if (h > 23) h = 23;
+    document.getElementById('extNewEndTime').value = String(h).padStart(2, '0') + ':' + (parts[1] || '00');
+  }
+  openModal('modalExtend');
+}
+
+// Open Cancel Modal with Policy Calculation (UC20)
+function openCancelModal(btn) {
+  const id = btn.getAttribute('data-id');
+  const cust = btn.getAttribute('data-customer');
+  const court = btn.getAttribute('data-court');
+  const time = btn.getAttribute('data-time');
+  const paid = parseFloat(btn.getAttribute('data-paid') || '0');
+  const feeRate = parseFloat(btn.getAttribute('data-fee') || '10');
+
+  const feeAmount = Math.round(paid * (feeRate / 100));
+  const refundAmount = Math.max(0, paid - feeAmount);
+
+  document.getElementById('cancelBookingId').value = id;
+  document.getElementById('cancelBookingIdTxt').innerText = '#' + id;
+  document.getElementById('cancelCustomerName').innerText = cust;
+  document.getElementById('cancelCourtTime').innerText = court + ' • ' + time;
+  document.getElementById('cancelTotalPaid').innerText = paid.toLocaleString('vi-VN') + ' đ';
+  document.getElementById('cancelFeeRateTxt').innerText = feeRate;
+  document.getElementById('cancelFeeAmount').innerText = feeAmount.toLocaleString('vi-VN') + ' đ';
+  document.getElementById('cancelRefundAmount').innerText = refundAmount.toLocaleString('vi-VN') + ' đ';
+
+  openModal('modalCancel');
+}
+
+// Open Booking Detail Modal & Print
+function openDetailModal(id) {
+  fetch('/admin/bookings/api/detail/' + encodeURIComponent(id))
+    .then(r => r.json())
+    .then(b => {
+      document.getElementById('dtId').innerText = '#' + b.id;
+      document.getElementById('dtCustomer').innerText = b.customerName;
+      document.getElementById('dtPhone').innerText = b.customerPhone || 'N/A';
+      document.getElementById('dtCourt').innerText = b.courtName + (b.sportName ? ' (' + b.sportName + ')' : '');
+      document.getElementById('dtDate').innerText = b.bookingDate;
+      document.getElementById('dtTime').innerText = b.startTime + ' - ' + b.endTime;
+      document.getElementById('dtPolicy').innerText = b.policyName || 'Tiêu chuẩn';
+      document.getElementById('dtTotal').innerText = Number(b.totalAmount || 0).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('dtPaid').innerText = Number(b.paidAmount || 0).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('dtRemaining').innerText = Number(b.remainingAmount || 0).toLocaleString('vi-VN') + ' đ';
+
+      const st = document.getElementById('dtStatus');
+      st.innerText = b.status;
+      st.className = 'badge ' + (b.status === 'Đã xác nhận' ? 'status-confirmed' : (b.status === 'Chờ xác nhận' ? 'status-pending' : (b.status === 'Đang sử dụng' ? 'status-inuse' : 'status-completed')));
+
+      openModal('modalDetail');
+    })
+    .catch(err => alert('Không thể tải chi tiết phiếu đặt: ' + err));
+}
+
+function printReceipt() {
+  window.print();
+}
+
+// Tra cứu khách hàng theo SĐT (AJAX)
+function lookupCustomerByPhone() {
+  const phone = document.getElementById('custPhoneInput').value.trim();
+  const notice = document.getElementById('custLookupNotice');
+  if (!phone) {
+    alert('Vui lòng nhập số điện thoại khách hàng!');
+    return;
+  }
+
+  fetch('/admin/bookings/api/customer-by-phone?phone=' + encodeURIComponent(phone))
+    .then(r => r.json())
+    .then(data => {
+      const select = document.getElementById('customerSelect');
+      const newRow = document.getElementById('newCustomerRow');
+
+      if (data.found) {
+        notice.innerText = '✓ Tìm thấy: ' + data.fullName + ' (' + data.phone + ')';
+        notice.style.color = '#087a42';
+        select.value = data.id;
+        newRow.style.display = 'none';
+      } else {
+        notice.innerText = 'ℹ Khách hàng chưa có hồ sơ. Vui lòng nhập họ tên khách để tạo nhanh.';
+        notice.style.color = '#d97706';
+        select.value = 'NEW';
+        newRow.style.display = 'block';
+        document.getElementById('newCustomerPhone').value = phone;
+        document.getElementById('newCustomerName').value = 'Khách ' + phone;
+        document.getElementById('newCustomerName').focus();
+      }
+    })
+    .catch(err => {
+      notice.innerText = 'Lỗi tra cứu: ' + err;
+      notice.style.color = '#dc2626';
+    });
+}
+
+// Tính giá tự động (Estimate Price)
+function triggerEstimate() {
+  const courtId = document.getElementById('courtSelect').value;
+  const date = document.getElementById('bookingDateInput').value;
+  const start = document.getElementById('startTimeInput').value;
+  const end = document.getElementById('endTimeInput').value;
+  const policyId = document.getElementById('policySelect').value;
+  const promo = document.getElementById('promoSelect').value;
+
+  if (!courtId || !date || !start || !end) return;
+
+  fetch('/admin/bookings/api/estimate-price', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ courtId, date, startTime: start, endTime: end, policyId, promotionCode: promo })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.valid) {
+      document.getElementById('totalAmountInput').value = data.totalAmount;
+      document.getElementById('depositAmountDisplay').value = Number(data.depositAmount).toLocaleString('vi-VN') + ' đ (' + data.depositRate + '%)';
+    }
+  })
+  .catch(err => console.error('Lỗi tính giá tự động:', err));
+}
+
+// Click vào Timeline Slot
+function handleSlotClick(el) {
+  const isFree = el.classList.contains('slot-free');
+  const isBusy = el.classList.contains('slot-busy') || el.classList.contains('slot-inuse');
+  const bookingId = el.getAttribute('data-booking-id');
+
+  if (isBusy && bookingId) {
+    openDetailModal(bookingId);
+  } else if (isFree) {
+    const courtId = el.getAttribute('data-court-id');
+    const time = el.getAttribute('data-time');
+
+    // Chuyển sang form đặt sân và điền sân & giờ
+    switchView('list');
+    if (courtId) document.getElementById('courtSelect').value = courtId;
+    if (time) {
+      document.getElementById('startTimeInput').value = time;
+      const h = parseInt(time.split(':')[0], 10) + 1;
+      document.getElementById('endTimeInput').value = String(h).padStart(2, '0') + ':00';
+    }
+    triggerEstimate();
   }
 }
 
-// Auto open schedule if url parameter view=schedule or hash #lich-san
+// Khởi chạy khi tải trang
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('view') === 'schedule' || window.location.hash === '#lich-san') {
@@ -845,6 +1089,23 @@ window.addEventListener('DOMContentLoaded', () => {
       if (id) location.href = '/admin/bookings?editId=' + encodeURIComponent(id);
     });
   });
+
+  // Listener khi đổi chọn khách hàng
+  const custSel = document.getElementById('customerSelect');
+  if (custSel) {
+    custSel.addEventListener('change', () => {
+      const isNew = custSel.value === 'NEW';
+      document.getElementById('newCustomerRow').style.display = isNew ? 'block' : 'none';
+      if (!isNew) {
+        const opt = custSel.selectedOptions[0];
+        if (opt && opt.getAttribute('data-phone')) {
+          document.getElementById('custPhoneInput').value = opt.getAttribute('data-phone');
+        }
+      }
+    });
+  }
+
+  triggerEstimate();
 });
 </script>
 </body>

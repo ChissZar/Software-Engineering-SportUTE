@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 @Table(name = "LICHBAOTRI")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Maintenance {
 
@@ -34,4 +32,20 @@ public class Maintenance {
 
     @Column(name = "LyDo", length = 200)
     private String reason;
+
+    public Maintenance() {
+    }
+
+    public Maintenance(String id, Court court, Employee employee, LocalDateTime startDate, LocalDateTime endDate, String reason) {
+        this.id = id;
+        this.court = court;
+        this.employee = employee;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.reason = reason;
+    }
+    public static class MaintenanceBuilder {
+        public MaintenanceBuilder() {
+        }
+    }
 }

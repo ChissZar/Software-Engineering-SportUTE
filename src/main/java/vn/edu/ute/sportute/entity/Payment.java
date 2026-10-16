@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 @Table(name = "GIAODICH")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Payment {
 
@@ -31,4 +29,19 @@ public class Payment {
 
     @Column(name = "PhuongThuc", length = 30)
     private String paymentMethod;
+
+    public Payment() {
+    }
+
+    public Payment(String id, Booking booking, String transactionType, BigDecimal amount, String paymentMethod) {
+        this.id = id;
+        this.booking = booking;
+        this.transactionType = transactionType;
+        this.amount = amount != null ? amount : BigDecimal.ZERO;
+        this.paymentMethod = paymentMethod;
+    }
+    public static class PaymentBuilder {
+        public PaymentBuilder() {
+        }
+    }
 }

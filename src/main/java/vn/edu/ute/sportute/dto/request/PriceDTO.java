@@ -9,10 +9,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PriceDTO {
     private String id;
 
@@ -30,13 +29,44 @@ public class PriceDTO {
     @Builder.Default
     private List<DetailDTO> details = new ArrayList<>();
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    public PriceDTO() {
+        this.details = new ArrayList<>();
+    }
+
+    public PriceDTO(String id, String courtId, String courtName, LocalDate fromDate, LocalDate toDate, List<DetailDTO> details) {
+        this.id = id;
+        this.courtId = courtId;
+        this.courtName = courtName;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.details = details != null ? details : new ArrayList<>();
+    }
+
+    public static class PriceDTOBuilder {
+        public PriceDTOBuilder() {
+        }
+    }
+
+    @Getter
+    @Setter
     @Builder
     public static class DetailDTO {
         private String id;
-        private String timeSlot; // Ví dụ: 05:00 - 17:00, 17:00 - 23:00
+        private String timeSlot;
         private BigDecimal priceAmount;
+
+        public DetailDTO() {
+        }
+
+        public DetailDTO(String id, String timeSlot, BigDecimal priceAmount) {
+            this.id = id;
+            this.timeSlot = timeSlot;
+            this.priceAmount = priceAmount;
+        }
+
+        public static class DetailDTOBuilder {
+            public DetailDTOBuilder() {
+            }
+        }
     }
 }

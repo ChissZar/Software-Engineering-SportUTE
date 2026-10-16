@@ -11,8 +11,6 @@ import java.util.List;
 @Table(name = "BANGGIA", schema = "dbo") // Chỉ định rõ schema dbo
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Price {
 
@@ -33,4 +31,19 @@ public class Price {
     @OneToMany(mappedBy = "price", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<PriceDetail> priceDetails = new ArrayList<>();
+
+    public Price() {
+    }
+
+    public Price(String id, Court court, LocalDate fromDate, LocalDate toDate, List<PriceDetail> priceDetails) {
+        this.id = id;
+        this.court = court;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.priceDetails = priceDetails != null ? priceDetails : new ArrayList<>();
+    }
+    public static class PriceBuilder {
+        public PriceBuilder() {
+        }
+    }
 }

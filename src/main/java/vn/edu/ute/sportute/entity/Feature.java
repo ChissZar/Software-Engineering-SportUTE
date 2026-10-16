@@ -7,8 +7,6 @@ import lombok.*;
 @Table(name = "CHUCNANG")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Feature {
 
@@ -21,4 +19,17 @@ public class Feature {
 
     @Column(name = "MoTa", length = 200)
     private String description;
+
+    public Feature() {
+    }
+
+    public Feature(String id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+    public static class FeatureBuilder {
+        public FeatureBuilder() {
+        }
+    }
 }

@@ -10,8 +10,6 @@ import java.util.List;
 @Table(name = "PHIEUDATSAN")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Booking {
 
@@ -45,4 +43,22 @@ public class Booking {
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Payment> payments = new ArrayList<>();
+
+    public Booking() {
+    }
+
+    public Booking(String id, Customer customer, Employee employee, Promotion promotion, BookingPolicy bookingPolicy, String status, List<BookingDetail> bookingDetails, List<Payment> payments) {
+        this.id = id;
+        this.customer = customer;
+        this.employee = employee;
+        this.promotion = promotion;
+        this.bookingPolicy = bookingPolicy;
+        this.status = status;
+        this.bookingDetails = bookingDetails != null ? bookingDetails : new ArrayList<>();
+        this.payments = payments != null ? payments : new ArrayList<>();
+    }
+    public static class BookingBuilder {
+        public BookingBuilder() {
+        }
+    }
 }

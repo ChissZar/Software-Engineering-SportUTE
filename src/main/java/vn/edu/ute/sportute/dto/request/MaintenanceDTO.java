@@ -7,10 +7,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MaintenanceDTO {
     private String id;
 
@@ -31,4 +30,23 @@ public class MaintenanceDTO {
 
     @NotBlank(message = "Vui lòng nhập lý do bảo trì")
     private String reason;
+
+    public MaintenanceDTO() {
+    }
+
+    public MaintenanceDTO(String id, String courtId, String courtName, String employeeId,
+                          String employeeName, LocalDateTime startDate, LocalDateTime endDate, String reason) {
+        this.id = id;
+        this.courtId = courtId;
+        this.courtName = courtName;
+        this.employeeId = employeeId;
+        this.employeeName = employeeName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.reason = reason;
+    }
+    public static class MaintenanceDTOBuilder {
+        public MaintenanceDTOBuilder() {
+        }
+    }
 }

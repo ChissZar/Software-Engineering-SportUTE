@@ -27,6 +27,9 @@ public class PriceController {
         model.addAttribute("prices", priceService.getAllPrices());
         model.addAttribute("courts", courtService.getAllCourts());
         PriceDTO priceDTO = new PriceDTO();
+        if (priceDTO.getDetails() == null) {
+            priceDTO.setDetails(new java.util.ArrayList<>());
+        }
         priceDTO.getDetails().add(new PriceDTO.DetailDTO());
         model.addAttribute("priceDTO", priceDTO);
         return "prices/index";

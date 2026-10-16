@@ -7,8 +7,6 @@ import lombok.*;
 @Table(name = "SAN")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Court {
 
@@ -29,4 +27,19 @@ public class Court {
     @Column(name = "TrangThai", length = 20, nullable = false)
     @Builder.Default
     private String status = "Hoạt động";
+
+    public Court() {
+    }
+
+    public Court(String id, String name, Sport sport, String location, String status) {
+        this.id = id;
+        this.name = name;
+        this.sport = sport;
+        this.location = location;
+        this.status = status != null ? status : "Hoạt động";
+    }
+    public static class CourtBuilder {
+        public CourtBuilder() {
+        }
+    }
 }

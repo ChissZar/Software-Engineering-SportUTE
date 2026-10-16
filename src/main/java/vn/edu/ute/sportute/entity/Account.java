@@ -13,8 +13,6 @@ import vn.edu.ute.sportute.entity.Role;
 @Table(name = "TAIKHOAN")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Account {
 
@@ -43,4 +41,21 @@ public class Account {
     )
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
+
+    public Account() {
+    }
+
+    public Account(String id, String username, String password, String email, String status, Set<Role> roles) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.status = status != null ? status : "Hoạt động";
+        this.roles = roles != null ? roles : new HashSet<>();
+    }
+
+    public static class AccountBuilder {
+        public AccountBuilder() {
+        }
+    }
 }

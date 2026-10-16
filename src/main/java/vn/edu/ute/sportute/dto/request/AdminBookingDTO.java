@@ -9,45 +9,110 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class AdminBookingDTO {
-    // 7. Mã đặt sân (Chỉ đọc)
+    // Mã đặt sân (Chỉ đọc)
     private String id;
 
-    // 8. Khách hàng
+    // Khách hàng
     @NotBlank(message = "Vui lòng chọn khách hàng")
     private String customerId;
     private String customerName;
     private String customerPhone;
+    private String customerEmail;
 
-    // 9. Sân
+    // Sân và môn
     @NotBlank(message = "Vui lòng chọn sân")
     private String courtId;
     private String courtName;
+    private String sportId;
+    private String sportName;
 
-    // 10. Ngày đặt
+    // Thời gian
     @NotNull(message = "Vui lòng chọn ngày đặt")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate bookingDate;
 
-    // 11. Giờ bắt đầu
     @NotNull(message = "Vui lòng chọn giờ bắt đầu")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
-    // 12. Giờ kết thúc[cite: 3]
     @NotNull(message = "Vui lòng chọn giờ kết thúc")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
-    // 13. Tổng tiền (đ)[cite: 3]
+    // Tài chính và tiền tệ
     @NotNull(message = "Vui lòng nhập tổng tiền")
     private BigDecimal totalAmount;
 
-    // 14. Trạng thái[cite: 3]
+    @Builder.Default
+    private BigDecimal depositAmount = BigDecimal.ZERO;
+
+    @Builder.Default
+    private BigDecimal paidAmount = BigDecimal.ZERO;
+
+    @Builder.Default
+    private BigDecimal remainingAmount = BigDecimal.ZERO;
+
+    // Chính sách & Khuyến mãi
+    private String policyId;
+    private String policyName;
+    private BigDecimal depositRate;
+    private BigDecimal cancellationFeeRate;
+
+    private String promotionId;
+    private String promotionName;
+    private BigDecimal discountAmount;
+
+    // Trạng thái: Chờ xác nhận, Đã xác nhận, Đang sử dụng, Hoàn tất, Đã hủy
     @NotBlank(message = "Vui lòng chọn trạng thái")
-    private String status; // Chờ xác nhận, Đã xác nhận, Đang sử dụng, Hoàn thành, Đã hủy[cite: 3]
+    private String status;
+
+    private String note;
+
+    public AdminBookingDTO() {
+        this.depositAmount = BigDecimal.ZERO;
+        this.paidAmount = BigDecimal.ZERO;
+        this.remainingAmount = BigDecimal.ZERO;
+    }
+
+    public AdminBookingDTO(String id, String customerId, String customerName, String customerPhone, String customerEmail,
+                           String courtId, String courtName, String sportId, String sportName,
+                           LocalDate bookingDate, LocalTime startTime, LocalTime endTime,
+                           BigDecimal totalAmount, BigDecimal depositAmount, BigDecimal paidAmount, BigDecimal remainingAmount,
+                           String policyId, String policyName, BigDecimal depositRate, BigDecimal cancellationFeeRate,
+                           String promotionId, String promotionName, BigDecimal discountAmount,
+                           String status, String note) {
+        this.id = id;
+        this.customerId = customerId;
+        this.customerName = customerName;
+        this.customerPhone = customerPhone;
+        this.customerEmail = customerEmail;
+        this.courtId = courtId;
+        this.courtName = courtName;
+        this.sportId = sportId;
+        this.sportName = sportName;
+        this.bookingDate = bookingDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.totalAmount = totalAmount;
+        this.depositAmount = depositAmount != null ? depositAmount : BigDecimal.ZERO;
+        this.paidAmount = paidAmount != null ? paidAmount : BigDecimal.ZERO;
+        this.remainingAmount = remainingAmount != null ? remainingAmount : BigDecimal.ZERO;
+        this.policyId = policyId;
+        this.policyName = policyName;
+        this.depositRate = depositRate;
+        this.cancellationFeeRate = cancellationFeeRate;
+        this.promotionId = promotionId;
+        this.promotionName = promotionName;
+        this.discountAmount = discountAmount;
+        this.status = status;
+        this.note = note;
+    }
+    public static class AdminBookingDTOBuilder {
+        public AdminBookingDTOBuilder() {
+        }
+    }
 }

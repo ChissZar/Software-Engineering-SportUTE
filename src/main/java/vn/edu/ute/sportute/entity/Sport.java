@@ -10,8 +10,6 @@ import java.util.List;
 @Table(name = "MONTHETHAO")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Sport {
 
@@ -32,4 +30,19 @@ public class Sport {
     @OneToMany(mappedBy = "sport", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Court> courts = new ArrayList<>();
+
+    public Sport() {
+    }
+
+    public Sport(String id, String name, String description, String status, List<Court> courts) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status != null ? status : "Hoạt động";
+        this.courts = courts != null ? courts : new ArrayList<>();
+    }
+    public static class SportBuilder {
+        public SportBuilder() {
+        }
+    }
 }

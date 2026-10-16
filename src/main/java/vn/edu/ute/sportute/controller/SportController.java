@@ -38,7 +38,7 @@ public class SportController {
         try {
             sportService.saveSport(dto);
             redirectAttributes.addFlashAttribute("successMessage", "Lưu môn thể thao thành công!");
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/admin/sports";

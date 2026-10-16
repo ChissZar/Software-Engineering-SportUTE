@@ -4,10 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class SportDTO {
     private String id;
 
@@ -20,4 +19,18 @@ public class SportDTO {
 
     @NotBlank(message = "Trạng thái không được để trống")
     private String status; // "Hoạt động" hoặc "Ngừng kinh doanh"
+
+    public SportDTO() {
+    }
+
+    public SportDTO(String id, String name, String description, String status) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+    public static class SportDTOBuilder {
+        public SportDTOBuilder() {
+        }
+    }
 }

@@ -1,9 +1,11 @@
 package vn.edu.ute.sportute.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class LoginRequest {
     @NotBlank(message = "Vui lòng nhập Email hoặc Tên đăng nhập")
     private String usernameOrEmail;
@@ -12,4 +14,13 @@ public class LoginRequest {
     private String password;
 
     private boolean rememberMe;
+
+    public LoginRequest() {
+    }
+
+    public LoginRequest(String usernameOrEmail, String password, boolean rememberMe) {
+        this.usernameOrEmail = usernameOrEmail;
+        this.password = password;
+        this.rememberMe = rememberMe;
+    }
 }

@@ -7,8 +7,6 @@ import lombok.*;
 @Table(name = "KHACHHANG")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Customer {
 
@@ -35,4 +33,21 @@ public class Customer {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MaTK")
     private Account account;
+
+    public Customer() {
+    }
+
+    public Customer(String id, String fullName, String phone, String email, String address, String status, Account account) {
+        this.id = id;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+        this.status = status != null ? status : "Hoạt động";
+        this.account = account;
+    }
+    public static class CustomerBuilder {
+        public CustomerBuilder() {
+        }
+    }
 }

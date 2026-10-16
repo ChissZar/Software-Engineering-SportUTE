@@ -1,4 +1,12 @@
 package vn.edu.ute.sportute.service;
-/** Phieu dat san online/tai quay, nhan/tra san, gia han. TODO: khai bao hop dong nghiep vu bang DTO. */
+
+import vn.edu.ute.sportute.dto.request.AdminBookingDTO;
+import java.util.List;
+
+/**
+ * Hợp đồng nghiệp vụ quản lý phiếu đặt sân toàn hệ thống.
+ */
 public interface BookingService {
+    List<AdminBookingDTO> getAllBookings();
+    AdminBookingDTO getBookingById(String id);
 }

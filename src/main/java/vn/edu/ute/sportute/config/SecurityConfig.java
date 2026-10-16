@@ -29,12 +29,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**")) 
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/admin/bookings/api/**")) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/customer/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN")
-                .requestMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
-                .requestMatchers("/staff/**").hasAnyAuthority("ROLE_RECEPTIONIST", "ROLE_OPERATOR")
+                .requestMatchers("/login", "/register/**", "/forgot-password/**", "/otp-action", "/auth/**", "/error", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/customer/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_MANAGER")
+                .requestMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_RECEPTIONIST", "ROLE_OPERATOR", "ROLE_STAFF")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

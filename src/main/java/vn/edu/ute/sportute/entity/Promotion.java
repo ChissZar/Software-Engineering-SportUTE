@@ -10,8 +10,6 @@ import java.time.LocalDate;
 @Table(name = "KHUYENMAI")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Promotion {
 
@@ -31,4 +29,19 @@ public class Promotion {
 
     @Column(name = "DenNgay")
     private LocalDate toDate;
+
+    public Promotion() {
+    }
+
+    public Promotion(String id, String name, BigDecimal discountAmount, LocalDate fromDate, LocalDate toDate) {
+        this.id = id;
+        this.name = name;
+        this.discountAmount = discountAmount != null ? discountAmount : BigDecimal.ZERO;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+    }
+    public static class PromotionBuilder {
+        public PromotionBuilder() {
+        }
+    }
 }

@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 @Table(name = "CHITIETDATSAN")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class BookingDetail {
 
@@ -31,4 +29,19 @@ public class BookingDetail {
 
     @Column(name = "GioKT", nullable = false)
     private LocalDateTime endTime;
+
+    public BookingDetail() {
+    }
+
+    public BookingDetail(String id, Booking booking, Court court, LocalDateTime startTime, LocalDateTime endTime) {
+        this.id = id;
+        this.booking = booking;
+        this.court = court;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+    public static class BookingDetailBuilder {
+        public BookingDetailBuilder() {
+        }
+    }
 }

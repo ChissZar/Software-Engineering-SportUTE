@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 @Table(name = "CHINHSACH")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class BookingPolicy {
 
@@ -26,4 +24,18 @@ public class BookingPolicy {
 
     @Column(name = "TyLeHuy", precision = 5, scale = 2)
     private BigDecimal cancellationFeeRate;
+
+    public BookingPolicy() {
+    }
+
+    public BookingPolicy(String id, String name, BigDecimal depositRate, BigDecimal cancellationFeeRate) {
+        this.id = id;
+        this.name = name;
+        this.depositRate = depositRate;
+        this.cancellationFeeRate = cancellationFeeRate;
+    }
+    public static class BookingPolicyBuilder {
+        public BookingPolicyBuilder() {
+        }
+    }
 }

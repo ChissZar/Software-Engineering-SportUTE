@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 @Table(name = "CHITIETBANGGIA")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class PriceDetail {
 
@@ -28,4 +26,18 @@ public class PriceDetail {
     @Column(name = "DonGia", precision = 18, scale = 0, nullable = false)
     @Builder.Default
     private BigDecimal priceAmount = BigDecimal.ZERO;
+
+    public PriceDetail() {
+    }
+
+    public PriceDetail(String id, Price price, String timeSlot, BigDecimal priceAmount) {
+        this.id = id;
+        this.price = price;
+        this.timeSlot = timeSlot;
+        this.priceAmount = priceAmount != null ? priceAmount : BigDecimal.ZERO;
+    }
+    public static class PriceDetailBuilder {
+        public PriceDetailBuilder() {
+        }
+    }
 }

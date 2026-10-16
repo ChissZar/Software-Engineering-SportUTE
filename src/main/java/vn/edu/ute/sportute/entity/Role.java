@@ -10,8 +10,6 @@ import java.util.Set;
 @Table(name = "VAITRO")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Role {
 
@@ -33,4 +31,18 @@ public class Role {
     )
     @Builder.Default
     private Set<Feature> features = new HashSet<>();
+
+    public Role() {
+    }
+
+    public Role(String id, String name, String description, Set<Feature> features) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.features = features != null ? features : new HashSet<>();
+    }
+    public static class RoleBuilder {
+        public RoleBuilder() {
+        }
+    }
 }

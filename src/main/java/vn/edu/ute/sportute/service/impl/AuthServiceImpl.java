@@ -84,4 +84,14 @@ public class AuthServiceImpl implements AuthService {
 
         return savedAccount;
     }
+
+    @Override
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        Account account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với email này!"));
+
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
+    }
 }

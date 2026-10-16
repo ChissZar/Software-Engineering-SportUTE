@@ -4,10 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class CourtDTO {
     private String id;
 
@@ -24,4 +23,20 @@ public class CourtDTO {
 
     @NotBlank(message = "Trạng thái không được để trống")
     private String status; // "Hoạt động", "Đang sử dụng", "Bảo trì", "Ngừng hoạt động"
+
+    public CourtDTO() {
+    }
+
+    public CourtDTO(String id, String name, String sportId, String sportName, String location, String status) {
+        this.id = id;
+        this.name = name;
+        this.sportId = sportId;
+        this.sportName = sportName;
+        this.location = location;
+        this.status = status;
+    }
+    public static class CourtDTOBuilder {
+        public CourtDTOBuilder() {
+        }
+    }
 }

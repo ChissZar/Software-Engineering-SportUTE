@@ -9,10 +9,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class BookingRequest {
     // 7. Mã đặt sân (Chỉ đọc)
     private String id;
@@ -38,16 +37,39 @@ public class BookingRequest {
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
-    // 12. Giờ kết thúc[cite: 3]
+    // 12. Giờ kết thúc
     @NotNull(message = "Vui lòng chọn giờ kết thúc")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
-    // 13. Tổng tiền (đ)[cite: 3]
+    // 13. Tổng tiền (đ)
     @NotNull(message = "Vui lòng nhập tổng tiền")
     private BigDecimal totalAmount;
 
-    // 14. Trạng thái[cite: 3]
+    // 14. Trạng thái
     @NotBlank(message = "Vui lòng chọn trạng thái")
-    private String status; // Chờ xác nhận, Đã xác nhận, Đang sử dụng, Hoàn thành, Đã hủy[cite: 3]
+    private String status;
+
+    public BookingRequest() {
+    }
+
+    public BookingRequest(String id, String customerId, String customerName, String customerPhone,
+                          String courtId, String courtName, LocalDate bookingDate,
+                          LocalTime startTime, LocalTime endTime, BigDecimal totalAmount, String status) {
+        this.id = id;
+        this.customerId = customerId;
+        this.customerName = customerName;
+        this.customerPhone = customerPhone;
+        this.courtId = courtId;
+        this.courtName = courtName;
+        this.bookingDate = bookingDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.totalAmount = totalAmount;
+        this.status = status;
+    }
+    public static class BookingRequestBuilder {
+        public BookingRequestBuilder() {
+        }
+    }
 }

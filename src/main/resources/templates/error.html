@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SportHub - Thông báo hệ thống</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.12) 0px, transparent 50%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .error-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      max-width: 580px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--danger);
+      font-size: 36px;
+      margin-bottom: 24px;
+    }
+    .status-code {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    p {
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .error-details {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 32px;
+      font-family: monospace;
+      font-size: 12.5px;
+      color: #cbd5e1;
+      text-align: left;
+      overflow-x: auto;
+      max-height: 120px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="error-card">
+    <div class="icon-wrapper">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <div class="status-code" th:text="${status != null ? status : '500'}">500</div>
+    <h1 th:text="${error != null ? error : 'Đã xảy ra lỗi trong quá trình xử lý'}">Đã xảy ra lỗi trong quá trình xử lý</h1>
+    <p th:text="${message != null and !#strings.isEmpty(message) ? message : 'Yêu cầu không thể hoàn thành hoặc hệ thống gặp sự cố tạm thời. Vui lòng thử lại sau.'}">
+      Yêu cầu không thể hoàn thành hoặc hệ thống gặp sự cố tạm thời. Vui lòng thử lại sau.
+    </p>
+
+    <div class="error-details" th:if="${trace != null or path != null}">
+      <span th:if="${path != null}">Đường dẫn: <strong th:text="${path}"></strong><br></span>
+      <span th:if="${timestamp != null}">Thời gian: <span th:text="${timestamp}"></span></span>
+    </div>
+
+    <div class="actions">
+      <button onclick="window.history.back()" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Quay lại
+      </button>
+      <a href="/admin/dashboard" class="btn btn-primary">
+        <i class="fa-solid fa-house"></i> Về bảng điều khiển
+      </a>
+    </div>
+  </div>
+</body>
+</html>
