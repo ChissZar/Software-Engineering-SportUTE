@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Quản lý sân thể thao</title>
@@ -184,28 +186,21 @@
                         th:classappend="${c.status == 'Hoạt động' ? 'status-active' : (c.status == 'Đang sử dụng' ? 'status-inuse' : (c.status == 'Bảo trì' ? 'status-maint' : 'status-disabled'))}"
                         th:text="${c.status}"></span>
                 </td>
-                <td style="text-align:right; white-space:nowrap;">
-                  <button type="button" class="btn btn-sm"
-                          th:data-id="${c.id}"
-                          th:data-name="${c.name}"
-                          th:data-sport="${c.sportName}"
-                          th:data-status="${c.status}"
-                          onclick="openCourtViewModal(this)"
-                          title="Xem chi tiết đầy đủ">
-                    <i class="fa-regular fa-eye"></i> Chi tiết
-                  </button>
-                  <button type="button" class="btn btn-sm"
-                          th:data-id="${c.id}"
-                          th:data-name="${c.name}"
-                          th:data-sportid="${c.sportId}"
-                          th:data-status="${c.status}"
-                          onclick="openCourtEditModal(this)"
-                          title="Sửa thông tin">
-                    <i class="fa-solid fa-pen"></i> Sửa
-                  </button>
-                  <form th:action="@{/admin/courts/toggle/{id}(id=${c.id})}" method="post" style="display:inline">
-                    <button type="submit" class="btn btn-sm" th:classappend="${c.status == 'Hoạt động' ? 'btn-danger' : 'btn-success'}" th:text="${c.status == 'Hoạt động' ? 'Khóa' : 'Mở'}">Khóa</button>
-                  </form>
+                <td style="text-align:right; white-space:nowrap; vertical-align:middle;">
+                  <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:8px;">
+                    <button type="button" class="btn btn-sm"
+                            th:data-id="${c.id}"
+                            th:data-name="${c.name}"
+                            th:data-sportid="${c.sportId}"
+                            th:data-status="${c.status}"
+                            onclick="openCourtEditModal(this)"
+                            title="Sửa thông tin sân">
+                      <i class="fa-solid fa-pen" style="color:var(--primary);"></i> Sửa
+                    </button>
+                    <form th:action="@{/admin/courts/toggle/{id}(id=${c.id})}" method="post" style="display:inline; margin:0;">
+                      <button type="submit" class="btn btn-sm" th:classappend="${c.status == 'Hoạt động' ? 'btn-danger' : 'btn-success'}" th:text="${c.status == 'Hoạt động' ? 'Khóa' : 'Mở'}">Khóa</button>
+                    </form>
+                  </div>
                 </td>
               </tr>
               <tr th:if="${courts == null or #lists.isEmpty(courts)}">

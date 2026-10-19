@@ -89,6 +89,14 @@ Trong quá trình rà soát và kiểm thử tự động, hệ thống đã ph�
      + Nút **"Tiếp nhận khách tại quầy"**: Mở Wizard 4 bước chọn môn -> chọn sân/giờ -> chọn khách cũ hoặc nhập khách mới -> chọn thanh toán (Tiền mặt / VietQR) -> Tạo đơn và tự động in vé.
      + Ô **Tra cứu & Check-in tức thì**: Gõ mã phiếu hoặc số điện thoại khách hàng và bấm Check-in để giao sân ngay trong 1 cú click.
 
+6. **Nâng cấp Popup Trả Sân & Quyết Toán Tài Chính Chuyên Nghiệp (Check-out Modal)**:
+   - *Vấn đề phát hiện*: Nút Trả sân kích hoạt hộp thoại `confirm()` mặc định của trình duyệt (`localhost:8081 cho biết`) kèm chuỗi chưa parse `#[${b.id}]`.
+   - *Khắc phục*: Xây dựng hoàn chỉnh Modal Trả sân `modalCheckout`:
+     + Hiển thị thông tin phiếu, khách hàng, sân và khung giờ.
+     + Bảng kê chi phí minh bạch: Tiền sân + Dịch vụ F&B phát sinh - Tiền đã cọc = Số tiền còn lại cần thu.
+     + Hỗ trợ linh hoạt hình thức thu tiền: Tiền mặt tại quầy hoặc Quét mã VietQR động tức thì.
+     + Tự động cập nhật trạng thái phiếu sang `Hoàn tất`, ghi nhận giao dịch quyết toán vào `GIAODICH` và giải phóng sân về trạng thái `Hoạt động`.
+
 ---
 
 ## 4. TÀI KHOẢN MẪU ĐỂ TRIẾT TRẢI NGHIỆM NGAY KHI THỨC DẬY
@@ -127,6 +135,15 @@ Triết có thể mở trình duyệt tại địa chỉ `http://localhost:8081`
 - **Tài khoản**: `minhanh`
 - **Mật khẩu**: `12345678`
 - **Thông tin**: Khách hàng mới để Triết thử nghiệm luồng đặt sân đầu tiên từ con số 0, áp dụng mã ưu đãi `SPORTUTE10` hoặc `SVUTE` và theo dõi điểm thưởng tích lũy tăng lên sau mỗi giao dịch.
+
+### 🔄 5. Tính năng Đột phá: Hợp nhất Hồ sơ O2O Thông minh (Offline-to-Online Smart Merge)
+- **Vấn đề giải quyết**: Trước đây nếu khách vãng lai đặt sân lần đầu tại quầy lễ tân (đã lưu SĐT trong `KHACHHANG`), khi lên web đăng ký tài khoản online với cùng SĐT sẽ bị lỗi nghẽn *"Số điện thoại này đã được sử dụng!"*.
+- **Cơ chế mới**:
+  + Hệ thống nhận diện SĐT đã có hồ sơ tại quầy nhưng chưa gắn tài khoản (`account == null`).
+  + Cho phép khách hàng đăng ký tài khoản trực tuyến bình thường qua mã xác thực OTP gửi về email.
+  + Sau khi xác thực OTP, tự động liên kết tài khoản mới với hồ sơ khách hàng cũ mà không làm trùng lặp dữ liệu CSDL.
+  + Khách đăng nhập online lập tức thấy **100% lịch sử các lần đặt sân tại quầy**, bảo lưu đầy đủ chi tiêu tích lũy và điểm thưởng hội viên!
+  + Đã kiểm thử tự động toàn diện qua kịch bản End-to-End: `test_walkin_to_online_merge.py` (PASS 100%).
 
 ---
 

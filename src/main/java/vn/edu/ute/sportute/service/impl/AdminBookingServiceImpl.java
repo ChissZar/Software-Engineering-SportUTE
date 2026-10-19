@@ -34,6 +34,9 @@ public class AdminBookingServiceImpl implements AdminBookingService {
     private final BookingPolicyRepository bookingPolicyRepository;
     private final PromotionRepository promotionRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private vn.edu.ute.sportute.service.MatchmakingService matchmakingService;
+
     public AdminBookingServiceImpl(BookingRepository bookingRepository,
                                   BookingDetailRepository bookingDetailRepository,
                                   CustomerRepository customerRepository,
@@ -313,6 +316,11 @@ public class AdminBookingServiceImpl implements AdminBookingService {
 
     @Override
     public void checkOutBooking(String id) {
+        checkOutBooking(id, "Tiền mặt tại quầy", null);
+    }
+
+    @Override
+    public void checkOutBooking(String id, String paymentMethod, String note) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiếu đặt sân: " + id));
 
@@ -320,11 +328,22 @@ public class AdminBookingServiceImpl implements AdminBookingService {
             throw new IllegalArgumentException("Chỉ có thể trả sân cho các phiếu ở trạng thái 'Đang sử dụng'!");
         }
 
-        // Tính tổng tiền cần thanh toán và tiền đã thanh toán
-        BigDecimal totalPaid = booking.getPayments().stream()
-                .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
-                .map(Payment::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Quyết toán tiền còn lại nếu có
+        AdminBookingDTO dto = mapToDTO(booking);
+        BigDecimal remaining = dto.getRemainingAmount();
+        if (remaining != null && remaining.compareTo(BigDecimal.ZERO) > 0) {
+            String pMethod = (paymentMethod != null && !paymentMethod.isBlank()) ? paymentMethod : "Tiền mặt tại quầy";
+            if (pMethod.length() > 30) pMethod = pMethod.substring(0, 30);
+            Payment settlePayment = Payment.builder()
+                    .id(IdGenerator.generateId("GD"))
+                    .booking(booking)
+                    .transactionType("Thanh toán")
+                    .amount(remaining)
+                    .paymentMethod(pMethod)
+                    .build();
+            paymentRepository.save(settlePayment);
+            booking.getPayments().add(settlePayment);
+        }
 
         // Chuyển trạng thái sang Hoàn tất (RB6)
         booking.setStatus("Hoàn tất");
@@ -489,6 +508,12 @@ public class AdminBookingServiceImpl implements AdminBookingService {
             court.setStatus("Hoạt động");
             courtRepository.save(court);
         }
+
+        if (matchmakingService != null) {
+            try {
+                matchmakingService.cancelPostByBookingId(id, "Quản trị viên");
+            } catch (Exception ignored) {}
+        }
     }
 
     @Override
@@ -543,6 +568,12 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     .build();
             paymentRepository.save(refund);
         }
+
+        if (matchmakingService != null) {
+            try {
+                matchmakingService.cancelPostByBookingId(dto.getBookingId(), "Quản trị viên");
+            } catch (Exception ignored) {}
+        }
     }
 
     @Override
@@ -572,18 +603,24 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 .filter(m -> m.getStartDate().isBefore(endOfDay) && m.getEndDate().isAfter(startOfDay))
                 .collect(Collectors.toList());
 
-        // Các mốc giờ từ 05:00 đến 23:00 (18 khung giờ)
-        int[] hours = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22};
+        // Các mốc giờ từ 05:00 đến 23:00 mỗi 30 phút (36 khung giờ: 05:00, 05:30, ..., 22:30)
+        List<LocalTime> timePoints = new ArrayList<>();
+        LocalTime tp = LocalTime.of(5, 0);
+        while (tp.isBefore(LocalTime.of(23, 0))) {
+            timePoints.add(tp);
+            tp = tp.plusMinutes(30);
+        }
+        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm");
 
         for (Court court : courts) {
             List<TimelineSlotDTO> slots = new ArrayList<>();
-
-            for (int h : hours) {
-                LocalTime slotStart = LocalTime.of(h, 0);
-                LocalTime slotEnd = slotStart.plusHours(1);
+            int i = 0;
+            while (i < timePoints.size()) {
+                LocalTime slotStart = timePoints.get(i);
+                LocalTime slotEnd = slotStart.plusMinutes(30);
                 LocalDateTime slotStartDateTime = LocalDateTime.of(targetDate, slotStart);
                 LocalDateTime slotEndDateTime = LocalDateTime.of(targetDate, slotEnd);
-                String timeStr = String.format("%02d:00", h);
+                String timeStr = slotStart.format(timeFmt);
 
                 // 1. Kiểm tra bảo trì
                 Optional<Maintenance> maint = allMaintenance.stream()
@@ -592,13 +629,39 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                         .findFirst();
 
                 if (maint.isPresent()) {
+                    Maintenance m = maint.get();
+                    int span = 0;
+                    while (i + span < timePoints.size()) {
+                        LocalTime checkStart = timePoints.get(i + span);
+                        LocalTime checkEnd = checkStart.plusMinutes(30);
+                        LocalDateTime checkStartDT = LocalDateTime.of(targetDate, checkStart);
+                        LocalDateTime checkEndDT = LocalDateTime.of(targetDate, checkEnd);
+                        if (m.getStartDate().isBefore(checkEndDT) && m.getEndDate().isAfter(checkStartDT)) {
+                            span++;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (span < 1) span = 1;
+
                     slots.add(TimelineSlotDTO.builder()
                             .time(timeStr)
                             .status("MAINT")
                             .statusLabel("Bảo trì")
                             .cssClass("slot-maint")
-                            .note(maint.get().getReason() != null ? maint.get().getReason() : "Bảo trì sân")
+                            .note(m.getReason() != null ? m.getReason() : "Bảo trì sân")
+                            .span(span)
+                            .isSpanContinuation(false)
                             .build());
+
+                    for (int k = 1; k < span; k++) {
+                        slots.add(TimelineSlotDTO.builder()
+                                .time(timePoints.get(i + k).format(timeFmt))
+                                .span(1)
+                                .isSpanContinuation(true)
+                                .build());
+                    }
+                    i += span;
                     continue;
                 }
 
@@ -609,39 +672,79 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                         .findFirst();
 
                 if (bookingDetail.isPresent()) {
-                    Booking b = bookingDetail.get().getBooking();
+                    BookingDetail bd = bookingDetail.get();
+                    Booking b = bd.getBooking();
                     String bStatus = b.getStatus();
-                    String custName = b.getCustomer() != null ? b.getCustomer().getFullName() : "Khách";
 
-                    if ("Đang sử dụng".equalsIgnoreCase(bStatus)) {
+                    // Thông tin khách hàng
+                    String customerId = (b.getCustomer() != null && b.getCustomer().getId() != null) ? b.getCustomer().getId() : "KH";
+                    String fullName = (b.getCustomer() != null && b.getCustomer().getFullName() != null) ? b.getCustomer().getFullName().trim() : "Khách";
+                    String customerPhone = (b.getCustomer() != null && b.getCustomer().getPhone() != null) ? b.getCustomer().getPhone() : "";
+
+                    // Tách chỉ lấy tên (không đệm và họ)
+                    String shortName = fullName;
+                    if (fullName.contains(" ")) {
+                        String[] parts = fullName.split("\\s+");
+                        shortName = parts[parts.length - 1];
+                    }
+                    String displayName = customerId + " - " + shortName;
+
+                    // Khung giờ đầy đủ
+                    String timeRange = bd.getStartTime().format(timeFmt) + " - " + bd.getEndTime().format(timeFmt);
+
+                    // Tính span số ô 30 phút mà đơn đặt sân này bao phủ
+                    int span = 0;
+                    while (i + span < timePoints.size()) {
+                        LocalTime checkStart = timePoints.get(i + span);
+                        LocalTime checkEnd = checkStart.plusMinutes(30);
+                        LocalDateTime checkStartDT = LocalDateTime.of(targetDate, checkStart);
+                        LocalDateTime checkEndDT = LocalDateTime.of(targetDate, checkEnd);
+                        if (bd.getStartTime().isBefore(checkEndDT) && bd.getEndTime().isAfter(checkStartDT)) {
+                            span++;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (span < 1) span = 1;
+
+                    boolean isInUse = "Đang sử dụng".equalsIgnoreCase(bStatus);
+                    slots.add(TimelineSlotDTO.builder()
+                            .time(timeStr)
+                            .status(isInUse ? "IN_USE" : "BUSY")
+                            .statusLabel(isInUse ? "Đang dùng" : "Đã đặt")
+                            .cssClass(isInUse ? "slot-inuse" : "slot-busy")
+                            .bookingId(b.getId())
+                            .customerId(customerId)
+                            .customerName(fullName)
+                            .customerShortName(shortName)
+                            .customerDisplayName(displayName)
+                            .customerPhone(customerPhone)
+                            .timeRange(timeRange)
+                            .span(span)
+                            .isSpanContinuation(false)
+                            .build());
+
+                    for (int k = 1; k < span; k++) {
                         slots.add(TimelineSlotDTO.builder()
-                                .time(timeStr)
-                                .status("IN_USE")
-                                .statusLabel("Đang dùng")
-                                .cssClass("slot-inuse")
-                                .bookingId(b.getId())
-                                .customerName(custName)
-                                .build());
-                    } else {
-                        slots.add(TimelineSlotDTO.builder()
-                                .time(timeStr)
-                                .status("BUSY")
-                                .statusLabel("Đã đặt")
-                                .cssClass("slot-busy")
-                                .bookingId(b.getId())
-                                .customerName(custName)
+                                .time(timePoints.get(i + k).format(timeFmt))
+                                .span(1)
+                                .isSpanContinuation(true)
                                 .build());
                     }
+                    i += span;
                     continue;
                 }
 
-                // 3. Trống
+                // 3. Trống (Free 30m slot)
                 slots.add(TimelineSlotDTO.builder()
                         .time(timeStr)
                         .status("FREE")
                         .statusLabel("Trống")
                         .cssClass("slot-free")
+                        .span(1)
+                        .isSpanContinuation(false)
                         .build());
+                i++;
             }
 
             result.add(CourtTimelineDTO.builder()

@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Quản lý Dịch vụ, Nước uống & Phụ kiện</title>
@@ -214,44 +216,34 @@
                 <td>
                   <span class="badge" th:classappend="${s.status == 'Đang bán' ? 'status-active' : 'status-disabled'}" th:text="${s.status}"></span>
                 </td>
-                <td style="text-align:right; white-space:nowrap;">
-                  <button type="button" class="btn btn-sm"
-                          th:data-id="${s.id}"
-                          th:data-name="${s.name}"
-                          th:data-cat="${s.category}"
-                          th:data-unit="${s.unit}"
-                          th:data-price="${s.price}"
-                          th:data-stock="${s.stock}"
-                          th:data-status="${s.status}"
-                          th:data-img="${s.imageUrl}"
-                          onclick="openServiceViewModal(this)"
-                          title="Xem chi tiết đầy đủ">
-                    <i class="fa-regular fa-eye"></i> Chi tiết
-                  </button>
-                  <button type="button" class="btn btn-sm"
-                          th:data-id="${s.id}"
-                          th:data-name="${s.name}"
-                          th:data-cat="${s.category}"
-                          th:data-unit="${s.unit}"
-                          th:data-price="${s.price}"
-                          th:data-stock="${s.stock}"
-                          th:data-status="${s.status}"
-                          th:data-img="${s.imageUrl}"
-                          onclick="openServiceEditModal(this)">
-                    <i class="fa-solid fa-pen" style="color:var(--primary);"></i> Sửa
-                  </button>
-                  <form th:action="@{/admin/services/toggle/{id}(id=${s.id})}" method="post" style="display:inline;"
-                        onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái kinh doanh của mặt hàng này?');">
-                    <button type="submit" class="btn btn-sm" th:classappend="${s.status == 'Đang bán' ? 'btn-danger' : 'btn-confirm'}" title="Đổi trạng thái kinh doanh">
-                      <i class="fa-solid fa-power-off"></i>
+                <td style="text-align:right; white-space:nowrap; vertical-align:middle;">
+                  <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:8px;">
+                    <button type="button" class="btn btn-sm"
+                            th:data-id="${s.id}"
+                            th:data-name="${s.name}"
+                            th:data-cat="${s.category}"
+                            th:data-unit="${s.unit}"
+                            th:data-price="${s.price}"
+                            th:data-stock="${s.stock}"
+                            th:data-status="${s.status}"
+                            th:data-img="${s.imageUrl}"
+                            onclick="openServiceEditModal(this)"
+                            title="Sửa thông tin mặt hàng">
+                      <i class="fa-solid fa-pen" style="color:var(--primary);"></i> Sửa
                     </button>
-                  </form>
-                  <form th:action="@{/admin/services/delete/{id}(id=${s.id})}" method="post" style="display:inline;"
-                        onsubmit="return confirm('Bạn có chắc muốn xóa mặt hàng này khỏi hệ thống?');">
-                    <button type="submit" class="btn btn-sm btn-danger" title="Xóa mặt hàng">
-                      <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                  </form>
+                    <form th:action="@{/admin/services/toggle/{id}(id=${s.id})}" method="post" style="display:inline; margin:0;"
+                          onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái kinh doanh của mặt hàng này?');">
+                      <button type="submit" class="btn btn-sm" th:classappend="${s.status == 'Đang bán' ? 'btn-danger' : 'btn-confirm'}" title="Đổi trạng thái kinh doanh">
+                        <i class="fa-solid fa-power-off"></i>
+                      </button>
+                    </form>
+                    <form th:action="@{/admin/services/delete/{id}(id=${s.id})}" method="post" style="display:inline; margin:0;"
+                          onsubmit="return confirm('Bạn có chắc muốn xóa mặt hàng này khỏi hệ thống?');">
+                      <button type="submit" class="btn btn-sm btn-danger" title="Xóa mặt hàng">
+                        <i class="fa-regular fa-trash-can"></i>
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
               <tr th:if="${services == null or #lists.isEmpty(services)}">

@@ -16,6 +16,7 @@ public class CustomerDTO {
     private String fullName;
 
     @NotBlank(message = "Vui lòng nhập số điện thoại")
+    @jakarta.validation.constraints.Pattern(regexp = "^0\\d{9}$", message = "Số điện thoại phải gồm 10 chữ số hợp lệ")
     private String phone;
 
     private String email;

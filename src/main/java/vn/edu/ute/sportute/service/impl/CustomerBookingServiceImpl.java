@@ -29,6 +29,9 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     @Autowired(required = false)
     private EmailService emailService;
 
+    @Autowired(required = false)
+    private vn.edu.ute.sportute.service.MatchmakingService matchmakingService;
+
     private final CourtRepository courtRepository;
     private final BookingRepository bookingRepository;
     private final BookingDetailRepository bookingDetailRepository;
@@ -38,6 +41,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     private final PriceRepository priceRepository;
     private final BookingPolicyRepository bookingPolicyRepository;
     private final PaymentRepository paymentRepository;
+    private final vn.edu.ute.sportute.repository.PromotionRepository promotionRepository;
 
     public CustomerBookingServiceImpl(CourtRepository courtRepository,
                                       BookingRepository bookingRepository,
@@ -47,7 +51,8 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                                       CustomerRepository customerRepository,
                                       PriceRepository priceRepository,
                                       BookingPolicyRepository bookingPolicyRepository,
-                                      PaymentRepository paymentRepository) {
+                                      PaymentRepository paymentRepository,
+                                      vn.edu.ute.sportute.repository.PromotionRepository promotionRepository) {
         this.courtRepository = courtRepository;
         this.bookingRepository = bookingRepository;
         this.bookingDetailRepository = bookingDetailRepository;
@@ -57,6 +62,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         this.priceRepository = priceRepository;
         this.bookingPolicyRepository = bookingPolicyRepository;
         this.paymentRepository = paymentRepository;
+        this.promotionRepository = promotionRepository;
     }
 
     @Override
@@ -196,12 +202,25 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         // Lấy chính sách cọc mặc định
         BookingPolicy defaultPolicy = bookingPolicyRepository.findAll().stream().findFirst().orElse(null);
 
+        // Tìm khuyến mãi / voucher nếu có
+        vn.edu.ute.sportute.entity.Promotion promotion = null;
+        if (request.getVoucherCode() != null && !request.getVoucherCode().trim().isEmpty()) {
+            String vCode = request.getVoucherCode().trim();
+            promotion = promotionRepository.findById(vCode).orElse(null);
+            if (promotion == null) {
+                promotion = promotionRepository.findAll().stream()
+                        .filter(p -> p.getId().equalsIgnoreCase(vCode) || p.getName().equalsIgnoreCase(vCode))
+                        .findFirst().orElse(null);
+            }
+        }
+
         // 3. Tạo phiếu đặt sân trực tuyến
         Booking booking = Booking.builder()
                 .id(IdGenerator.generateId("DS"))
                 .customer(customer)
                 .employee(null) // Đặt online không qua nhân viên lễ tân lập
                 .bookingPolicy(defaultPolicy)
+                .promotion(promotion)
                 .status("Đã xác nhận") // Thanh toán thành công -> chuyển thẳng sang Đã xác nhận giữ sân
                 .build();
 
@@ -269,6 +288,44 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                         System.err.println("[CustomerBookingService] Lỗi gửi email vé điện tử: " + ex.getMessage());
                     }
                 });
+            }
+        }
+
+        // 6. Tự động đăng tin Ghép đối thủ nếu khách hàng có chọn
+        if (request.isEnableMatchmaking() && matchmakingService != null) {
+            try {
+                String sportName = court.getSport() != null ? court.getSport().getName() : "Thể thao";
+                String skill = (request.getMatchmakingSkillLevel() != null && !request.getMatchmakingSkillLevel().isBlank())
+                        ? request.getMatchmakingSkillLevel() : "Trung bình / Phong trào";
+                String tSize = (request.getMatchmakingTeamSize() != null && !request.getMatchmakingTeamSize().isBlank())
+                        ? request.getMatchmakingTeamSize() : "Giao lưu";
+                String msg = (request.getMatchmakingMessage() != null && !request.getMatchmakingMessage().isBlank())
+                        ? request.getMatchmakingMessage() : "Giao lưu vui vẻ, share 50% tiền sân!";
+
+                java.time.format.DateTimeFormatter timeFmt = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+                java.time.format.DateTimeFormatter dateFmt = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                vn.edu.ute.sportute.model.MatchmakingPost post = vn.edu.ute.sportute.model.MatchmakingPost.builder()
+                        .bookingId(savedBooking.getId())
+                        .sportName(sportName)
+                        .courtName(court.getName())
+                        .courtId(court.getId())
+                        .matchDate(request.getBookingDate().format(dateFmt))
+                        .startTime(request.getStartTime().format(timeFmt))
+                        .endTime(request.getStartTime().plusMinutes(request.getDurationMinutes()).format(timeFmt))
+                        .durationMinutes(request.getDurationMinutes())
+                        .creatorName(customer != null ? customer.getFullName() : "Khách thể thao")
+                        .creatorPhone(customer != null ? customer.getPhone() : "")
+                        .creatorEmail(customer != null ? customer.getEmail() : "")
+                        .skillLevel(skill)
+                        .teamSize(tSize)
+                        .message(msg)
+                        .status("WAITING")
+                        .build();
+
+                matchmakingService.createPost(post);
+            } catch (Exception ex) {
+                System.err.println("[CustomerBookingService] Lỗi tự động tạo tin ghép đối: " + ex.getMessage());
             }
         }
 
@@ -369,6 +426,13 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                     .paymentMethod("Chuyển khoản")
                     .build();
             paymentRepository.save(refund);
+        }
+
+        // Tự động hủy/gỡ bài ghép đối thủ trên sàn giao lưu (nếu có)
+        try {
+            matchmakingService.cancelPostByBookingId(bookingId, customer.getFullName());
+        } catch (Exception ex) {
+            System.err.println("[CustomerBookingService] Lỗi gỡ bài ghép kèo: " + ex.getMessage());
         }
     }
 

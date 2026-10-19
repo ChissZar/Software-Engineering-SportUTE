@@ -1,41 +1,50 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>SportHub — Đăng nhập vào hệ thống</title>
-    
+
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Font Awesome 6.5.1 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Auth Stylesheet -->
     <link rel="stylesheet" href="/css/auth.css?v=20261016">
 </head>
+
 <body>
 
     <div class="bg-backdrop"></div>
     <div class="bg-overlay"></div>
 
     <div class="auth-container">
-        
+
         <!-- Cột trái: Banner thể thao -->
         <div class="auth-banner">
             <div>
-                <a href="/login" class="brand-logo-link" title="SportHub — PLAY • BOOK • TOGETHER" style="text-decoration: none; display: inline-flex; align-items: center; gap: 14px;">
-                    <img src="/images/auth/sporthub-icon.png" alt="SportHub Icon" style="height: 52px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); flex-shrink: 0;">
+                <a href="/login" class="brand-logo-link" title="SportHub — PLAY • BOOK • TOGETHER"
+                    style="text-decoration: none; display: inline-flex; align-items: center; gap: 14px;">
+                    <img src="/images/auth/sporthub-icon.png" alt="SportHub Icon"
+                        style="height: 52px; width: auto; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); flex-shrink: 0;">
                     <div style="display: flex; flex-direction: column;">
-                        <div class="brand-title" style="font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 30px; font-weight: 800; line-height: 1.1; letter-spacing: -0.5px; color: #ffffff; margin-bottom: 4px;">
+                        <div class="brand-title"
+                            style="font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 30px; font-weight: 800; line-height: 1.1; letter-spacing: -0.5px; color: #ffffff; margin-bottom: 4px;">
                             Sport<span style="color: #2fe195;">Hub</span>
                         </div>
-                        <div class="brand-subtitle" style="font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #e0e6e3; display: flex; align-items: center; gap: 6px;">
+                        <div class="brand-subtitle"
+                            style="font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #e0e6e3; display: flex; align-items: center; gap: 6px;">
                             <span>PLAY</span>
                             <span style="font-size: 8px; opacity: 0.85;">•</span>
                             <span>BOOK</span>
@@ -65,7 +74,7 @@
 
         <!-- Cột phải: Form Đăng nhập -->
         <div class="auth-form-card">
-            
+
             <!-- Tab Chuyển đổi (Mục 1 & 2) -->
             <div class="tab-switch">
                 <a href="/login" class="tab-item active">Đăng nhập</a>
@@ -73,8 +82,11 @@
             </div>
 
             <!-- Thông báo trạng thái -->
-            <div th:if="${param.error}" class="alert-error">
-                <i class="fa-solid fa-circle-exclamation me-1"></i> Tên đăng nhập, email hoặc mật khẩu không chính xác!
+            <div th:if="${param.error != null and param.error[0] == 'locked'}" class="alert-error">
+                <i class="fa-solid fa-lock me-1"></i> Tài khoản của bạn đã bị tạm khóa. Vui lòng liên hệ quản trị viên.
+            </div>
+            <div th:if="${param.error != null and param.error[0] != 'locked'}" class="alert-error">
+                <i class="fa-solid fa-circle-exclamation me-1"></i> Tên đăng nhập hoặc mật khẩu không chính xác!
             </div>
             <div th:if="${param.logout}" class="alert-info">
                 <i class="fa-solid fa-circle-info me-1"></i> Bạn đã đăng xuất khỏi hệ thống thành công.
@@ -84,13 +96,13 @@
             </div>
 
             <form th:action="@{/login}" method="post">
-                
-                <!-- Mục 3: Email hoặc Tên đăng nhập -->
+
+                <!-- Mục 3: Email, Số điện thoại hoặc Tên đăng nhập -->
                 <div class="form-group">
-                    <label class="form-label" for="username">Email hoặc Tên đăng nhập</label>
+                    <label class="form-label" for="username">Email, Số điện thoại hoặc Tên đăng nhập</label>
                     <div class="input-wrap">
                         <input type="text" id="username" name="username" class="form-control"
-                               placeholder="admin@sporthub.vn" required autofocus>
+                            placeholder="Ví dụ: abc@gmail.com, 039xxxxxxx, sporthub123,..." required autofocus>
                     </div>
                 </div>
 
@@ -98,9 +110,10 @@
                 <div class="form-group">
                     <label class="form-label" for="password">Mật khẩu</label>
                     <div class="input-wrap">
-                        <input type="password" id="password" name="password" class="form-control"
-                               placeholder="••••••••" required>
-                        <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility()" title="Ẩn/Hiện mật khẩu">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••"
+                            required>
+                        <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility()"
+                            title="Ẩn/Hiện mật khẩu">
                             <i class="fa-regular fa-eye" id="toggleIcon"></i>
                         </button>
                     </div>
@@ -144,4 +157,5 @@
     </script>
 
 </body>
+
 </html>

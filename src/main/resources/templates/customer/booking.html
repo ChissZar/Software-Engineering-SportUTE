@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SportHub — Chọn sân yêu thích, đặt lịch dễ dàng</title>
@@ -2474,6 +2476,12 @@
           </button>
         </div>
 
+        <a href="/customer/community" class="nav-item" id="navItemCommunity">
+          <i class="fa-solid fa-handshake-angle"></i>
+          <span>Ghép Kèo Giao Lưu</span>
+          <span style="font-size:10px;padding:2px 7px;border-radius:9999px;background:linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);color:#fff;font-weight:800;letter-spacing:0.5px;">MỚI</span>
+        </a>
+
         <a href="/customer/history" class="nav-item">
           <i class="fa-regular fa-calendar-check"></i>
           <span>Lịch đặt của tôi</span>
@@ -3082,7 +3090,7 @@
                     </div>
                   </div>
                   <div class="voucher-box">
-                    <input type="text" class="voucher-input" id="inputVoucherCode" placeholder="Nhập mã voucher (Thử: SPORTUTE10, SVUTE)">
+                    <input type="text" class="voucher-input" id="inputVoucherCode" placeholder="Nhập mã voucher (Ví dụ: SUMMER2026, GIAM50K, SPORTUTE10,...)">
                     <button type="button" class="btn-apply-voucher" onclick="applyVoucherCode()">
                       <i class="fa-solid fa-tag"></i> Áp dụng
                     </button>
@@ -3090,7 +3098,56 @@
                   <div id="voucherFeedbackMsg" style="margin-top:10px;font-size:13px;font-weight:600;display:none;"></div>
                 </div>
 
-                <!-- 4. Cam kết bảo đảm giữ sân -->
+                <!-- 4. Tìm đối thủ giao lưu (Kèo thể thao) -->
+                <div class="checkout-section-card" style="border: 1.5px solid #a7f3d0; background: #fcfdfd;">
+                  <div class="checkout-section-header" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleMatchmakingCheckbox()">
+                    <div class="checkout-section-title">
+                      <i class="fa-solid fa-handshake-angle text-success" style="color:#059669;"></i>
+                      <span>4. Đăng tìm đối thủ giao lưu (Kèo thể thao)</span>
+                      <span style="font-size:10px;padding:2px 7px;border-radius:9999px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:700;">Miễn phí</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <input type="checkbox" id="checkEnableMatchmaking" name="enableMatchmaking" style="width:20px;height:20px;accent-color:#059669;cursor:pointer;" onclick="event.stopPropagation();handleMatchmakingToggle(this.checked);">
+                      <label for="checkEnableMatchmaking" style="font-size:13px;font-weight:700;color:#059669;cursor:pointer;">Tìm đối thủ</label>
+                    </div>
+                  </div>
+
+                  <div id="matchmakingExpandBox" style="display:none;margin-top:14px;border-top:1px dashed #cbd5e1;padding-top:14px;">
+                    <!-- Hộp lưu ý theo yêu cầu của người dùng -->
+                    <div style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;padding:12px 14px;border-radius:8px;font-size:12.5px;color:#92400e;line-height:1.6;margin-bottom:14px;">
+                      <div style="font-weight:800;display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                        <i class="fa-solid fa-shield-halved"></i> LƯU Ý QUAN TRỌNG TỪ SPORTHUB:
+                      </div>
+                      <ul style="padding-left:16px;margin:0;">
+                        <li>Toàn bộ tiền thuê sân & cọc VietQR do <strong>chính bạn chịu trách nhiệm thanh toán</strong> với trung tâm.</li>
+                        <li>Bạn nên <strong>chủ động đi đủ số lượng người chơi</strong> để đề phòng trường hợp không có đối thủ nhận kèo.</li>
+                        <li>Hai bên tự liên hệ qua SĐT/Zalo để giao lưu và tự thỏa thuận chia sẻ tiền sân (50/50, bên thua trả,...).</li>
+                      </ul>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                      <div>
+                        <label style="font-size:12.5px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:5px;">Trình độ mong muốn</label>
+                        <select id="selMatchmakingSkill" name="matchmakingSkillLevel" class="voucher-input" style="width:100%;padding:8px 12px;font-size:13px;border-radius:8px;">
+                          <option value="Mới chơi / Giao lưu vui vẻ">Mới chơi / Giao lưu vui vẻ</option>
+                          <option value="Trung bình / Phong trào" selected>Trung bình / Phong trào</option>
+                          <option value="Khá / Bán chuyên">Khá / Bán chuyên</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style="font-size:12.5px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:5px;">Quy mô đội hình</label>
+                        <input type="text" id="inputMatchmakingTeamSize" name="matchmakingTeamSize" class="voucher-input" style="width:100%;padding:8px 12px;font-size:13px;border-radius:8px;" placeholder="VD: 5 vs 5 hoặc Đánh đôi" value="5 vs 5">
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style="font-size:12.5px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:5px;">Lời nhắn gửi đối thủ nhận kèo</label>
+                      <input type="text" id="inputMatchmakingMsg" name="matchmakingMessage" class="voucher-input" style="width:100%;padding:8px 12px;font-size:13px;border-radius:8px;" placeholder="VD: Đội sinh viên UTE giao lưu vui vẻ, share 50% tiền sân!">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 5. Cam kết bảo đảm giữ sân -->
                 <div class="policy-box">
                   <div>
                     <i class="fa-solid fa-circle-check text-success"></i>
@@ -3710,6 +3767,21 @@
       updateStep3Calculations();
     }
 
+    function toggleMatchmakingCheckbox() {
+      const chk = document.getElementById('checkEnableMatchmaking');
+      if (chk) {
+        chk.checked = !chk.checked;
+        handleMatchmakingToggle(chk.checked);
+      }
+    }
+
+    function handleMatchmakingToggle(checked) {
+      const box = document.getElementById('matchmakingExpandBox');
+      if (box) {
+        box.style.display = checked ? 'block' : 'none';
+      }
+    }
+
     // Chuyển sang Bước 4 (Màn hình Thanh toán)
     function goToStep4() {
       if (!selectedStartSlot || !selectedEndSlot) {
@@ -3825,7 +3897,7 @@
     }
 
     // Áp dụng mã Voucher
-    function applyVoucherCode() {
+    async function applyVoucherCode() {
       const code = (document.getElementById('inputVoucherCode').value || '').trim().toUpperCase();
       const feedback = document.getElementById('voucherFeedbackMsg');
 
@@ -3833,29 +3905,75 @@
         currentVoucherDiscount = 0;
         currentVoucherCode = '';
         feedback.style.display = 'none';
+        document.getElementById('finalVoucherCode').value = '';
         updateStep3Calculations();
+        updateVietQRDetails();
         return;
       }
 
-      if (code === 'SPORTUTE10') {
-        currentVoucherCode = code;
-        currentVoucherDiscount = Math.round(selectedTotalAmount * 0.1);
-        feedback.style.display = 'block';
-        feedback.style.color = '#059669';
-        feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SPORTUTE10: Giảm 10% tổng hóa đơn (-' + formatVND(currentVoucherDiscount) + ')!';
-      } else if (code === 'SVUTE') {
-        currentVoucherCode = code;
-        currentVoucherDiscount = 20000;
-        if (currentVoucherDiscount > selectedTotalAmount) currentVoucherDiscount = selectedTotalAmount;
-        feedback.style.display = 'block';
-        feedback.style.color = '#059669';
-        feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SVUTE: Giảm trực tiếp 20.000đ!';
-      } else {
-        currentVoucherCode = '';
-        currentVoucherDiscount = 0;
-        feedback.style.display = 'block';
-        feedback.style.color = '#EF4444';
-        feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Mã ưu đãi không tồn tại hoặc đã hết hạn!';
+      try {
+        const formData = new FormData();
+        formData.append('code', code);
+        formData.append('totalAmount', selectedTotalAmount);
+        const res = await fetch('/customer/booking/api/validate-voucher', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.valid) {
+          currentVoucherCode = data.code;
+          currentVoucherDiscount = Number(data.discountAmount) || 0;
+          feedback.style.display = 'block';
+          feedback.style.color = '#059669';
+          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + data.message;
+        } else {
+          currentVoucherCode = '';
+          currentVoucherDiscount = 0;
+          feedback.style.display = 'block';
+          feedback.style.color = '#EF4444';
+          feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.message || 'Mã ưu đãi không hợp lệ!');
+        }
+      } catch (err) {
+        // Fallback local
+        if (code === 'SUMMER2026') {
+          if (selectedTotalAmount < 300000) {
+            currentVoucherCode = '';
+            currentVoucherDiscount = 0;
+            feedback.style.display = 'block';
+            feedback.style.color = '#EF4444';
+            feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Đơn hàng chưa đạt giá trị tối thiểu 300.000đ để áp dụng voucher này';
+          } else {
+            currentVoucherCode = code;
+            currentVoucherDiscount = Math.min(50000, Math.round(selectedTotalAmount * 0.1));
+            feedback.style.display = 'block';
+            feedback.style.color = '#059669';
+            feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SUMMER2026: Giảm 10% (tối đa 50.000đ)!';
+          }
+        } else if (code === 'GIAM50K') {
+          currentVoucherCode = code;
+          currentVoucherDiscount = Math.min(selectedTotalAmount, 50000);
+          feedback.style.display = 'block';
+          feedback.style.color = '#059669';
+          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã GIAM50K: Giảm trực tiếp 50.000đ!';
+        } else if (code === 'SPORTUTE10') {
+          currentVoucherCode = code;
+          currentVoucherDiscount = Math.round(selectedTotalAmount * 0.1);
+          feedback.style.display = 'block';
+          feedback.style.color = '#059669';
+          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SPORTUTE10: Giảm 10%!';
+        } else if (code === 'SVUTE') {
+          currentVoucherCode = code;
+          currentVoucherDiscount = Math.min(selectedTotalAmount, 20000);
+          feedback.style.display = 'block';
+          feedback.style.color = '#059669';
+          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SVUTE: Giảm trực tiếp 20.000đ!';
+        } else {
+          currentVoucherCode = '';
+          currentVoucherDiscount = 0;
+          feedback.style.display = 'block';
+          feedback.style.color = '#EF4444';
+          feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Mã ưu đãi không tồn tại hoặc đã hết hạn!';
+        }
       }
 
       document.getElementById('finalVoucherCode').value = currentVoucherCode;
@@ -3977,6 +4095,14 @@
       formData.append('discountAmount', currentDiscountAmount);
       const note = document.getElementById('inputBookingNote') ? document.getElementById('inputBookingNote').value : '';
       formData.append('note', note);
+
+      const enableMatchmaking = document.getElementById('checkEnableMatchmaking')?.checked || false;
+      formData.append('enableMatchmaking', enableMatchmaking);
+      if (enableMatchmaking) {
+        formData.append('matchmakingSkillLevel', document.getElementById('selMatchmakingSkill')?.value || 'Trung bình / Phong trào');
+        formData.append('matchmakingTeamSize', document.getElementById('inputMatchmakingTeamSize')?.value || '5 vs 5');
+        formData.append('matchmakingMessage', document.getElementById('inputMatchmakingMsg')?.value || 'Giao lưu cọ xát vui vẻ, share 50% tiền sân!');
+      }
 
       fetch('/customer/booking/api/confirm', {
         method: 'POST',
@@ -4852,5 +4978,8 @@
       }
     });
   </script>
+
+  <!-- Real-time SportBot AI Assistant -->
+  <th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
 </body>
 </html>

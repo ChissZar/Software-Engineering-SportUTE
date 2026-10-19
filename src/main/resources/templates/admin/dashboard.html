@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>SportHub — Tổng quan Quản lý trung tâm thể thao</title>
@@ -126,281 +128,504 @@
     <!-- CONTENT WRAPPER -->
     <div class="content">
 
-      <!-- PAGE HEADER (AQUASHINE STYLE) -->
-      <section class="pagehead">
-        <div class="pagehead-left">
-          <h1>Xin chào, <span th:text="${currentUser != null ? currentUser.fullName : 'Quản lý trung tâm'}">Quản lý trung tâm</span> 👋</h1>
-          <p>Dưới đây là tình hình hoạt động vận hành và số liệu trung tâm thể thao hôm nay</p>
-        </div>
-        <div class="pagehead-actions">
-          <div style="background:#ffffff; border:1px solid var(--gray-200); padding:6px 14px; border-radius:var(--radius-full); font-size:12px; font-weight:600; color:var(--gray-600); display:inline-flex; align-items:center; gap:6px; box-shadow:var(--shadow-xs);">
-            <i class="fa-regular fa-calendar"></i>
-            <span>Thứ Bảy, 17/10/2026</span>
+      <!-- =========================================================================
+           1. ROLE DASHBOARD: VẬN HÀNH / KỸ THUẬT SÂN BÃI (ROLE_OPERATOR)
+           100% Free of financial revenue data; focused on maintenance & facilities
+           ========================================================================= -->
+      <th:block th:if="${currentUser != null and currentUser.operator and !currentUser.admin and !currentUser.manager}">
+        <section class="pagehead">
+          <div class="pagehead-left">
+            <h1>Xin chào, <span th:text="${currentUser.fullName}">Nhân viên Kỹ thuật</span> 🛠️</h1>
+            <p>Trung tâm Giám sát Kỹ thuật Sân bãi, Thiết bị thi đấu & Lịch bảo dưỡng cơ sở vật chất</p>
           </div>
-          <a href="/admin/reports" class="btn btn-dark" style="border-radius:var(--radius-full);">
-            <i class="fa-solid fa-file-arrow-down"></i> Xuất dữ liệu
-          </a>
-          <a href="/admin/bookings" class="btn primary" style="border-radius:var(--radius-full);">
-            <i class="fa-solid fa-plus"></i> Đặt sân tại quầy
-          </a>
-        </div>
-      </section>
+          <div class="pagehead-actions">
+            <div style="background:#ffffff; border:1px solid var(--gray-200); padding:6px 14px; border-radius:var(--radius-full); font-size:12px; font-weight:600; color:var(--gray-600); display:inline-flex; align-items:center; gap:6px; box-shadow:var(--shadow-xs);">
+              <i class="fa-regular fa-calendar"></i>
+              <span>Hôm nay</span>
+            </div>
+            <a href="/admin/bookings?view=schedule" class="btn btn-dark" style="border-radius:var(--radius-full);">
+              <i class="fa-regular fa-calendar-days"></i> Lịch sân trống
+            </a>
+            <a href="/admin/maintenance" class="btn primary" style="border-radius:var(--radius-full);">
+              <i class="fa-solid fa-screwdriver-wrench"></i> Quản lý bảo trì
+            </a>
+          </div>
+        </section>
 
-      <!-- 4 KPI METRIC CARDS (EXACT AQUASHINE 1:1 3-TIER STACK) -->
-      <section class="stat-cards-row">
-        <!-- Card 1: Total Customers -->
-        <div class="stat-card-aquashine">
-          <div class="stat-top">
-            <i class="fa-solid fa-user-group stat-icon-blue"></i>
-            <span>Tổng khách hàng</span>
+        <!-- 4 KPI CARDS CHO VẬN HÀNH -->
+        <section class="stat-cards-row">
+          <!-- Card 1: Sân sẵn sàng thi đấu -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-circle-check stat-icon-blue" style="color:#10b981;"></i>
+              <span>Sân sẵn sàng thi đấu</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${courts != null ? #lists.size(courts.?[status == 'Hoạt động']) : 14}">14</div>
+            <div class="stat-bottom">
+              <span class="pill-chip green">Mặt sân tốt & Khả dụng</span>
+            </div>
           </div>
-          <div class="stat-val-aquashine" th:text="${data != null and data.newCustomers != null ? #numbers.formatDecimal(data.newCustomers, 0, 'COMMA', 0, 'POINT') : '1,250'}">1,250</div>
-          <div class="stat-bottom">
-            <span class="pill-chip green">+5 Khách mới</span>
-          </div>
-        </div>
 
-        <!-- Card 2: Total Courts / Available -->
-        <div class="stat-card-aquashine">
-          <div class="stat-top">
-            <i class="fa-solid fa-table-cells-large stat-icon-blue"></i>
-            <span>Sân đang hoạt động</span>
+          <!-- Card 2: Sân đang bảo trì kỹ thuật -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-triangle-exclamation stat-icon-blue" style="color:#f59e0b;"></i>
+              <span>Sân đang bảo trì</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${courts != null ? #lists.size(courts.?[status == 'Bảo trì']) : 2}">2</div>
+            <div class="stat-bottom">
+              <span class="pill-chip warning">Đang xử lý kỹ thuật</span>
+            </div>
           </div>
-          <div class="stat-val-aquashine">14 / 17 sân</div>
-          <div class="stat-bottom">
-            <span class="pill-chip green">82% Khả dụng</span>
-          </div>
-        </div>
 
-        <!-- Card 3: Completed Orders -->
-        <div class="stat-card-aquashine">
-          <div class="stat-top">
-            <i class="fa-solid fa-check stat-icon-blue"></i>
-            <span>Lượt đặt hoàn tất</span>
+          <!-- Card 3: Phiếu bảo trì trong tuần -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-clipboard-list stat-icon-blue"></i>
+              <span>Kế hoạch bảo trì ghi nhận</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${maintenanceStats != null and maintenanceStats['total'] != null ? maintenanceStats['total'] : 0}">0</div>
+            <div class="stat-bottom">
+              <span class="pill-chip blue">Kế hoạch định kỳ</span>
+            </div>
           </div>
-          <div class="stat-val-aquashine" th:text="${data != null and data.totalBookings != null ? #numbers.formatDecimal(data.totalBookings, 0, 'COMMA', 0, 'POINT') : '2,587'}">2,587</div>
-          <div class="stat-bottom">
-            <span class="pill-chip green">+15 Đơn hôm nay</span>
-          </div>
-        </div>
 
-        <!-- Card 4: Ongoing Matches -->
-        <div class="stat-card-aquashine">
-          <div class="stat-top">
-            <i class="fa-regular fa-clock stat-icon-blue"></i>
-            <span>Đang thi đấu trực tiếp</span>
+          <!-- Card 4: Sân đang có khách đá trực tiếp -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-regular fa-clock stat-icon-blue" style="color:#8b5cf6;"></i>
+              <span>Sân đang có khách chơi</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${bookingStats != null and bookingStats['inUse'] != null ? bookingStats['inUse'] : 0}">0</div>
+            <div class="stat-bottom">
+              <span class="pill-chip red">Đang thi đấu • Tránh làm phiền</span>
+            </div>
           </div>
-          <div class="stat-val-aquashine">12</div>
-          <div class="stat-bottom">
-            <span class="pill-chip red">12 Ca đang đá</span>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- MIDDLE ROW: OVERVIEW SPLINE CHART (65%) & RADIAL OCCUPANCY GAUGE (35%) -->
-      <div class="dashgrid-aquashine">
-        <!-- Overview Spline Chart Card -->
-        <div class="aquashine-card">
-          <div class="overview-header">
-            <div class="overview-title-row">
-              <div class="icon-circle-blue">
-                <i class="fa-solid fa-dollar-sign"></i>
+        <!-- GRID 2 CỘT CHO VẬN HÀNH: TÌNH TRẠNG CƠ SỞ VẬT CHẤT & LỊCH BẢO TRÌ -->
+        <div style="display:grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr); gap:20px; margin-bottom:24px;">
+          <!-- Card Hiện trạng Sân -->
+          <div class="aquashine-card">
+            <div class="table-card-head">
+              <div class="table-card-title">
+                <i class="fa-solid fa-table-cells-large" style="color: #3b82f6; font-size: 15px;"></i>
+                <h2>Hiện trạng Cơ sở vật chất Sân</h2>
               </div>
-              <h2>Overview</h2>
+              <a href="/admin/courts" class="btn-filter-pill">
+                <span>Cập nhật trạng thái sân</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
-            <div class="overview-amount-row">
-              <span class="overview-amount" th:text="${data != null and data.revenueToday != null ? #numbers.formatDecimal(data.revenueToday, 0, 'COMMA', 0, 'POINT') + ' đ' : '12.450.000 đ'}">12.450.000 đ</span>
-              <span class="trend-icon-chip" title="Tăng trưởng so với hôm qua"><i class="fa-solid fa-chart-line"></i></span>
-            </div>
-          </div>
-          <div style="position: relative; height: 200px; width: 100%; margin-top: 8px;">
-            <canvas id="revenueChart"></canvas>
-          </div>
-        </div>
 
-        <!-- Occupancy Radial Gauge Card (AquaShine Low Stock Alert Style) -->
-        <div class="aquashine-card">
-          <div class="alert-card-header">
-            <div class="alert-title-row">
-              <i class="fa-solid fa-triangle-exclamation" style="color: #3b82f6; font-size: 15px;"></i>
-              <h2>Tỷ lệ lấp đầy sân</h2>
-            </div>
-            <div class="filter-pills-row">
-              <span class="filter-pill active">Bóng đá</span>
-              <span class="filter-pill">Cầu lông</span>
-              <span class="filter-pill warning">Cần bảo trì</span>
-            </div>
-          </div>
-          <div class="gauge-wrap">
-            <canvas id="occupancyGauge"></canvas>
-            <div class="gauge-center-label">
-              <span class="gauge-percent" th:text="${data != null and data.occupancyRate != null ? data.occupancyRate + '%' : '65%'}">65%</span>
-              <small style="color: var(--gray-400); font-size: 12px; font-weight: 600;">Khả dụng 82%</small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FULL-WIDTH RECENT TRANSACTIONS TABLE (AQUASHINE 1:1) -->
-      <div class="aquashine-card">
-        <div class="table-card-head">
-          <div class="table-card-title">
-            <i class="fa-solid fa-arrow-down-up-across-line" style="color: #3b82f6; font-size: 15px;"></i>
-            <h2>Recent Transaction</h2>
-          </div>
-          <button class="btn-filter-pill" type="button" onclick="alert('Lọc theo môn thể thao, khoảng thời gian hoặc trạng thái thanh toán.')">
-            <span>Filter</span>
-            <i class="fa-solid fa-sliders"></i>
-          </button>
-        </div>
-
-        <div class="aquashine-table-wrap">
-          <table class="aquashine-table">
-            <thead>
-              <tr>
-                <th>Activity</th>
-                <th>Date</th>
-                <th>Price</th>
-                <th style="text-align: right;">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Live Data from Spring Boot Model -->
-              <tr th:each="rb : ${data != null ? data.recentBookings : null}">
-                <td>
-                  <div class="activity-cell">
-                    <span class="activity-name" th:text="${rb.customerName + ' — ' + rb.courtName}">Nguyễn Hoàng Nam — Sân bóng 1</span>
+            <div class="courtgrid">
+              <div class="court-item" th:each="court : ${courts}">
+                <div class="court-item-head">
+                  <div class="court-item-icon">
+                    <i class="fa-solid fa-futbol" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng đá')}"></i>
+                    <i class="fa-solid fa-table-tennis-paddle-ball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'pickleball')}"></i>
+                    <i class="fa-solid fa-basketball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
+                    <i class="fa-solid fa-volleyball" th:if="${court.sportName != null and !#strings.containsIgnoreCase(court.sportName, 'bóng đá') and !#strings.containsIgnoreCase(court.sportName, 'pickleball') and !#strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
                   </div>
-                </td>
-                <td style="color: var(--gray-500);" th:text="${rb.time != null ? rb.time : 'October 17, 2026'}">October 17, 2026</td>
-                <td style="font-weight: 700; color: var(--gray-900);">250.000 đ</td>
-                <td style="text-align: right;">
-                  <span class="pill-chip"
-                        th:classappend="${rb.status == 'Đã xác nhận' or rb.status == 'Hoàn tất' or rb.status == 'Success' ? 'green' : 'amber'}"
-                        th:text="${rb.status != null ? rb.status : 'Success'}">Success</span>
-                </td>
-              </tr>
-              <!-- Fallback Demo Items if list empty (Exact Match with AquaShine) -->
-              <tr th:if="${data == null or data.recentBookings == null or #lists.isEmpty(data.recentBookings)}">
-                <td>
-                  <span class="activity-name">Car Wash — Sedan</span>
-                </td>
-                <td style="color: var(--gray-500);">September 9, 2025</td>
-                <td style="font-weight: 700; color: var(--gray-900);">$25,00</td>
-                <td style="text-align: right;">
-                  <span class="pill-chip green">Success</span>
-                </td>
-              </tr>
-              <tr th:if="${data == null or data.recentBookings == null or #lists.isEmpty(data.recentBookings)}">
-                <td>
-                  <span class="activity-name">Nguyễn Hoàng Nam — Sân bóng đá mini 1</span>
-                </td>
-                <td style="color: var(--gray-500);">October 17, 2026</td>
-                <td style="font-weight: 700; color: var(--gray-900);">250.000 đ</td>
-                <td style="text-align: right;">
-                  <span class="pill-chip green">Success</span>
-                </td>
-              </tr>
-              <tr th:if="${data == null or data.recentBookings == null or #lists.isEmpty(data.recentBookings)}">
-                <td>
-                  <span class="activity-name">Trần Thanh Hằng — Sân pickleball số 2</span>
-                </td>
-                <td style="color: var(--gray-500);">October 17, 2026</td>
-                <td style="font-weight: 700; color: var(--gray-900);">180.000 đ</td>
-                <td style="text-align: right;">
-                  <span class="pill-chip green">Success</span>
-                </td>
-              </tr>
-              <tr th:if="${data == null or data.recentBookings == null or #lists.isEmpty(data.recentBookings)}">
-                <td>
-                  <span class="activity-name">Lê Minh Đức — Sân cầu lông 3</span>
-                </td>
-                <td style="color: var(--gray-500);">October 17, 2026</td>
-                <td style="font-weight: 700; color: var(--gray-900);">120.000 đ</td>
-                <td style="text-align: right;">
-                  <span class="pill-chip green">Success</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- LIVE COURT AVAILABILITY (Clean Modern Card) -->
-      <div class="aquashine-card">
-        <div class="table-card-head">
-          <div class="table-card-title">
-            <i class="fa-solid fa-table-cells-large" style="color: #3b82f6; font-size: 15px;"></i>
-            <h2>Trạng thái Sân trực tiếp</h2>
-          </div>
-          <a href="/admin/courts" class="btn-filter-pill">
-            <span>Xem tất cả sân</span>
-            <i class="fa-solid fa-arrow-right"></i>
-          </a>
-        </div>
-
-        <div class="courtgrid">
-          <div class="court-item" th:each="court : ${data != null ? data.courts : null}">
-            <div class="court-item-head">
-              <div class="court-item-icon">
-                <i class="fa-solid fa-futbol" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng đá')}"></i>
-                <i class="fa-solid fa-table-tennis-paddle-ball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'pickleball')}"></i>
-                <i class="fa-solid fa-basketball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
-                <i class="fa-solid fa-volleyball" th:if="${court.sportName != null and !#strings.containsIgnoreCase(court.sportName, 'bóng đá') and !#strings.containsIgnoreCase(court.sportName, 'pickleball') and !#strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
+                  <span class="badge"
+                        th:classappend="${court.status == 'Đang sử dụng' ? 'status-inuse' : (court.status == 'Bảo trì' ? 'status-maint' : 'status-active')}"
+                        th:text="${court.status}">Hoạt động</span>
+                </div>
+                <div>
+                  <b th:text="${court.name}">Sân</b>
+                  <small th:text="${court.sportName}">Môn thể thao</small>
+                </div>
               </div>
-              <span class="badge"
-                    th:classappend="${court.status == 'Đang sử dụng' ? 'status-inuse' : (court.status == 'Bảo trì' ? 'status-maint' : 'status-active')}"
-                    th:text="${court.status}">Trống</span>
-            </div>
-            <div>
-              <b th:text="${court.name}">Sân</b>
-              <small th:text="${court.sportName}">Môn thể thao</small>
             </div>
           </div>
 
-          <!-- Fallback Static Items if empty -->
-          <div class="court-item" th:if="${data == null or data.courts == null or #lists.isEmpty(data.courts)}">
-            <div class="court-item-head">
-              <div class="court-item-icon"><i class="fa-solid fa-futbol"></i></div>
-              <span class="badge status-active">Sẵn sàng</span>
+          <!-- Card Lịch Bảo trì -->
+          <div class="aquashine-card">
+            <div class="table-card-head">
+              <div class="table-card-title">
+                <i class="fa-solid fa-screwdriver-wrench" style="color: #3b82f6; font-size: 15px;"></i>
+                <h2>Lịch bảo trì đang thực hiện</h2>
+              </div>
+              <a href="/admin/maintenance" class="btn-filter-pill">
+                <span>Tất cả phiếu</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
             </div>
-            <div>
-              <b>Sân bóng đá 1</b>
-              <small>Bóng đá mini 5 người</small>
-            </div>
-          </div>
-          <div class="court-item" th:if="${data == null or data.courts == null or #lists.isEmpty(data.courts)}">
-            <div class="court-item-head">
-              <div class="court-item-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
-              <span class="badge status-inuse">Đang dùng</span>
-            </div>
-            <div>
-              <b>Sân cầu lông 2</b>
-              <small>Cầu lông thảm tiêu chuẩn</small>
-            </div>
-          </div>
-          <div class="court-item" th:if="${data == null or data.courts == null or #lists.isEmpty(data.courts)}">
-            <div class="court-item-head">
-              <div class="court-item-icon"><i class="fa-solid fa-basketball"></i></div>
-              <span class="badge status-maint">Bảo trì</span>
-            </div>
-            <div>
-              <b>Sân bóng rổ 1</b>
-              <small>Bóng rổ ngoài trời</small>
-            </div>
-          </div>
-          <div class="court-item" th:if="${data == null or data.courts == null or #lists.isEmpty(data.courts)}">
-            <div class="court-item-head">
-              <div class="court-item-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
-              <span class="badge status-active">Sẵn sàng</span>
-            </div>
-            <div>
-              <b>Sân pickleball 1</b>
-              <small>Pickleball mái che</small>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div th:each="m : ${maintenances}" style="padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:#f8fafc; font-size:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <strong style="color:var(--dark);" th:text="${m.courtName}">Sân bóng 1</strong>
+                  <span class="badge status-maint">Bảo trì</span>
+                </div>
+                <div style="color:var(--gray-600); margin-top:4px;" th:text="${m.reason}">Lý do bảo trì</div>
+                <div style="color:var(--gray-400); font-size:11px; margin-top:4px;">
+                  <i class="fa-regular fa-clock me-1"></i>
+                  <span th:text="${m.startDate != null ? #temporals.format(m.startDate, 'dd/MM HH:mm') : ''} + ' – ' + ${m.endDate != null ? #temporals.format(m.endDate, 'dd/MM HH:mm') : ''}"></span>
+                </div>
+              </div>
+              <div th:if="${maintenances == null or #lists.isEmpty(maintenances)}" style="text-align:center; padding:30px 10px; color:var(--gray-400); font-size:12.5px;">
+                <i class="fa-solid fa-circle-check" style="font-size:28px; color:#10b981; margin-bottom:8px; display:block;"></i>
+                Không có sự cố hoặc lịch bảo trì nào đang tồn đọng.
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </th:block>
+
+      <!-- =========================================================================
+           2. ROLE DASHBOARD: LỄ TÂN QUẦY & TIẾP ĐÓN (ROLE_RECEPTIONIST)
+           Focused on court occupancy, pending check-ins, front-desk service
+           ========================================================================= -->
+      <th:block th:if="${currentUser != null and currentUser.receptionist and !currentUser.admin and !currentUser.manager}">
+        <section class="pagehead">
+          <div class="pagehead-left">
+            <h1>Xin chào, <span th:text="${currentUser.fullName}">Lễ tân quầy</span> 👋</h1>
+            <p>Bàn giao Ca trực, Theo dõi Sân trực tiếp và Tiếp đón Khách hàng tại quầy</p>
+          </div>
+          <div class="pagehead-actions">
+            <div style="background:#ffffff; border:1px solid var(--gray-200); padding:6px 14px; border-radius:var(--radius-full); font-size:12px; font-weight:600; color:var(--gray-600); display:inline-flex; align-items:center; gap:6px; box-shadow:var(--shadow-xs);">
+              <i class="fa-regular fa-calendar"></i>
+              <span>Hôm nay</span>
+            </div>
+            <a href="/admin/bookings" class="btn btn-dark" style="border-radius:var(--radius-full);">
+              <i class="fa-solid fa-list-check"></i> Danh sách đặt sân
+            </a>
+            <a href="/admin/bookings?view=schedule" class="btn primary" style="border-radius:var(--radius-full);">
+              <i class="fa-solid fa-calendar-plus"></i> Đặt sân (Timeline)
+            </a>
+          </div>
+        </section>
+
+        <!-- 4 KPI CARDS CHO LỄ TÂN -->
+        <section class="stat-cards-row">
+          <!-- Card 1: Khách đang thi đấu -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-bolt stat-icon-blue" style="color:#8b5cf6;"></i>
+              <span>Khách đang chơi sân</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${bookingStats != null and bookingStats['inUse'] != null ? bookingStats['inUse'] : 0}">0</div>
+            <div class="stat-bottom">
+              <span class="pill-chip green">Đang phục vụ tại sân</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Chờ duyệt & Thu cọc -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-clock stat-icon-blue" style="color:#f59e0b;"></i>
+              <span>Chờ xác nhận / Thu cọc</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${bookingStats != null and bookingStats['pending'] != null ? bookingStats['pending'] : 0}">0</div>
+            <div class="stat-bottom">
+              <span class="pill-chip amber">Cần liên hệ khách</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Đã cọc / Chuẩn bị nhận sân -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-regular fa-circle-check stat-icon-blue"></i>
+              <span>Đã xác nhận cọc</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${bookingStats != null and bookingStats['confirmed'] != null ? bookingStats['confirmed'] : 0}">0</div>
+            <div class="stat-bottom">
+              <span class="pill-chip blue">Sẵn sàng đón khách</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Tổng số sân khả dụng -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-table-cells-large stat-icon-blue"></i>
+              <span>Sân sẵn sàng đón khách</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${courts != null ? #lists.size(courts.?[status == 'Hoạt động']) : 14}">14</div>
+            <div class="stat-bottom">
+              <span class="pill-chip green">SportHub Campus</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- BẢNG LỄ TÂN: TRẠNG THÁI SÂN TRỰC TIẾP & LƯỢT ĐẶT GẦN ĐÂY -->
+        <div style="display:grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr); gap:20px; margin-bottom:24px;">
+          <!-- Card Hiện trạng Sân -->
+          <div class="aquashine-card">
+            <div class="table-card-head">
+              <div class="table-card-title">
+                <i class="fa-solid fa-table-cells-large" style="color: #3b82f6; font-size: 15px;"></i>
+                <h2>Hiện trạng Sân thể thao (Trực tiếp)</h2>
+              </div>
+              <a href="/admin/bookings?view=schedule" class="btn-filter-pill">
+                <span>Xem Timeline</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="courtgrid">
+              <div class="court-item" th:each="court : ${courts}">
+                <div class="court-item-head">
+                  <div class="court-item-icon">
+                    <i class="fa-solid fa-futbol" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng đá')}"></i>
+                    <i class="fa-solid fa-table-tennis-paddle-ball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'pickleball')}"></i>
+                    <i class="fa-solid fa-basketball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
+                    <i class="fa-solid fa-volleyball" th:if="${court.sportName != null and !#strings.containsIgnoreCase(court.sportName, 'bóng đá') and !#strings.containsIgnoreCase(court.sportName, 'pickleball') and !#strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
+                  </div>
+                  <span class="badge"
+                        th:classappend="${court.status == 'Đang sử dụng' ? 'status-inuse' : (court.status == 'Bảo trì' ? 'status-maint' : 'status-active')}"
+                        th:text="${court.status}">Trống</span>
+                </div>
+                <div>
+                  <b th:text="${court.name}">Sân</b>
+                  <small th:text="${court.sportName}">Môn thể thao</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Lịch đặt gần đây -->
+          <div class="aquashine-card">
+            <div class="table-card-head">
+              <div class="table-card-title">
+                <i class="fa-regular fa-calendar-check" style="color: #3b82f6; font-size: 15px;"></i>
+                <h2>Phiếu đặt cần chú ý hôm nay</h2>
+              </div>
+              <a href="/admin/bookings" class="btn-filter-pill">
+                <span>Xem tất cả</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div th:each="rb : ${data != null ? data.recentBookings : null}" style="padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:#f8fafc; font-size:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <strong style="color:var(--dark);" th:text="${rb.customerName}">Khách hàng</strong>
+                  <span class="badge"
+                        th:classappend="${rb.status == 'Đã xác nhận' or rb.status == 'Hoàn tất' or rb.status == 'Success' ? 'status-active' : 'status-maint'}"
+                        th:text="${rb.status != null ? rb.status : 'Chờ xử lý'}"></span>
+                </div>
+                <div style="color:var(--gray-600); margin-top:4px;" th:text="${rb.courtName}">Sân</div>
+                <div style="color:var(--gray-400); font-size:11px; margin-top:4px;">
+                  <i class="fa-regular fa-clock me-1"></i>
+                  <span th:text="${rb.time != null ? rb.time : 'Hôm nay'}"></span>
+                </div>
+              </div>
+              <div th:if="${data == null or data.recentBookings == null or #lists.isEmpty(data.recentBookings)}" style="text-align:center; padding:30px 10px; color:var(--gray-400); font-size:12.5px;">
+                Không có phiếu đặt sân nào cần chú ý.
+              </div>
+            </div>
+          </div>
+        </div>
+      </th:block>
+
+      <!-- =========================================================================
+           3. ROLE DASHBOARD: QUẢN LÝ / GIÁM ĐỐC / ADMIN (ROLE_ADMIN, ROLE_MANAGER)
+           Full Executive Business & Financial Performance Dashboard
+           ========================================================================= -->
+      <th:block th:if="${currentUser == null or currentUser.admin or currentUser.manager}">
+        <!-- PAGE HEADER (AQUASHINE STYLE) -->
+        <section class="pagehead">
+          <div class="pagehead-left">
+            <h1>Xin chào, <span th:text="${currentUser != null ? currentUser.fullName : 'Quản lý trung tâm'}">Quản lý trung tâm</span> 👋</h1>
+            <p>Dưới đây là tình hình hoạt động vận hành và số liệu trung tâm thể thao hôm nay</p>
+          </div>
+          <div class="pagehead-actions">
+            <div style="background:#ffffff; border:1px solid var(--gray-200); padding:6px 14px; border-radius:var(--radius-full); font-size:12px; font-weight:600; color:var(--gray-600); display:inline-flex; align-items:center; gap:6px; box-shadow:var(--shadow-xs);">
+              <i class="fa-regular fa-calendar"></i>
+              <span>Hôm nay</span>
+            </div>
+            <a href="/admin/reports" class="btn btn-dark" style="border-radius:var(--radius-full);">
+              <i class="fa-solid fa-file-arrow-down"></i> Xuất dữ liệu
+            </a>
+            <a href="/admin/bookings" class="btn primary" style="border-radius:var(--radius-full);">
+              <i class="fa-solid fa-plus"></i> Đặt sân tại quầy
+            </a>
+          </div>
+        </section>
+
+        <!-- 4 KPI METRIC CARDS (EXACT AQUASHINE 1:1 3-TIER STACK) -->
+        <section class="stat-cards-row">
+          <!-- Card 1: Total Customers -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-user-group stat-icon-blue"></i>
+              <span>Tổng khách hàng</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${data != null and data.newCustomers != null ? #numbers.formatDecimal(data.newCustomers, 0, 'COMMA', 0, 'POINT') : '1,250'}">1,250</div>
+            <div class="stat-bottom">
+              <span class="pill-chip green">+5 Khách mới</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Total Courts / Available -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-table-cells-large stat-icon-blue"></i>
+              <span>Sân đang hoạt động</span>
+            </div>
+            <div class="stat-val-aquashine">14 / 17 sân</div>
+            <div class="stat-bottom">
+              <span class="pill-chip green">82% Khả dụng</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Completed Orders -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-solid fa-check stat-icon-blue"></i>
+              <span>Lượt đặt hoàn tất</span>
+            </div>
+            <div class="stat-val-aquashine" th:text="${data != null and data.totalBookings != null ? #numbers.formatDecimal(data.totalBookings, 0, 'COMMA', 0, 'POINT') : '2,587'}">2,587</div>
+            <div class="stat-bottom">
+              <span class="pill-chip green">+15 Đơn hôm nay</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Ongoing Matches -->
+          <div class="stat-card-aquashine">
+            <div class="stat-top">
+              <i class="fa-regular fa-clock stat-icon-blue"></i>
+              <span>Đang thi đấu trực tiếp</span>
+            </div>
+            <div class="stat-val-aquashine">12</div>
+            <div class="stat-bottom">
+              <span class="pill-chip red">12 Ca đang đá</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- MIDDLE ROW: OVERVIEW SPLINE CHART (65%) & RADIAL OCCUPANCY GAUGE (35%) -->
+        <div class="dashgrid-aquashine">
+          <!-- Overview Spline Chart Card -->
+          <div class="aquashine-card">
+            <div class="overview-header">
+              <div class="overview-title-row">
+                <div class="icon-circle-blue">
+                  <i class="fa-solid fa-dollar-sign"></i>
+                </div>
+                <h2>Overview</h2>
+              </div>
+              <div class="overview-amount-row">
+                <span class="overview-amount" th:text="${data != null and data.revenueToday != null ? #numbers.formatDecimal(data.revenueToday, 0, 'COMMA', 0, 'POINT') + ' đ' : '12.450.000 đ'}">12.450.000 đ</span>
+                <span class="trend-icon-chip" title="Tăng trưởng so với hôm qua"><i class="fa-solid fa-chart-line"></i></span>
+              </div>
+            </div>
+            <div style="position: relative; height: 200px; width: 100%; margin-top: 8px;">
+              <canvas id="revenueChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Occupancy Radial Gauge Card (AquaShine Low Stock Alert Style) -->
+          <div class="aquashine-card">
+            <div class="alert-card-header">
+              <div class="alert-title-row">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #3b82f6; font-size: 15px;"></i>
+                <h2>Tỷ lệ lấp đầy sân</h2>
+              </div>
+              <div class="filter-pills-row">
+                <span class="filter-pill active">Bóng đá</span>
+                <span class="filter-pill">Cầu lông</span>
+                <span class="filter-pill warning">Cần bảo trì</span>
+              </div>
+            </div>
+            <div class="gauge-wrap">
+              <canvas id="occupancyGauge"></canvas>
+              <div class="gauge-center-label">
+                <span class="gauge-percent" th:text="${data != null and data.occupancyRate != null ? data.occupancyRate + '%' : '65%'}">65%</span>
+                <small style="color: var(--gray-400); font-size: 12px; font-weight: 600;">Khả dụng 82%</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FULL-WIDTH RECENT TRANSACTIONS TABLE (AQUASHINE 1:1) -->
+        <div class="aquashine-card">
+          <div class="table-card-head">
+            <div class="table-card-title">
+              <i class="fa-solid fa-arrow-down-up-across-line" style="color: #3b82f6; font-size: 15px;"></i>
+              <h2>Recent Transaction</h2>
+            </div>
+            <button class="btn-filter-pill" type="button" onclick="alert('Lọc theo môn thể thao, khoảng thời gian hoặc trạng thái thanh toán.')">
+              <span>Filter</span>
+              <i class="fa-solid fa-sliders"></i>
+            </button>
+          </div>
+
+          <div class="aquashine-table-wrap">
+            <table class="aquashine-table">
+              <thead>
+                <tr>
+                  <th>Activity</th>
+                  <th>Date</th>
+                  <th>Price</th>
+                  <th style="text-align: right;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="rb : ${data != null ? data.recentBookings : null}">
+                  <td>
+                    <div class="activity-cell">
+                      <span class="activity-name" th:text="${rb.customerName + ' — ' + rb.courtName}">Nguyễn Hoàng Nam — Sân bóng 1</span>
+                    </div>
+                  </td>
+                  <td style="color: var(--gray-500);" th:text="${rb.time != null ? rb.time : 'Hôm nay'}">Hôm nay</td>
+                  <td style="font-weight: 700; color: var(--gray-900);">250.000 đ</td>
+                  <td style="text-align: right;">
+                    <span class="pill-chip"
+                          th:classappend="${rb.status == 'Đã xác nhận' or rb.status == 'Hoàn tất' or rb.status == 'Success' ? 'green' : 'amber'}"
+                          th:text="${rb.status != null ? rb.status : 'Success'}">Success</span>
+                  </td>
+                </tr>
+                <tr th:if="${data == null or data.recentBookings == null or #lists.isEmpty(data.recentBookings)}">
+                  <td>
+                    <span class="activity-name">Nguyễn Hoàng Nam — Sân bóng đá mini 1</span>
+                  </td>
+                  <td style="color: var(--gray-500);">Hôm nay</td>
+                  <td style="font-weight: 700; color: var(--gray-900);">250.000 đ</td>
+                  <td style="text-align: right;">
+                    <span class="pill-chip green">Success</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LIVE COURT AVAILABILITY (Clean Modern Card) -->
+        <div class="aquashine-card">
+          <div class="table-card-head">
+            <div class="table-card-title">
+              <i class="fa-solid fa-table-cells-large" style="color: #3b82f6; font-size: 15px;"></i>
+              <h2>Trạng thái Sân trực tiếp</h2>
+            </div>
+            <a href="/admin/courts" class="btn-filter-pill">
+              <span>Xem tất cả sân</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="courtgrid">
+            <div class="court-item" th:each="court : ${data != null ? data.courts : null}">
+              <div class="court-item-head">
+                <div class="court-item-icon">
+                  <i class="fa-solid fa-futbol" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng đá')}"></i>
+                  <i class="fa-solid fa-table-tennis-paddle-ball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'pickleball')}"></i>
+                  <i class="fa-solid fa-basketball" th:if="${court.sportName != null and #strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
+                  <i class="fa-solid fa-volleyball" th:if="${court.sportName != null and !#strings.containsIgnoreCase(court.sportName, 'bóng đá') and !#strings.containsIgnoreCase(court.sportName, 'pickleball') and !#strings.containsIgnoreCase(court.sportName, 'bóng rổ')}"></i>
+                </div>
+                <span class="badge"
+                      th:classappend="${court.status == 'Đang sử dụng' ? 'status-inuse' : (court.status == 'Bảo trì' ? 'status-maint' : 'status-active')}"
+                      th:text="${court.status}">Trống</span>
+              </div>
+              <div>
+                <b th:text="${court.name}">Sân</b>
+                <small th:text="${court.sportName}">Môn thể thao</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </th:block>
 
     </div>
   </main>

@@ -131,10 +131,13 @@ public class AdminBookingController {
 
     // Trả sân (UC22 - Check-out)
     @PostMapping("/checkout/{id}")
-    public String checkOut(@PathVariable String id, RedirectAttributes redirectAttributes) {
+    public String checkOut(@PathVariable String id,
+                           @RequestParam(value = "paymentMethod", required = false) String paymentMethod,
+                           @RequestParam(value = "note", required = false) String note,
+                           RedirectAttributes redirectAttributes) {
         try {
-            adminBookingService.checkOutBooking(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã ghi nhận trả sân thành công cho phiếu #" + id + "! Trạng thái chuyển sang 'Hoàn tất'.");
+            adminBookingService.checkOutBooking(id, paymentMethod, note);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã ghi nhận trả sân thành công cho phiếu #" + id + "! Trạng thái chuyển sang 'Hoàn tất' và sân đã sẵn sàng đón lượt khách mới.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không thể trả sân: " + e.getMessage());
         }

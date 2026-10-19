@@ -44,4 +44,14 @@ public class CustomerBookingRequestDTO {
     private String voucherCode;
 
     private BigDecimal discountAmount;
+
+    // Tính năng ghép đối thủ giao lưu
+    @Builder.Default
+    private boolean enableMatchmaking = false;
+
+    private String matchmakingSkillLevel;
+
+    private String matchmakingTeamSize;
+
+    private String matchmakingMessage;
 }

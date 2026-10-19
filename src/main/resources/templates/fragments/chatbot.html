@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<!-- ==========================================================================
+     SPORTHUB AI CHATBOT WIDGET (FLOATING BUBBLE & REAL-TIME CHAT PANEL)
+     ========================================================================== -->
+<div th:fragment="chatbot" id="sportbotRoot">
+  <style>
+    /* Floating Action Button (FAB) */
+    .sportbot-fab-wrap {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    .sportbot-tooltip-bubble {
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+      white-space: nowrap;
+      pointer-events: none;
+      animation: sportbotFloat 3s ease-in-out infinite;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sportbot-tooltip-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      right: 24px;
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #0f172a transparent transparent;
+    }
+
+    @keyframes sportbotFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* Mascot Standing Floating Trigger */
+    .sportbot-fab {
+      width: 82px;
+      height: 94px;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      animation: sportbotMascotBounce 3.2s ease-in-out infinite;
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.16)) drop-shadow(0 4px 10px rgba(16, 185, 129, 0.35));
+    }
+    .sportbot-fab:hover {
+      transform: scale(1.12) translateY(-6px);
+      filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.22)) drop-shadow(0 6px 14px rgba(16, 185, 129, 0.55));
+    }
+    .sportbot-fab:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes sportbotMascotBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .sportbot-mascot-ground-shadow {
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 10px;
+      background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.45) 0%, rgba(5, 150, 105, 0.15) 50%, transparent 75%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: sportbotGroundPulse 3.2s ease-in-out infinite;
+    }
+    @keyframes sportbotGroundPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+      50% { transform: translateX(-50%) scale(0.78); opacity: 0.45; }
+    }
+
+    .sportbot-mascot-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .sportbot-online-badge {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      width: 13px;
+      height: 13px;
+      background: #10b981;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.85);
+      animation: sportbotBadgePulse 2.2s infinite;
+    }
+    @keyframes sportbotBadgePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+    }
+
+    .sportbot-close-badge {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+    .sportbot-fab.open .sportbot-close-badge {
+      display: flex;
+    }
+    .sportbot-fab.open .sportbot-online-badge {
+      display: none;
+    }
+
+    /* Chat Window Flyout Panel */
+    .sportbot-panel {
+      position: fixed;
+      bottom: 118px;
+      right: 24px;
+      width: 395px;
+      height: 590px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100vh - 140px);
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 99999;
+      transform-origin: bottom right;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: scale(0.85) translateY(20px);
+      pointer-events: none;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    .sportbot-panel.active {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: all;
+    }
+
+    /* Header */
+    .sportbot-header {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: #ffffff;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .sportbot-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sportbot-avatar-wrap {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border-radius: 13px;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16), 0 0 0 2px rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+    }
+    .sportbot-header-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 11px;
+      display: block;
+    }
+    .sportbot-avatar-status {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 11px;
+      height: 11px;
+      background: #34d399;
+      border: 2px solid #047857;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(52, 211, 153, 0.85);
+    }
+    .sportbot-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .sportbot-subtitle {
+      font-size: 11px;
+      color: #a7f3d0;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sportbot-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sportbot-hbtn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #ffffff;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: background 0.15s ease;
+    }
+    .sportbot-hbtn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Messages Area */
+    .sportbot-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #f8fafc;
+      scroll-behavior: smooth;
+    }
+
+    .sportbot-msg-row {
+      display: flex;
+      gap: 8px;
+      max-width: 88%;
+      animation: sportbotMsgAppear 0.25s ease-out;
+    }
+    @keyframes sportbotMsgAppear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .sportbot-msg-row.bot {
+      align-self: flex-start;
+    }
+    .sportbot-msg-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .sportbot-msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      overflow: hidden;
+    }
+    .sportbot-msg-row.bot .sportbot-msg-avatar {
+      background: #ffffff;
+      border: 1.5px solid #a7f3d0;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.12);
+    }
+    .sportbot-msg-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .sportbot-msg-row.user .sportbot-msg-avatar {
+      background: #059669;
+      color: #ffffff;
+    }
+
+    .sportbot-bubble-content {
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .sportbot-msg-row.bot .sportbot-bubble-content {
+      background: #ffffff;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      border-top-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .sportbot-msg-row.user .sportbot-bubble-content {
+      background: #059669;
+      color: #ffffff;
+      border-top-right-radius: 4px;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+    }
+    .sportbot-bubble-content code {
+      background: rgba(0,0,0,0.06);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #047857;
+    }
+    .sportbot-msg-row.user .sportbot-bubble-content code {
+      background: rgba(255,255,255,0.25);
+      color: #ffffff;
+    }
+
+    .sportbot-msg-time {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 4px;
+      text-align: right;
+    }
+    .sportbot-msg-row.user .sportbot-msg-time {
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* Action button inside message */
+    .sportbot-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #10b981;
+      color: #ffffff !important;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none !important;
+      margin-top: 8px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+      transition: all 0.15s ease;
+    }
+    .sportbot-action-btn:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    /* Suggestions Bar */
+    .sportbot-suggestions {
+      padding: 8px 14px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      background: #ffffff;
+      border-top: 1px solid #f1f5f9;
+      scrollbar-width: none;
+    }
+    .sportbot-suggestions::-webkit-scrollbar {
+      display: none;
+    }
+    .sportbot-chip {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      border-radius: 16px;
+      padding: 5px 11px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .sportbot-chip:hover {
+      background: #10b981;
+      color: #ffffff;
+      border-color: #10b981;
+      transform: translateY(-1px);
+    }
+
+    /* Typing Indicator */
+    .sportbot-typing {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      border-top-left-radius: 4px;
+      width: fit-content;
+      margin-left: 36px;
+    }
+    .sportbot-dot {
+      width: 6px;
+      height: 6px;
+      background: #059669;
+      border-radius: 50%;
+      animation: sportbotBounce 1.4s infinite ease-in-out both;
+    }
+    .sportbot-dot:nth-child(1) { animation-delay: -0.32s; }
+    .sportbot-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes sportbotBounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    /* Input Footer */
+    .sportbot-footer {
+      padding: 12px 14px;
+      background: #ffffff;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sportbot-input-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 4px 6px 4px 14px;
+      border: 1.5px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .sportbot-input-box:focus-within {
+      background: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .sportbot-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13px;
+      font-family: inherit;
+      color: #0f172a;
+    }
+    .sportbot-send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      border: none;
+      background: #059669;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.15s ease;
+    }
+    .sportbot-send-btn:hover {
+      background: #047857;
+      transform: scale(1.05);
+    }
+    .sportbot-send-btn:active {
+      transform: scale(0.95);
+    }
+    .sportbot-footer-hint {
+      font-size: 10px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+
+  <!-- FLOATING CHAT BUBBLE TRIGGER (MASCOT STANDING) -->
+  <div class="sportbot-fab-wrap" id="sportbotFabWrap">
+    <div class="sportbot-tooltip-bubble" id="sportbotTooltip">
+      <i class="fa-solid fa-sparkles text-amber" style="color: #fbbf24;"></i>
+      <span>SportBot AI: Chạm vào mình để hỏi sân nhé! 🏸⚽</span>
+    </div>
+
+    <button type="button" class="sportbot-fab" id="sportbotFab" onclick="toggleSportBot()" title="Trợ lý SportBot AI">
+      <div class="sportbot-mascot-ground-shadow"></div>
+      <img th:src="@{/images/chatbot/mascot-standing.png}" src="/images/chatbot/mascot-standing.png" alt="SportBot Mascot" class="sportbot-mascot-img" />
+      <span class="sportbot-online-badge" title="Đang trực tuyến"></span>
+      <span class="sportbot-close-badge" title="Đóng chat"><i class="fa-solid fa-xmark"></i></span>
+    </button>
+  </div>
+
+  <!-- CHAT WINDOW FLYOUT PANEL -->
+  <div class="sportbot-panel" id="sportbotPanel">
+    <!-- Header -->
+    <div class="sportbot-header">
+      <div class="sportbot-header-left">
+        <div class="sportbot-avatar-wrap">
+          <img th:src="@{/images/chatbot/mascot-avatar.png}" src="/images/chatbot/mascot-avatar.png" alt="SportBot Avatar" class="sportbot-header-avatar-img" />
+          <div class="sportbot-avatar-status"></div>
+        </div>
+        <div>
+          <div class="sportbot-title">SportBot AI</div>
+          <div class="sportbot-subtitle">
+            <i class="fa-solid fa-circle" style="font-size: 7px; color: #34d399;"></i>
+            <span>Trợ lý SportHub • Thời gian thực</span>
+          </div>
+        </div>
+      </div>
+      <div class="sportbot-header-actions">
+        <button type="button" class="sportbot-hbtn" onclick="resetSportBotChat()" title="Làm mới cuộc trò chuyện">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+        <button type="button" class="sportbot-hbtn" onclick="toggleSportBot()" title="Thu nhỏ">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="sportbot-body" id="sportbotMessages">
+      <!-- Initial Welcome Message from Bot -->
+      <div class="sportbot-msg-row bot">
+        <div class="sportbot-msg-avatar">
+          <img th:src="@{/images/chatbot/mascot-avatar.png}" src="/images/chatbot/mascot-avatar.png" alt="SportBot" class="sportbot-msg-avatar-img" />
+        </div>
+        <div>
+          <div class="sportbot-bubble-content">
+            👋 <strong>Xin chào bạn!</strong> Mình là <strong>SportBot AI</strong> — trợ lý ảo của Trung tâm Thể thao SportHub.<br><br>
+            Mình có thể hỗ trợ bạn tức thì:<br>
+            • 🔍 <strong>Kiểm tra sân trống thời gian thực</strong><br>
+            • 📖 <strong>Hướng dẫn quy trình 4 bước đặt sân & cọc VietQR</strong><br>
+            • 💰 <strong>Bảng giá thuê các loại sân</strong><br>
+            • 🥤 <strong>Menu đồ uống & thuê vợt/bóng F&B</strong><br>
+            • 📜 <strong>Chính sách hủy sân & hoàn tiền cọc</strong><br><br>
+            Bạn có thể hỏi trực tiếp ví dụ: <em>"cách đặt sân"</em> hoặc <em>"Sân bóng đá 1 lúc 18h hôm nay đã ai đặt chưa?"</em>
+          </div>
+          <div class="sportbot-msg-time" id="sportbotInitTime">Vừa xong</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Dots Indicator -->
+    <div class="sportbot-typing" id="sportbotTyping">
+      <div class="sportbot-dot"></div>
+      <div class="sportbot-dot"></div>
+      <div class="sportbot-dot"></div>
+    </div>
+
+    <!-- Quick Suggestions Bar -->
+    <div class="sportbot-suggestions" id="sportbotSuggestions">
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Hướng dẫn cách đặt sân trực tuyến?')">📖 Cách đặt sân?</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Sân bóng đá 1 lúc 18h hôm nay đã ai đặt chưa?')">⚽ Sân bóng đá 1 lúc 18h?</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Hôm nay có sân cầu lông nào trống?')">🏸 Sân cầu lông hôm nay?</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Phương thức thanh toán VietQR và đặt cọc?')">💳 Thanh toán VietQR</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Bảng giá thuê các loại sân?')">💰 Bảng giá thuê sân?</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Trung tâm có nước uống và thuê vợt không?')">🥤 Menu F&B nước uống</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Chính sách hủy sân và hoàn cọc?')">📜 Chính sách hủy & cọc</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Địa chỉ trung tâm và giờ mở cửa?')">📍 Địa chỉ & giờ mở cửa</button>
+      <button type="button" class="sportbot-chip" onclick="sendSportBotPreset('Kiểm tra lịch đặt sân của tôi')">📋 Lịch đặt của tôi</button>
+    </div>
+
+    <!-- Input Footer -->
+    <div class="sportbot-footer">
+      <div class="sportbot-input-box">
+        <input type="text" class="sportbot-input" id="sportbotInput" 
+               placeholder="Hỏi tình trạng sân, giá, dịch vụ... (Enter)"
+               autocomplete="off"
+               onkeydown="if(event.key === 'Enter') sendSportBotMessage()">
+        <button type="button" class="sportbot-send-btn" onclick="sendSportBotMessage()" title="Gửi tin nhắn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+      <div class="sportbot-footer-hint">
+        ⚡ Cập nhật trực tiếp từ hệ thống quản lý sân theo thời gian thực
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT-SIDE SCRIPT FOR SPORTBOT -->
+  <script>
+    let sportbotIsOpen = false;
+    let sportbotIsSending = false;
+
+    function toggleSportBot() {
+      sportbotIsOpen = !sportbotIsOpen;
+      const panel = document.getElementById('sportbotPanel');
+      const fab = document.getElementById('sportbotFab');
+      const tooltip = document.getElementById('sportbotTooltip');
+
+      if (sportbotIsOpen) {
+        panel.classList.add('active');
+        if (fab) fab.classList.add('open');
+        if (tooltip) tooltip.style.display = 'none';
+        setTimeout(() => {
+          document.getElementById('sportbotInput')?.focus();
+          scrollSportBotToBottom();
+        }, 150);
+      } else {
+        panel.classList.remove('active');
+        if (fab) fab.classList.remove('open');
+      }
+    }
+
+    function scrollSportBotToBottom() {
+      const container = document.getElementById('sportbotMessages');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    function resetSportBotChat() {
+      const container = document.getElementById('sportbotMessages');
+      const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      container.innerHTML = `
+        <div class="sportbot-msg-row bot">
+          <div class="sportbot-msg-avatar">
+            <img src="/images/chatbot/mascot-avatar.png" alt="SportBot" class="sportbot-msg-avatar-img" />
+          </div>
+          <div>
+            <div class="sportbot-bubble-content">
+              Cuộc trò chuyện đã được làm mới! SportBot đã sẵn sàng hỗ trợ bạn kiểm tra tình trạng sân theo thời gian thực ạ.
+            </div>
+            <div class="sportbot-msg-time">${nowStr}</div>
+          </div>
+        </div>
+      `;
+      updateSportBotSuggestions([
+        "Sân bóng đá 1 lúc 18h hôm nay đã ai đặt chưa?",
+        "Hôm nay có sân cầu lông nào trống?",
+        "Bảng giá thuê các loại sân?",
+        "Menu nước uống và dịch vụ F&B",
+        "Chính sách hủy sân & hoàn tiền cọc"
+      ]);
+    }
+
+    function sendSportBotPreset(txt) {
+      const input = document.getElementById('sportbotInput');
+      input.value = txt;
+      sendSportBotMessage();
+    }
+
+    function sendSportBotMessage() {
+      const input = document.getElementById('sportbotInput');
+      const text = input.value.trim();
+      if (!text || sportbotIsSending) return;
+
+      sportbotIsSending = true;
+      input.value = '';
+
+      const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+      // 1. Render User Message
+      appendSportBotMessage('user', text, nowStr);
+
+      // 2. Show Typing Indicator
+      const typingEl = document.getElementById('sportbotTyping');
+      if (typingEl) typingEl.style.display = 'flex';
+      scrollSportBotToBottom();
+
+      // 3. Send AJAX request to real-time endpoint
+      fetch('/customer/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: text })
+      })
+      .then(res => {
+        if (!res.ok) {
+          // Thử endpoint fallback nếu cần
+          return fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+          }).then(r => r.json());
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (typingEl) typingEl.style.display = 'none';
+        sportbotIsSending = false;
+
+        const botReply = data.reply || 'Dạ SportBot đã nhận được thông tin, bạn có cần hỗ trợ gì thêm không ạ?';
+        const botTimeStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+        appendSportBotMessage('bot', botReply, botTimeStr, data.actionData);
+
+        if (data.suggestions && data.suggestions.length > 0) {
+          updateSportBotSuggestions(data.suggestions);
+        }
+      })
+      .catch(err => {
+        console.error('SportBot Error:', err);
+        if (typingEl) typingEl.style.display = 'none';
+        sportbotIsSending = false;
+        appendSportBotMessage('bot', '⚠️ Xin lỗi bạn, kết nối máy chủ đang bị gián đoạn đôi chút. Bạn vui lòng thử lại sau giây lát nhé!', nowStr);
+      });
+    }
+
+    function appendSportBotMessage(sender, text, timeStr, actionData) {
+      const container = document.getElementById('sportbotMessages');
+      const row = document.createElement('div');
+      row.className = `sportbot-msg-row ${sender}`;
+
+      const avatarIcon = (sender === 'bot') 
+        ? '<img src="/images/chatbot/mascot-avatar.png" alt="SportBot" class="sportbot-msg-avatar-img" />' 
+        : '<i class="fa-solid fa-user"></i>';
+
+      // Chuyển đổi định dạng văn bản (markdown sang HTML an toàn)
+      let formattedText = formatBotMarkdown(text);
+
+      // Nếu có action data đặt sân trực tiếp
+      if (sender === 'bot' && actionData && actionData.courtId && actionData.available) {
+        formattedText += `
+          <div>
+            <button type="button" class="sportbot-action-btn" onclick="sportbotSelectCourt('${actionData.courtId}', '${actionData.time || ''}')">
+              <i class="fa-solid fa-calendar-check"></i> Đặt ${actionData.courtName || 'sân này'} ngay
+            </button>
+          </div>
+        `;
+      }
+
+      row.innerHTML = `
+        <div class="sportbot-msg-avatar">${avatarIcon}</div>
+        <div>
+          <div class="sportbot-bubble-content">${formattedText}</div>
+          <div class="sportbot-msg-time">${timeStr}</div>
+        </div>
+      `;
+
+      container.appendChild(row);
+      scrollSportBotToBottom();
+    }
+
+    function formatBotMarkdown(txt) {
+      if (!txt) return '';
+      let res = txt
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") // escape HTML
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>');
+
+      // Highlight links
+      const linkRegex = new RegExp('\\[' + '([^\\]]+)' + '\\]' + '\\(([^)]+)\\)', 'g');
+      res = res.replace(linkRegex, '<a href="$2" target="_blank" style="color:#059669; font-weight:700; text-decoration:underline;">$1</a>');
+      return res;
+    }
+
+    function updateSportBotSuggestions(list) {
+      const sugBox = document.getElementById('sportbotSuggestions');
+      if (!sugBox || !list) return;
+      sugBox.innerHTML = '';
+      list.forEach(item => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'sportbot-chip';
+        chip.innerText = item;
+        chip.onclick = () => sendSportBotPreset(item);
+        sugBox.appendChild(chip);
+      });
+    }
+
+    // Tự động tương tác với giao diện đặt sân khi người dùng bấm nút trong Chatbot
+    function sportbotSelectCourt(courtId, time) {
+      toggleSportBot(); // Thu nhỏ khung chat
+
+      // 1. Tìm thẻ card của sân trên trang booking
+      const courtCard = document.querySelector(`.court-card[data-court-id="${courtId}"]`) 
+                     || document.querySelector(`[data-id="${courtId}"]`);
+
+      if (courtCard) {
+        courtCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        courtCard.style.outline = '3px solid #10b981';
+        courtCard.style.boxShadow = '0 0 25px rgba(16, 185, 129, 0.4)';
+        setTimeout(() => {
+          courtCard.style.outline = '';
+          courtCard.style.boxShadow = '';
+        }, 3000);
+
+        // Kích hoạt click vào card hoặc nút đặt
+        const bookBtn = courtCard.querySelector('.btn-book') || courtCard.querySelector('button');
+        if (bookBtn) {
+          bookBtn.click();
+        }
+      } else {
+        // Nếu đang ở trang khác (history, profile), chuyển hướng sang trang booking kèm mã sân
+        window.location.href = `/customer/booking?courtId=${encodeURIComponent(courtId)}`;
+      }
+    }
+
+    // Khởi tạo thời gian ban đầu
+    document.addEventListener('DOMContentLoaded', () => {
+      const initTime = document.getElementById('sportbotInitTime');
+      if (initTime) {
+        initTime.innerText = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      // Tự động ẩn tooltip sau 8 giây nếu chưa click
+      setTimeout(() => {
+        const tooltip = document.getElementById('sportbotTooltip');
+        if (tooltip && !sportbotIsOpen) {
+          tooltip.style.opacity = '0';
+          tooltip.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => tooltip.style.display = 'none', 500);
+        }
+      }, 8000);
+    });
+  </script>
+</div>
+
+</body>
+</html>

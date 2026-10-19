@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Dashboard Khách hàng</title>
@@ -465,5 +467,6 @@ document.querySelectorAll('.sport').forEach(btn => btn.addEventListener('click',
   btn.setAttribute('aria-pressed', 'true');
 }));
 </script>
+<th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
 </body>
 </html>

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SportHub — Lịch Sử Đặt Sân Của Tôi</title>
@@ -1051,6 +1053,12 @@
           <input type="text" id="courtSearchInput" class="topbar-search-input" placeholder="Tìm sân nhanh..." onkeydown="if(event.key==='Enter') redirectToSearch()">
         </div>
 
+        <a href="/customer/community" class="nav-item">
+          <i class="fa-solid fa-handshake-angle"></i>
+          <span>Ghép Kèo Giao Lưu</span>
+          <span style="font-size:10px;padding:2px 7px;border-radius:9999px;background:linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);color:#fff;font-weight:800;letter-spacing:0.5px;">MỚI</span>
+        </a>
+
         <a href="/customer/history" class="nav-item active">
           <i class="fa-regular fa-calendar-check"></i>
           <span>Lịch đặt của tôi</span>
@@ -1259,9 +1267,33 @@
               <span th:if="${b.status == 'Đã hủy'}" class="status-badge badge-cancelled">
                 <i class="fa-solid fa-ban"></i> Đã hủy
               </span>
+              <!-- Kèo giao lưu tìm đối thủ liên kết -->
+              <div th:if="${bookingMatchPostMap != null and bookingMatchPostMap.containsKey(b.id)}" style="margin-top:6px;">
+                <span th:if="${bookingMatchPostMap.get(b.id).status == 'WAITING'}" class="status-badge" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-size:11.5px; padding:3px 8px; border-radius:9999px;" title="Kèo đang mở tìm đối trên sàn giao lưu">
+                  <i class="fa-solid fa-handshake-angle me-1"></i> Đang tìm đối (#<span th:text="${bookingMatchPostMap.get(b.id).id}"></span>)
+                </span>
+                <span th:if="${bookingMatchPostMap.get(b.id).status == 'MATCHED'}" class="status-badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:11.5px; padding:3px 8px; border-radius:9999px;" title="Đã có đối thủ nhận kèo thành công">
+                  <i class="fa-solid fa-circle-check me-1"></i> Đã ghép đối (#<span th:text="${bookingMatchPostMap.get(b.id).id}"></span>)
+                </span>
+              </div>
             </td>
             <td>
               <div class="table-actions" style="justify-content: flex-end;">
+                <!-- Tìm đối thủ (Chỉ hiển thị cho các phiếu trước giờ thi đấu và chưa có bài đăng tìm đối) -->
+                <button th:if="${eligibleMatchmakingBookingIds != null and eligibleMatchmakingBookingIds.contains(b.id)}"
+                        type="button" class="btn-action"
+                        style="color:#059669; border-color:#a7f3d0; background:#ecfdf5; font-weight:700;"
+                        th:data-id="${b.id}"
+                        th:data-sport="${b.sportName}"
+                        th:data-court="${b.courtName}"
+                        th:data-courtid="${b.courtId}"
+                        th:data-date="${b.bookingDate != null ? #temporals.format(b.bookingDate, 'dd/MM/yyyy') : ''}"
+                        th:data-time="${b.startTime} + ' - ' + ${b.endTime}"
+                        onclick="openCreateMatchModal(this)"
+                        title="Đăng tin tìm đối thủ giao lưu cho khung giờ này">
+                  <i class="fa-solid fa-handshake-angle"></i> Tìm đối thủ
+                </button>
+
                 <!-- Chi tiết -->
                 <button type="button" class="btn-action"
                         th:data-id="${b.id}"
@@ -1418,6 +1450,78 @@
           <i class="fa-solid fa-xmark"></i> Xác nhận hủy
         </button>
       </div>
+    </div>
+  <!-- Modal Tạo Kèo Tìm Đối Thủ Từ Phiếu Đặt Sân -->
+  <div class="notif-modal-backdrop" id="matchCreationModalBackdrop" style="display:none; align-items:center; justify-content:center; z-index:999;">
+    <div class="modal-card" style="background:#ffffff; border-radius:20px; max-width:540px; width:100%; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden; border:1px solid var(--gray-200); animation:notifSlideDown 0.25s ease;">
+      <!-- Head -->
+      <div style="background:linear-gradient(135deg, #064e3b 0%, #059669 100%); padding:20px 24px; color:#ffffff; display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:42px; height:42px; border-radius:12px; background:rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:20px;">
+            🤝
+          </div>
+          <div>
+            <h3 style="font-size:18px; font-weight:800; margin:0; color:#ffffff;">Đăng Tin Tìm Đối Thủ Giao Lưu</h3>
+            <p style="font-size:12.5px; color:#a7f3d0; margin:2px 0 0 0;">Kết nối bạn chơi thể thao cùng khung giờ thi đấu</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCreateMatchModal()" style="background:none; border:none; color:#ffffff; font-size:24px; cursor:pointer; opacity:0.8; line-height:1;">&times;</button>
+      </div>
+
+      <!-- Body -->
+      <form id="createMatchForm" onsubmit="submitCreateMatch(event)" style="padding:22px 24px;">
+        <input type="hidden" id="matchBookingId">
+
+        <!-- Booking Quick Preview Box -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:14px 16px; margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:12px; font-weight:700; color:#059669; text-transform:uppercase; letter-spacing:0.5px;" id="matchModalSport">BÓNG ĐÁ</span>
+            <span style="font-size:12.5px; font-weight:800; color:#334155;" id="matchModalBookingId">#DS0101</span>
+          </div>
+          <div style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:6px;" id="matchModalCourt">Sân bóng đá 1</div>
+          <div style="font-size:13px; color:#64748b; display:flex; align-items:center; gap:14px;">
+            <span><i class="fa-regular fa-calendar me-1"></i> <span id="matchModalDate">18/10/2026</span></span>
+            <span><i class="fa-regular fa-clock me-1"></i> <span id="matchModalTime">19:00 - 21:00</span></span>
+          </div>
+        </div>
+
+        <!-- Trình độ & Quy mô -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#334155; margin-bottom:6px;">Trình độ mong muốn</label>
+            <select id="matchSkillLevel" style="width:100%; height:40px; border-radius:10px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13px; background:#ffffff; outline:none;">
+              <option value="Mới chơi / Giao lưu">Mới chơi / Giao lưu</option>
+              <option value="Trung bình / Phong trào" selected>Trung bình / Phong trào</option>
+              <option value="Khá / Bán chuyên">Khá / Bán chuyên</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#334155; margin-bottom:6px;">Thể thức thi đấu</label>
+            <select id="matchTeamSize" style="width:100%; height:40px; border-radius:10px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13px; background:#ffffff; outline:none;">
+              <option value="Giao lưu tự do" selected>Giao lưu tự do</option>
+              <option value="5 vs 5">5 vs 5 (Sân mini)</option>
+              <option value="7 vs 7">7 vs 7</option>
+              <option value="Đánh đôi">Đánh đôi (2 vs 2)</option>
+              <option value="Đánh đơn">Đánh đơn (1 vs 1)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Lời nhắn giao lưu -->
+        <div style="margin-bottom:18px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#334155; margin-bottom:6px;">Lời nhắn & Thỏa thuận tiền sân</label>
+          <textarea id="matchMessage" rows="3" style="width:100%; border-radius:10px; border:1.5px solid #cbd5e1; padding:10px 12px; font-size:13px; line-height:1.5; outline:none; resize:none;" placeholder="Ví dụ: Đội mình tìm đối đá giao lưu cọ xát, văn minh, hai bên share 50% tiền sân nhé!"></textarea>
+          <small style="color:#64748b; font-size:11.5px; display:block; margin-top:4px;">* Tiền sân bạn đã đặt, đối thủ nhận kèo sẽ liên hệ trực tiếp với bạn qua SĐT để chia sẻ chi phí.</small>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #f1f5f9; padding-top:16px;">
+          <button type="button" onclick="closeCreateMatchModal()" style="padding:9px 18px; border-radius:10px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; font-weight:600; font-size:13px; cursor:pointer;">Hủy bỏ</button>
+          <button type="submit" id="btnSubmitMatch" style="padding:9px 22px; border-radius:10px; border:none; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; font-weight:700; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-paper-plane"></i> Đăng tin tìm đối
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1717,6 +1821,63 @@
       }
     }
 
+    function openCreateMatchModal(btn) {
+      const id = btn.getAttribute('data-id');
+      const sport = btn.getAttribute('data-sport') || 'Thể thao';
+      const court = btn.getAttribute('data-court') || 'Sân thi đấu';
+      const date = btn.getAttribute('data-date') || '';
+      const time = btn.getAttribute('data-time') || '';
+
+      document.getElementById('matchBookingId').value = id;
+      document.getElementById('matchModalSport').innerText = sport.toUpperCase();
+      document.getElementById('matchModalBookingId').innerText = '#' + id;
+      document.getElementById('matchModalCourt').innerText = court;
+      document.getElementById('matchModalDate').innerText = date;
+      document.getElementById('matchModalTime').innerText = time;
+      document.getElementById('matchMessage').value = `Đội mình giao lưu cọ xát cuối tuần, tìm đối vui vẻ văn minh. Hai bên cùng share 50% tiền sân nhé!`;
+
+      const backdrop = document.getElementById('matchCreationModalBackdrop');
+      if (backdrop) backdrop.style.display = 'flex';
+    }
+
+    function closeCreateMatchModal() {
+      const backdrop = document.getElementById('matchCreationModalBackdrop');
+      if (backdrop) backdrop.style.display = 'none';
+    }
+
+    async function submitCreateMatch(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitMatch');
+      const bookingId = document.getElementById('matchBookingId').value;
+      const skillLevel = document.getElementById('matchSkillLevel').value;
+      const teamSize = document.getElementById('matchTeamSize').value;
+      const message = document.getElementById('matchMessage').value;
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang đăng tin...';
+
+      try {
+        const res = await fetch('/customer/community/api/create-from-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, skillLevel, teamSize, message })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(data.message || 'Đăng tin tìm đối thủ thành công!');
+          window.location.reload();
+        } else {
+          alert(data.message || 'Không thể tạo bài đăng tìm đối.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Đăng tin tìm đối';
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Đăng tin tìm đối';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       updateNotifBadge();
 
@@ -1734,5 +1895,8 @@
       }
     });
   </script>
+
+  <!-- Real-time SportBot AI Assistant -->
+  <th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
 </body>
 </html>

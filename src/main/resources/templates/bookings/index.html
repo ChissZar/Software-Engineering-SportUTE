@@ -1,19 +1,32 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Quản lý đặt sân & Lịch sân</title>
-<!-- Google Fonts: Plus Jakarta Sans -->
+<!-- Google Fonts: Inter & Be Vietnam Pro (100% Hỗ trợ Tiếng Việt & Dấu thanh sắc nét) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <!-- Font Awesome 6.5.1 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <!-- Unified Admin Design System -->
 <link rel="stylesheet" th:href="@{/css/admin.css}">
 <style>
-/* View switcher tabs (Linear / Shadcn segmented control style) */
+/* Global Font Override ensuring perfect Vietnamese rendering */
+html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5, h6, table, th, td {
+  font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Widen content container for bookings management */
+.content {
+  max-width: 100% !important;
+  padding: 16px 28px 40px !important;
+}
+
+/* View switcher tabs */
 .view-tabs {
   display: inline-flex;
   align-items: center;
@@ -48,7 +61,7 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-/* Timeline Matrix View */
+/* Timeline Matrix View: 30-minute intervals (36 slots + SÂN + THAO TÁC = 38 columns) */
 .timeline-view {
   display: none;
   margin-top: 10px;
@@ -68,44 +81,133 @@
   flex-wrap: wrap;
   gap: 14px;
 }
-.timeline-matrix {
+/* Split Layout: Cột sân nằm hoàn toàn NGOÀI khung cuộn giờ, không bị đè hay dính vào các ô giờ */
+.timeline-split-wrapper {
+  display: flex;
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+}
+.timeline-court-pane {
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  flex-shrink: 0;
+  background: #f8fafc;
+  border-right: 2px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
+}
+.timeline-court-header {
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  background: #e2e8f0;
+  color: var(--gray-800);
+  font-weight: 900;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid #cbd5e1;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+}
+.timeline-court-row {
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #f0fdf4;
+  border-bottom: 1px solid #e2e8f0;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+.timeline-court-row:hover {
+  background: #dcfce7;
+}
+.timeline-court-row .court-title {
+  font-weight: 800;
+  font-size: 13px;
+  color: #064e3b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.timeline-court-row .court-sub {
+  font-size: 10px;
+  color: #047857;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.timeline-slots-pane {
+  flex: 1;
+  min-width: 0;
   overflow-x: auto;
+  background: #ffffff;
+  scrollbar-width: thin;
 }
-.timeline-grid {
+.timeline-slots-inner {
+  min-width: 2304px;
+  display: flex;
+  flex-direction: column;
+}
+.timeline-slots-header {
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
   display: grid;
-  grid-template-columns: 160px repeat(18, minmax(68px, 1fr)) 100px;
-  gap: 4px;
-  min-width: 1520px;
-  background: #f1f5f9;
-  padding: 8px;
-  border-radius: var(--radius-md);
+  grid-template-columns: repeat(36, minmax(64px, 1fr));
+  background: #f8fafc;
+  border-bottom: 2px solid #cbd5e1;
+  gap: 2px;
+  padding: 0 4px;
+  box-sizing: border-box;
 }
+.timeline-slots-row {
+  height: 60px;
+  min-height: 60px;
+  max-height: 60px;
+  display: grid;
+  grid-template-columns: repeat(36, minmax(64px, 1fr));
+  border-bottom: 1px solid #e2e8f0;
+  gap: 4px;
+  padding: 4px;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+.timeline-slots-row:hover {
+  background: #f8fafc;
+}
+
 .grid-cell {
   background: #ffffff;
-  padding: 10px 6px;
+  padding: 6px 4px;
   text-align: center;
-  font-size: 11.5px;
+  font-size: 11px;
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
   box-sizing: border-box;
+  height: 100%;
 }
 .grid-time {
   font-weight: 800;
   background: #f8fafc;
-  color: var(--gray-500);
+  color: var(--gray-600);
   font-size: 11px;
-}
-.grid-court {
-  font-weight: 800;
-  text-align: left;
-  padding-left: 12px;
-  background: var(--primary-subtle);
-  color: var(--primary-dark);
-  align-items: flex-start;
+  letter-spacing: -0.2px;
+  border-right: 1px solid #f1f5f9;
 }
 .slot-free {
   background: #ffffff;
@@ -120,22 +222,63 @@
   border-color: #10b981;
   transform: scale(1.02);
 }
-.slot-busy {
-  background: #eff6ff;
-  color: #1d4ed8;
-  font-weight: 700;
+
+/* Khối chữ nhật liên tục trải dài các slot được đặt */
+.slot-booked-span {
+  padding: 4px 8px !important;
+  text-align: center;
+  border-radius: 8px !important;
   cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  user-select: none;
+}
+.slot-booked-span:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  filter: brightness(1.03);
 }
 .slot-inuse {
-  background: #dcfce7;
-  color: #15803d;
-  font-weight: 800;
-  cursor: pointer;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #047857 !important;
+}
+.slot-busy {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #1d4ed8 !important;
 }
 .slot-maint {
-  background: #fef3c7;
-  color: #b45309;
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border: 1px solid #fde68a !important;
   font-weight: 700;
+}
+.span-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+}
+.span-cust-name {
+  font-weight: 800;
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.span-time {
+  font-size: 9.5px;
+  opacity: 0.9;
+  font-weight: 600;
+  margin-top: 1px;
 }
 
 /* Quick POS F&B Modal Styles */
@@ -394,20 +537,125 @@
   border-color: #047857;
 }
 
-/* F&B Mini POS item in Wizard */
+/* Fullscreen POS Experience for Receptionist Wizard */
+#modalReceptionistWizard.active {
+  display: flex !important;
+}
+#modalReceptionistWizard.pos-workstation-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 10000 !important;
+  background: #0f172a !important;
+}
+#modalReceptionistWizard.pos-workstation-overlay .pos-fullscreen-card {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #f8fafc !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+  transition: all 0.25s ease;
+}
+#modalReceptionistWizard.windowed-mode {
+  padding: 24px !important;
+}
+#modalReceptionistWizard.windowed-mode .pos-fullscreen-card {
+  width: 95% !important;
+  height: 94vh !important;
+  max-width: 1200px !important;
+  max-height: 94vh !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid #334155 !important;
+}
+
+/* F&B POS Category Tabs & Product Cards */
+.pos-fnb-tab-btn {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+.pos-fnb-tab-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+.pos-fnb-tab-btn.active {
+  background: #059669;
+  color: #ffffff;
+  border-color: #047857;
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.25);
+}
+
+.pos-fnb-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  max-height: calc(100vh - 430px);
+  overflow-y: auto;
+  padding: 4px;
+}
+#modalReceptionistWizard.windowed-mode .pos-fnb-catalog-grid {
+  max-height: 380px;
+}
 .wiz-fnb-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 8px 10px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  transition: border-color 0.15s;
+  gap: 14px;
+  transition: all 0.2s ease;
+  position: relative;
 }
 .wiz-fnb-card:hover {
   border-color: #cbd5e1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.wiz-fnb-card.has-qty {
+  border-color: #059669 !important;
+  background: #f0fdf4 !important;
+  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.15) !important;
+}
+.wiz-fnb-img-box {
+  width: 68px;
+  height: 68px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+.wiz-fnb-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+.wiz-fnb-card:hover .wiz-fnb-img-box img {
+  transform: scale(1.08);
 }
 
 /* Modals */
@@ -481,28 +729,77 @@
   gap: 10px;
 }
 
-/* Action buttons inside table */
-.action-btn-group {
-  display: inline-flex;
-  gap: 4px;
-  align-items: center;
+/* Action buttons inside table: fixed-column grid to ensure 100% vertical alignment across all rows */
+.tablewrap table {
+  width: 100%;
+  min-width: 1400px;
+}
+.col-actions {
+  width: 510px !important;
+  min-width: 510px !important;
+  text-align: left !important;
+  padding: 8px 10px !important;
+}
+.action-grid {
+  display: grid !important;
+  grid-template-columns: 88px 92px 64px 86px 62px 34px 34px !important;
+  gap: 6px !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+.action-slot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 31px !important;
+  width: 100% !important;
+}
+.action-slot .w-100 {
+  width: 100% !important;
+  justify-content: center !important;
 }
 .action-btn {
-  height: 30px;
-  padding: 0 9px;
-  font-size: 11px;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
+  height: 31px !important;
+  padding: 0 8px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  border-radius: 7px !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  box-sizing: border-box !important;
+  text-decoration: none !important;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
 }
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+.action-btn.btn-icon-only {
+  padding: 0 !important;
+  width: 34px !important;
+  justify-content: center !important;
+}
+.btn-fnb { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.btn-fnb:hover { background: #dcfce7; color: #166534; }
 .btn-confirm { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.btn-confirm:hover { background: #d1fae5; color: #065f46; }
 .btn-checkin { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.btn-checkin:hover { background: #dbeafe; color: #1e40af; }
 .btn-checkout { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+.btn-checkout:hover { background: #ede9fe; color: #5b21b6; }
 .btn-extend { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.btn-extend:hover { background: #fef3c7; color: #92400e; }
 .btn-change { background: #f8fafc; color: #475569; border-color: #cbd5e1; }
+.btn-change:hover { background: #f1f5f9; color: #1e293b; border-color: #94a3b8; }
 .btn-cancel { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.btn-cancel:hover { background: #fee2e2; color: #991b1b; }
 </style>
 </head>
-<body>
+<body th:data-role="${currentUser != null ? currentUser.primaryRole : ''}">
 <div class="app">
   <th:block th:with="isSchedule=${param.view != null and #strings.contains(param.view, 'schedule')}">
     <div th:replace="~{fragments/sidebar :: sidebar(${isSchedule ? 'schedule' : 'bookings'})}"></div>
@@ -558,9 +855,7 @@
           </div>
         </div>
         <div class="pagehead-actions" style="display:flex; gap:10px; align-items:center;">
-          <button type="button" class="btn primary" onclick="openReceptionistWizard()" style="background:var(--primary); font-weight:800; box-shadow:0 3px 12px rgba(5,150,105,0.25);">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Tiếp nhận & Đặt sân tại quầy (F4)
-          </button>
+          <!-- Nút trùng lặp đã được gỡ bỏ; chỉ sử dụng 1 nút Tiếp nhận đặt sân nổi bật tại thanh Lễ tân bên dưới -->
         </div>
       </section>
 
@@ -598,7 +893,8 @@
         </div>
 
         <!-- Cột phải: Các nút nghiệp vụ chính -->
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div th:if="${currentUser == null or currentUser.canManagePayments or currentUser.admin or currentUser.manager}" 
+             style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
           <button type="button" class="btn" onclick="openReceptionistWizard()" 
                   style="background: #fbbf24; color: #78350f; font-weight: 800; border: none; height: 42px; padding: 0 18px; border-radius: 10px; font-size: 13.5px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4); cursor: pointer;">
             <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 15px;"></i>
@@ -612,15 +908,22 @@
             <span>Gọi Nước F&B (F3)</span>
           </button>
         </div>
+
+        <div th:if="${currentUser != null and currentUser.operator and !currentUser.admin and !currentUser.manager and !currentUser.receptionist}" 
+             style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 10px; color: #fff; font-size: 12.5px; font-weight: 700; backdrop-filter: blur(4px);">
+          <i class="fa-solid fa-eye"></i>
+          <span>Chế độ kiểm tra lịch sân trống (Kỹ thuật & Vận hành)</span>
+        </div>
       </section>
 
       <!-- View Switcher Tabs -->
       <div class="view-tabs">
-        <button th:class="'tab-btn ' + (${currentView == 'schedule' ? '' : 'active'})" id="btnTabList" onclick="switchView('list')">
-          <i class="fa-solid fa-list-check"></i> Danh sách đặt sân
-        </button>
         <button th:class="'tab-btn ' + (${currentView == 'schedule' ? 'active' : ''})" id="btnTabSchedule" onclick="switchView('schedule')">
-          <i class="fa-regular fa-calendar-days"></i> Lịch sân thể thao (Timeline)
+          <i class="fa-regular fa-calendar-days"></i> Đặt sân (Lịch sân)
+        </button>
+        <button th:if="${currentUser == null or currentUser.canManagePayments or currentUser.admin or currentUser.manager}" 
+                th:class="'tab-btn ' + (${currentView == 'schedule' ? '' : 'active'})" id="btnTabList" onclick="switchView('list')">
+          <i class="fa-solid fa-list-check"></i> Danh sách đặt
         </button>
       </div>
 
@@ -701,14 +1004,14 @@
           <table>
             <thead>
               <tr>
-                <th style="width: 80px;">Mã đặt</th>
-                <th>Khách hàng</th>
-                <th>Sân thể thao</th>
-                <th>Ngày</th>
-                <th>Khung giờ</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th style="text-align:right">Thao tác</th>
+                <th style="width: 95px; min-width: 95px;">Mã đặt</th>
+                <th style="width: 200px; min-width: 200px;">Khách hàng</th>
+                <th style="width: 170px; min-width: 170px;">Sân thể thao</th>
+                <th style="width: 105px; min-width: 105px;">Ngày</th>
+                <th style="width: 125px; min-width: 125px;">Khung giờ</th>
+                <th style="width: 130px; min-width: 130px;">Tổng tiền</th>
+                <th style="width: 125px; min-width: 125px;">Trạng thái</th>
+                <th class="col-actions" style="width: 510px; min-width: 510px; text-align: left !important;">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -743,61 +1046,86 @@
                         th:classappend="${b.status == 'Đã xác nhận' ? 'status-active' : (b.status == 'Chờ xác nhận' ? 'status-maint' : (b.status == 'Hoàn tất' ? 'status-inuse' : (b.status == 'Đang sử dụng' ? 'status-active' : 'status-disabled')))}"
                         th:text="${b.status}"></span>
                 </td>
-                <td style="text-align:right; white-space:nowrap;">
-                  <div class="action-btn-group">
-                    <!-- 0. F&B POS: Gọi nước & thuê dụng cụ -->
-                    <button type="button" class="btn action-btn btn-sm" style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;"
-                            th:data-id="${b.id}" th:data-customer="${b.customerName}" th:data-court="${b.courtName}"
-                            onclick="openAddServiceModal(this)" title="Gọi đồ ăn/thức uống, phụ kiện thể thao (F&B POS)">
-                      <i class="fa-solid fa-cart-plus"></i> + Dịch vụ
-                    </button>
+                <td class="col-actions">
+                  <div class="action-grid">
+                    <!-- Slot 1: Gọi nước F&B POS / Dịch vụ -->
+                    <div class="action-slot">
+                      <button type="button" class="btn action-btn btn-fnb w-100"
+                              th:data-id="${b.id}" th:data-customer="${b.customerName}" th:data-court="${b.courtName}"
+                              onclick="openAddServiceModal(this)" title="Gọi đồ ăn/thức uống, phụ kiện thể thao (F&B POS)">
+                        <i class="fa-solid fa-cart-plus"></i> + Dịch vụ
+                      </button>
+                    </div>
 
-                    <!-- 1. Chờ xác nhận: Nút Duyệt -->
-                    <form th:if="${b.status == 'Chờ xác nhận'}" th:action="@{/admin/bookings/confirm/{id}(id=${b.id})}" method="post" style="display:inline">
-                      <button type="submit" class="btn action-btn btn-confirm" title="Xác nhận phiếu"><i class="fa-solid fa-check"></i> Duyệt</button>
-                    </form>
+                    <!-- Slot 2: Thao tác vòng đời (Duyệt / Nhận sân / Trả sân) -->
+                    <div class="action-slot">
+                      <form th:if="${b.status == 'Chờ xác nhận'}" th:action="@{/admin/bookings/confirm/{id}(id=${b.id})}" method="post" style="margin:0; width:100%;">
+                        <button type="submit" class="btn action-btn btn-confirm w-100" title="Xác nhận phiếu"><i class="fa-solid fa-check"></i> Duyệt</button>
+                      </form>
+                      <form th:if="${b.status == 'Đã xác nhận'}" th:action="@{/admin/bookings/checkin/{id}(id=${b.id})}" method="post" style="margin:0; width:100%;">
+                        <button type="submit" class="btn action-btn btn-checkin w-100" title="Khách nhận sân"><i class="fa-solid fa-play"></i> Nhận sân</button>
+                      </form>
+                      <button th:if="${b.status == 'Đang sử dụng'}" type="button" class="btn action-btn btn-checkout w-100"
+                              th:data-id="${b.id}"
+                              th:data-customer="${b.customerName}"
+                              th:data-phone="${b.customerPhone}"
+                              th:data-court="${b.courtName}"
+                              th:data-time="(${b.startTime != null ? #temporals.format(b.startTime, 'HH:mm') : ''}) + ' - ' + (${b.endTime != null ? #temporals.format(b.endTime, 'HH:mm') : ''})"
+                              th:data-total="${b.totalAmount}"
+                              th:data-paid="${b.paidAmount}"
+                              onclick="openCheckoutModal(this)" title="Xác nhận trả sân & Quyết toán">
+                        <i class="fa-solid fa-stop"></i> Trả sân
+                      </button>
+                    </div>
 
-                    <!-- 2. Đã xác nhận: Nhận sân & Đổi lịch -->
-                    <form th:if="${b.status == 'Đã xác nhận'}" th:action="@{/admin/bookings/checkin/{id}(id=${b.id})}" method="post" style="display:inline">
-                      <button type="submit" class="btn action-btn btn-checkin" title="Khách nhận sân"><i class="fa-solid fa-play"></i> Nhận sân</button>
-                    </form>
-                    <button th:if="${b.status == 'Đã xác nhận' or b.status == 'Chờ xác nhận'}" type="button" class="btn action-btn btn-change"
-                            th:data-id="${b.id}" th:data-court="${b.courtId}" th:data-courtname="${b.courtName}"
-                            th:data-date="${b.bookingDate}" th:data-start="${b.startTime}" th:data-end="${b.endTime}"
-                            th:data-amount="${b.totalAmount}"
-                            onclick="openChangeScheduleModal(this)" title="Đổi sân hoặc giờ thuê"><i class="fa-solid fa-rotate"></i> Đổi</button>
+                    <!-- Slot 3: SỬA THÔNG TIN (Cố định ở cột 3, thẳng tắp 100% mọi dòng) -->
+                    <div class="action-slot">
+                      <a th:href="@{/admin/bookings(editId=${b.id})}" class="btn action-btn btn-change w-100" title="Chỉnh sửa thông tin phiếu">
+                        <i class="fa-solid fa-pen"></i> Sửa
+                      </a>
+                    </div>
 
-                    <!-- 3. Đang sử dụng: Trả sân & Gia hạn -->
-                    <form th:if="${b.status == 'Đang sử dụng'}" th:action="@{/admin/bookings/checkout/{id}(id=${b.id})}" method="post" style="display:inline"
-                          onsubmit="return confirm('Xác nhận trả sân cho phiếu #' + '[[${b.id}]]' + '?');">
-                      <button type="submit" class="btn action-btn btn-checkout" title="Khách trả sân"><i class="fa-solid fa-stop"></i> Trả sân</button>
-                    </form>
-                    <button th:if="${b.status == 'Đang sử dụng'}" type="button" class="btn action-btn btn-extend"
-                            th:data-id="${b.id}" th:data-courtname="${b.courtName}" th:data-end="${b.endTime}"
-                            onclick="openExtendModal(this)" title="Gia hạn thời gian thuê"><i class="fa-solid fa-clock-rotate-left"></i> Gia hạn</button>
+                    <!-- Slot 4: ĐỔI LỊCH (Đổi sân/giờ trước khi chơi - UC19) hoặc GIA HẠN (khi đang chơi - UC23) -->
+                    <div class="action-slot">
+                      <button th:if="${b.status == 'Đã xác nhận' or b.status == 'Chờ xác nhận'}" type="button" class="btn action-btn btn-change w-100"
+                              th:data-id="${b.id}" th:data-court="${b.courtId}" th:data-courtname="${b.courtName}"
+                              th:data-date="${b.bookingDate}" th:data-start="${b.startTime}" th:data-end="${b.endTime}"
+                              th:data-amount="${b.totalAmount}"
+                              onclick="openChangeScheduleModal(this)" title="Đổi sân hoặc đổi giờ thuê (UC19)">
+                        <i class="fa-solid fa-rotate"></i> Đổi lịch
+                      </button>
+                      <button th:if="${b.status == 'Đang sử dụng'}" type="button" class="btn action-btn btn-extend w-100"
+                              th:data-id="${b.id}" th:data-courtname="${b.courtName}" th:data-end="${b.endTime}"
+                              onclick="openExtendModal(this)" title="Gia hạn thời gian thuê (UC23)">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Gia hạn
+                      </button>
+                    </div>
 
-                    <!-- 4. Chỉnh sửa chi tiết phiếu -->
-                    <a th:href="@{/admin/bookings(editId=${b.id})}" class="btn action-btn btn-change" title="Sửa thông tin phiếu">
-                      <i class="fa-solid fa-pen"></i> Sửa
-                    </a>
+                    <!-- Slot 5: HỦY PHIẾU THEO CHÍNH SÁCH (UC20) -->
+                    <div class="action-slot">
+                      <button th:if="${b.status == 'Chờ xác nhận' or b.status == 'Đã xác nhận'}" type="button" class="btn action-btn btn-cancel w-100"
+                              th:data-id="${b.id}" th:data-customer="${b.customerName}" th:data-court="${b.courtName}"
+                              th:data-time="(${b.startTime != null ? #temporals.format(b.startTime, 'HH:mm') : ''}) + ' - ' + (${b.endTime != null ? #temporals.format(b.endTime, 'HH:mm') : ''})"
+                              th:data-amount="${b.totalAmount}" th:data-paid="${b.paidAmount}"
+                              th:data-fee="${b.cancellationFeeRate}"
+                              onclick="openCancelModal(this)" title="Hủy phiếu theo chính sách (UC20)">
+                        <i class="fa-solid fa-ban"></i> Hủy
+                      </button>
+                    </div>
 
-                    <!-- 5. Hủy phiếu theo chính sách -->
-                    <button th:if="${b.status == 'Chờ xác nhận' or b.status == 'Đã xác nhận'}" type="button" class="btn action-btn btn-cancel"
-                            th:data-id="${b.id}" th:data-customer="${b.customerName}" th:data-court="${b.courtName}"
-                            th:data-time="(${b.startTime != null ? #temporals.format(b.startTime, 'HH:mm') : ''}) + ' - ' + (${b.endTime != null ? #temporals.format(b.endTime, 'HH:mm') : ''})"
-                            th:data-amount="${b.totalAmount}" th:data-paid="${b.paidAmount}"
-                            th:data-fee="${b.cancellationFeeRate}"
-                            onclick="openCancelModal(this)" title="Hủy phiếu theo chính sách"><i class="fa-solid fa-ban"></i> Hủy</button>
+                    <!-- Slot 6: XUẤT HÓA ĐƠN PDF -->
+                    <div class="action-slot">
+                      <a th:href="@{/admin/bookings/export-pdf/{id}(id=${b.id})}" target="_blank" class="btn action-btn btn-icon-only w-100" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca;" title="Tải / In hóa đơn PDF">
+                        <i class="fa-solid fa-file-pdf"></i>
+                      </a>
+                    </div>
 
-                    <!-- 5.5 Xuất hóa đơn PDF -->
-                    <a th:href="@{/admin/bookings/export-pdf/{id}(id=${b.id})}" target="_blank" class="btn action-btn btn-sm" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; text-decoration:none;" title="Tải / Xem hóa đơn PDF">
-                      <i class="fa-solid fa-file-pdf"></i>
-                    </a>
-
-                    <!-- 6. Chi tiết / In phiếu -->
-                    <button type="button" class="btn action-btn" style="background:var(--gray-50);" th:data-id="${b.id}" onclick="openDetailModal(this.getAttribute('data-id'))" title="Xem chi tiết & in phiếu">
-                      <i class="fa-regular fa-eye"></i>
-                    </button>
+                    <!-- Slot 7: XEM CHI TIẾT & IN PHIẾU -->
+                    <div class="action-slot">
+                      <button type="button" class="btn action-btn btn-icon-only w-100" style="background:var(--gray-50); border-color:var(--line); color:var(--gray-700);" th:data-id="${b.id}" onclick="openDetailModal(this.getAttribute('data-id'))" title="Xem chi tiết & in phiếu">
+                        <i class="fa-regular fa-eye"></i>
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -812,28 +1140,49 @@
         </div>
       </section>
 
-      <!-- MODAL WIZARD: QUY TRÌNH TIẾP NHẬN & ĐẶT SÂN TẠI QUẦY CHO LỄ TÂN (4 BƯỚC) -->
-      <div class="modal-overlay" id="modalReceptionistWizard">
-        <div class="modal-card" style="max-width: 920px; width: 95%; max-height: 92vh; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden;">
+      <!-- MODAL WIZARD: QUY TRÌNH TIẾP NHẬN & ĐẶT SÂN TẠI QUẦY CHO LỄ TÂN (GIAO DIỆN MÀN HÌNH POS TOÀN DIỆN) -->
+      <div class="modal-overlay pos-workstation-overlay" id="modalReceptionistWizard">
+        <div class="pos-fullscreen-card">
           
-          <!-- Modal Header -->
-          <div class="modal-head" style="padding: 14px 22px; background: #fafbfc; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:38px; height:38px; border-radius:10px; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:18px;">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-              </div>
+          <!-- Top POS Workstation Bar -->
+          <div class="pos-workstation-head" style="padding: 12px 28px; background: #0f172a; border-bottom: 2px solid #1e293b; display: flex; justify-content: space-between; align-items: center; color: #ffffff; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <img src="/images/sporthub-logo-single.png" alt="SportHub" style="height: 38px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none'">
               <div>
-                <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--dark);">Quy Trình Tiếp Nhận & Đặt Sân Tại Quầy</h3>
-                <div style="font-size:12px; color:var(--gray-500); margin-top:2px;">
-                  Dành riêng cho Lễ tân • Tiếp khách lần đầu • Đặt sân • Gọi nước • Bàn giao nhận sân ngay
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="badge" style="background: #059669; color: #fff; font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.5px;">SPORTHUB POS</span>
+                  <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #f8fafc; letter-spacing: -0.2px;">QUẦY TIẾP NHẬN & ĐẶT SÂN TẠI CHỖ</h3>
+                </div>
+                <div style="font-size: 11.5px; color: #94a3b8; margin-top: 2px;">
+                  Bàn tiếp đón trực tiếp • Đặt sân nhanh • Gọi nước F&B • Bàn giao sân tức thì
                 </div>
               </div>
             </div>
-            <button type="button" class="modal-close" onclick="closeModal('modalReceptionistWizard')">&times;</button>
+
+            <!-- Center: Live Clock & Receptionist Identity -->
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; padding: 5px 14px; border-radius: 20px; display: flex; align-items: center; gap: 8px;">
+                <span class="status-dot green pulse" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                <span style="font-size: 11.5px; color: #94a3b8;">Lễ tân ca trực:</span>
+                <strong style="font-size: 12px; color: #e2e8f0;" th:text="${currentUser != null ? currentUser.fullName : 'Lễ tân trung tâm'}">Lễ tân trung tâm</strong>
+              </div>
+              <div id="posLiveClock" style="font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; font-weight: 800; color: #34d399; background: #022c22; border: 1px solid #065f46; padding: 4px 12px; border-radius: 8px; letter-spacing: 0.8px;">
+                --:--:--
+              </div>
+            </div>
+
+            <!-- Right: Close Button -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="btn btn-sm" onclick="closeModal('modalReceptionistWizard')" 
+                      style="background: #dc2626; color: #ffffff; border: none; font-size: 12.5px; font-weight: 700; padding: 6px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);">
+                <i class="fa-solid fa-xmark"></i>
+                <span>Thoát (Esc)</span>
+              </button>
+            </div>
           </div>
 
           <!-- Stepper Progress Bar (4 Bước) -->
-          <div class="wizard-stepper">
+          <div class="wizard-stepper" style="background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 14px 40px; margin: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex-shrink: 0;">
             <div class="wizard-step-node active" id="wizStepNode1" onclick="goToWizardStep(1)">
               <div class="wizard-step-num"><i class="fa-solid fa-user"></i></div>
               <span>1. Khách Hàng</span>
@@ -856,89 +1205,92 @@
           </div>
 
           <!-- Wizard Body: 4 Step Views -->
-          <div class="modal-body" style="padding: 20px 24px; overflow-y: auto; flex: 1; background: #ffffff;">
+          <div class="modal-body" style="padding: 24px 36px; overflow-y: auto; flex: 1; background: #f8fafc;">
 
             <!-- ================= BƯỚC 1: TIẾP NHẬN KHÁCH HÀNG ================= -->
-            <div id="wizStepView1" class="wizard-step-content" style="display:block;">
-              <div style="margin-bottom: 16px;">
-                <h4 style="margin:0 0 4px; font-size:15px; font-weight:800; color:#0f172a;">Bước 1: Tiếp nhận & Nhận diện Khách hàng</h4>
-                <p style="margin:0; font-size:12px; color:#64748b;">Nhập số điện thoại để kiểm tra hồ sơ khách quen, hoặc tạo nhanh hồ sơ cho khách tới thuê sân lần đầu.</p>
+            <div id="wizStepView1" class="wizard-step-content" style="display:block; max-width: 1100px; margin: 0 auto;">
+              <div style="margin-bottom: 20px;">
+                <h4 style="margin:0 0 6px; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                  <i class="fa-solid fa-id-card text-emerald" style="color:#059669;"></i>
+                  <span>Bước 1: Tiếp Nhận & Nhận Diện Khách Hàng</span>
+                </h4>
+                <p style="margin:0; font-size:13px; color:#64748b;">Nhập số điện thoại để kiểm tra hồ sơ khách quen, lịch sử tích điểm, hoặc tạo nhanh hồ sơ cho khách tới thuê sân lần đầu.</p>
               </div>
 
               <!-- Phone Lookup Box -->
-              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
-                <label style="font-size:12.5px; font-weight:700; color:#334155; margin-bottom:6px; display:block;">
+              <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:22px; margin-bottom:20px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
+                <label style="font-size:13.5px; font-weight:800; color:#1e293b; margin-bottom:8px; display:block;">
                   Số điện thoại khách hàng (*)
                 </label>
-                <div style="display:flex; gap:8px;">
+                <div style="display:flex; gap:10px;">
                   <div style="position:relative; flex:1;">
-                    <i class="fa-solid fa-phone" style="position:absolute; left:12px; top:12px; color:#94a3b8; font-size:13px;"></i>
+                    <i class="fa-solid fa-phone" style="position:absolute; left:14px; top:14px; color:#94a3b8; font-size:14px;"></i>
                     <input type="text" id="wizCustPhoneInput" placeholder="Nhập SĐT khách hàng (VD: 0901234567)..." 
                            oninput="handleWizPhoneInput(this.value)"
-                           style="height:40px; padding-left:36px; padding-right:12px; border-radius:8px; border:1.5px solid #cbd5e1; font-size:13.5px; font-weight:600; width:100%;">
+                           style="height:44px; padding-left:42px; padding-right:14px; border-radius:10px; border:2px solid #cbd5e1; font-size:15px; font-weight:700; width:100%; color:#0f172a; background:#ffffff;">
                   </div>
-                  <button type="button" class="btn" onclick="wizardTriggerPhoneLookup()" style="background:#059669; color:#fff; font-weight:700; padding:0 16px; border-radius:8px;">
+                  <button type="button" class="btn" onclick="wizardTriggerPhoneLookup()" style="background:#059669; color:#fff; font-weight:800; padding:0 22px; border-radius:10px; font-size:13.5px; box-shadow:0 2px 8px rgba(5,150,105,0.25);">
                     <i class="fa-solid fa-magnifying-glass me-1"></i> Tra cứu
                   </button>
-                  <button type="button" class="btn" onclick="wizardUseWalkInGuest()" style="background:#f1f5f9; color:#475569; font-weight:700; padding:0 14px; border-radius:8px; border:1px solid #cbd5e1;" title="Tự động điền khách vãng lai nếu khách cần chơi ngay không để lại tên">
-                    <i class="fa-solid fa-bolt text-amber me-1"></i> Khách vãng lai nhanh
+                  <button type="button" class="btn" onclick="wizardUseWalkInGuest()" style="background:#f1f5f9; color:#334155; font-weight:700; padding:0 18px; border-radius:10px; border:1.5px solid #cbd5e1; font-size:13px;" title="Tự động điền khách vãng lai nếu khách cần chơi ngay không để lại tên">
+                    <i class="fa-solid fa-bolt text-amber me-1" style="color:#d97706;"></i> Khách vãng lai nhanh
                   </button>
                 </div>
-                <div id="wizPhoneStatusNotice" style="font-size:12px; margin-top:8px; color:#64748b; font-weight:500;">
+                <div id="wizPhoneStatusNotice" style="font-size:12.5px; margin-top:10px; color:#64748b; font-weight:600;">
                   Nhập số điện thoại để hệ thống tự động nhận diện khách cũ hoặc khách mới.
                 </div>
               </div>
 
               <!-- Profile Result: KHÁCH QUEN (ĐÃ CÓ HỒ SƠ) -->
-              <div id="wizExistingCustomerBox" style="display:none; background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:14px 18px; margin-bottom:16px;">
+              <div id="wizExistingCustomerBox" style="display:none; background:#f0fdf4; border:2px solid #86efac; border-radius:14px; padding:20px 24px; margin-bottom:20px; box-shadow:0 4px 14px rgba(5,150,105,0.06);">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:42px; height:42px; border-radius:50%; background:#10b981; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800;" id="wizCustAvatarInitials">
+                  <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="width:52px; height:52px; border-radius:50%; background:#10b981; color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900;" id="wizCustAvatarInitials">
                       KH
                     </div>
                     <div>
-                      <div style="display:flex; align-items:center; gap:8px;">
-                        <strong id="wizCustNameDisplay" style="font-size:15px; color:#064e3b;">Nguyễn Văn A</strong>
-                        <span class="badge" style="background:#059669; color:#fff; font-weight:800; font-size:10.5px;">Thành viên thân thiết</span>
+                      <div style="display:flex; align-items:center; gap:10px;">
+                        <strong id="wizCustNameDisplay" style="font-size:17px; color:#064e3b;">Nguyễn Văn A</strong>
+                        <span class="badge" style="background:#059669; color:#fff; font-weight:800; font-size:11px;">Thành viên thân thiết</span>
                       </div>
-                      <div style="font-size:12px; color:#047857; margin-top:2px;">
-                        SĐT: <b id="wizCustPhoneDisplay">0901234567</b> • Đã đặt: <span id="wizCustBookingsCount" style="font-weight:700;">---</span> lượt tại trung tâm
+                      <div style="font-size:13px; color:#047857; margin-top:4px;">
+                        SĐT: <b id="wizCustPhoneDisplay">0901234567</b> • Đã đặt: <span id="wizCustBookingsCount" style="font-weight:800;">---</span> lượt tại trung tâm
                       </div>
                     </div>
                   </div>
-                  <button type="button" class="btn btn-sm" onclick="wizardResetCustomer()" style="background:#fff; border:1px solid #86efac; color:#047857; font-weight:700;">
+                  <button type="button" class="btn btn-sm" onclick="wizardResetCustomer()" style="background:#fff; border:1.5px solid #86efac; color:#047857; font-weight:700; padding:8px 16px; border-radius:8px;">
                     <i class="fa-solid fa-rotate-left me-1"></i> Đổi số khác
                   </button>
                 </div>
               </div>
 
               <!-- Profile Result: KHÁCH THUÊ SÂN LẦN ĐẦU (TẠO HỒ SƠ NHANH) -->
-              <div id="wizNewCustomerBox" style="display:none; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:12px; padding:14px 18px; margin-bottom:16px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                  <span class="badge" style="background:#2563eb; color:#fff; font-weight:800; font-size:11px;">
+              <div id="wizNewCustomerBox" style="display:none; background:#eff6ff; border:2px solid #93c5fd; border-radius:14px; padding:20px 24px; margin-bottom:20px; box-shadow:0 4px 14px rgba(37,99,235,0.06);">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+                  <span class="badge" style="background:#2563eb; color:#fff; font-weight:800; font-size:11.5px; padding:4px 10px; border-radius:6px;">
                     <i class="fa-solid fa-sparkles me-1"></i> KHÁCH HÀNG MỚI LẦN ĐẦU
                   </span>
-                  <span style="font-size:12px; color:#1e40af; font-weight:600;">Số điện thoại chưa có trong danh bạ. Lễ tân nhập tên để tạo hồ sơ ngay:</span>
+                  <span style="font-size:13px; color:#1e40af; font-weight:700;">Số điện thoại chưa có trong danh bạ. Lễ tân nhập tên để tạo hồ sơ ngay:</span>
                 </div>
-                <div style="display:grid; grid-template-columns: 1.2fr 1fr 1fr; gap:10px;">
+                <div style="display:grid; grid-template-columns: 1.2fr 1fr 1fr; gap:14px;">
                   <div>
-                    <label style="font-size:12px; font-weight:700; color:#1e3a8a; margin-bottom:4px; display:block;">Họ và tên khách hàng (*)</label>
+                    <label style="font-size:12.5px; font-weight:800; color:#1e3a8a; margin-bottom:6px; display:block;">Họ và tên khách hàng (*)</label>
                     <input type="text" id="wizNewCustNameInput" placeholder="Ví dụ: Anh Tuấn, Chị Hoa, CLB UTE..." 
-                           style="height:38px; border-radius:8px; border:1px solid #bfdbfe; font-size:13px; font-weight:600; width:100%; padding:0 12px; background:#fff;">
+                           style="height:42px; border-radius:8px; border:1.5px solid #bfdbfe; font-size:14px; font-weight:700; width:100%; padding:0 14px; background:#fff;">
                   </div>
                   <div>
-                    <label style="font-size:12px; font-weight:700; color:#1e3a8a; margin-bottom:4px; display:block;">Email gửi hóa đơn</label>
+                    <label style="font-size:12.5px; font-weight:800; color:#1e3a8a; margin-bottom:6px; display:block;">Email gửi hóa đơn</label>
                     <input type="email" id="wizNewCustEmailInput" placeholder="khachhang@gmail.com" 
-                           style="height:38px; border-radius:8px; border:1px solid #bfdbfe; font-size:13px; width:100%; padding:0 12px; background:#fff;">
+                           style="height:42px; border-radius:8px; border:1.5px solid #bfdbfe; font-size:13.5px; width:100%; padding:0 14px; background:#fff;">
                   </div>
                   <div>
-                    <label style="font-size:12px; font-weight:700; color:#1e3a8a; margin-bottom:4px; display:block;">Ghi chú nhóm / Đội chơi</label>
+                    <label style="font-size:12.5px; font-weight:800; color:#1e3a8a; margin-bottom:6px; display:block;">Ghi chú nhóm / Đội chơi</label>
                     <input type="text" id="wizNewCustNoteInput" placeholder="Ví dụ: Đi nhóm 4 người..." 
-                           style="height:38px; border-radius:8px; border:1px solid #bfdbfe; font-size:13px; width:100%; padding:0 12px; background:#fff;">
+                           style="height:42px; border-radius:8px; border:1.5px solid #bfdbfe; font-size:13.5px; width:100%; padding:0 14px; background:#fff;">
                   </div>
                 </div>
-                <div style="font-size:11.5px; color:#3b82f6; margin-top:8px;">
-                  <i class="fa-solid fa-info-circle me-1"></i> Thông tin này sẽ được tự động lưu vào danh mục khách hàng sau khi hoàn tất.
+                <div style="font-size:12px; color:#2563eb; margin-top:10px;">
+                  <i class="fa-solid fa-info-circle me-1"></i> Thông tin này sẽ được tự động lưu vào danh mục khách hàng sau khi hoàn tất đặt sân.
                 </div>
               </div>
 
@@ -949,26 +1301,30 @@
             </div>
 
             <!-- ================= BƯỚC 2: CHỌN MÔN, SÂN & KHUNG GIỜ ================= -->
-            <div id="wizStepView2" class="wizard-step-content" style="display:none;">
-              <div style="margin-bottom: 14px;">
-                <h4 style="margin:0 0 4px; font-size:15px; font-weight:800; color:#0f172a;">Bước 2: Chọn Môn Thể Thao, Sân & Khung Giờ Thuê</h4>
-                <p style="margin:0; font-size:12px; color:#64748b;">Hệ thống tự động kiểm tra trùng lịch và tính giá thời gian thực theo chính sách.</p>
+            <div id="wizStepView2" class="wizard-step-content" style="display:none; max-width: 1200px; margin: 0 auto;">
+              <div style="margin-bottom: 16px;">
+                <h4 style="margin:0 0 6px; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                  <i class="fa-solid fa-table-tennis-paddle-ball text-emerald" style="color:#059669;"></i>
+                  <span>Bước 2: Chọn Môn Thể Thao, Sân & Khung Giờ Thuê</span>
+                </h4>
+                <p style="margin:0; font-size:13px; color:#64748b;">Hệ thống tự động kiểm tra trùng lịch với timeline và tính giá thời gian thực theo chính sách.</p>
               </div>
 
               <!-- Sport Filter Tabs -->
-              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;" id="wizSportTabs">
-                <button type="button" class="pos-cat-btn active" onclick="wizardFilterSport('ALL', this)">
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;" id="wizSportTabs">
+                <button type="button" class="pos-cat-btn active" onclick="wizardFilterSport('ALL', this)" style="padding:7px 16px; font-size:13px;">
                   <i class="fa-solid fa-layer-group"></i> Tất cả môn
                 </button>
                 <button th:each="s : ${sports}" type="button" class="pos-cat-btn"
                         th:data-sport-id="${s.id}"
-                        onclick="wizardFilterSport(this.getAttribute('data-sport-id'), this)">
+                        onclick="wizardFilterSport(this.getAttribute('data-sport-id'), this)"
+                        style="padding:7px 16px; font-size:13px;">
                   <span th:text="${s.name}"></span>
                 </button>
               </div>
 
               <!-- Court Pick Grid -->
-              <div class="court-pick-grid" id="wizCourtGrid" style="margin-bottom:16px;">
+              <div class="court-pick-grid" id="wizCourtGrid" style="margin-bottom:18px; max-height: calc(100vh - 460px); grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:12px;">
                 <div th:each="c : ${courts}" 
                      class="court-pick-card"
                      th:data-court-id="${c.id}"
@@ -979,57 +1335,57 @@
                      onclick="wizardSelectCourt(this)">
                   <i class="fa-solid fa-circle-check selected-badge"></i>
                   <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                    <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:10px; font-weight:700;" th:text="${c.sportName}"></span>
-                    <strong style="font-size:13px; color:#0f172a;" th:text="${c.name}"></strong>
+                    <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:10.5px; font-weight:700;" th:text="${c.sportName}"></span>
+                    <strong style="font-size:13.5px; color:#0f172a;" th:text="${c.name}"></strong>
                   </div>
-                  <div style="font-size:11px; color:#64748b; margin-bottom:6px;">
+                  <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">
                     <span th:text="${c.location != null ? c.location : 'Khu vực sân tiêu chuẩn'}"></span>
                   </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:6px;">
-                    <span style="font-size:10.5px; color:#64748b;">Trạng thái:</span>
-                    <b style="font-size:11.5px; color:#059669;" th:text="${c.status != null ? c.status : 'Sẵn sàng'}"></b>
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:8px;">
+                    <span style="font-size:11px; color:#64748b;">Trạng thái:</span>
+                    <b style="font-size:12px; color:#059669;" th:text="${c.status != null ? c.status : 'Sẵn sàng'}"></b>
                   </div>
                 </div>
               </div>
 
               <!-- Time & Date Setup Box -->
-              <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; margin-bottom:14px;">
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+              <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:18px 22px; margin-bottom:16px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:14px;">
                   <div>
-                    <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:4px; display:block;">Ngày thi đấu (*)</label>
-                    <input type="date" id="wizBookingDate" style="height:36px; border-radius:8px; border:1px solid #cbd5e1; padding:0 10px; font-size:12.5px; width:100%; background:#fff;" onchange="wizardTriggerPriceEstimate()">
+                    <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Ngày thi đấu (*)</label>
+                    <input type="date" id="wizBookingDate" style="height:40px; border-radius:8px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13.5px; font-weight:600; width:100%; background:#fff;" onchange="wizardTriggerPriceEstimate()">
                   </div>
                   <div>
-                    <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:4px; display:block;">Giờ bắt đầu (*)</label>
-                    <input type="time" id="wizStartTime" style="height:36px; border-radius:8px; border:1px solid #cbd5e1; padding:0 10px; font-size:12.5px; width:100%; background:#fff;" onchange="wizardOnStartTimeChange()">
+                    <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Giờ bắt đầu (*)</label>
+                    <input type="time" id="wizStartTime" style="height:40px; border-radius:8px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13.5px; font-weight:600; width:100%; background:#fff;" onchange="wizardOnStartTimeChange()">
                   </div>
                   <div>
-                    <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:4px; display:block;">Giờ kết thúc (*)</label>
-                    <input type="time" id="wizEndTime" style="height:36px; border-radius:8px; border:1px solid #cbd5e1; padding:0 10px; font-size:12.5px; width:100%; background:#fff;" onchange="wizardTriggerPriceEstimate()">
+                    <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Giờ kết thúc (*)</label>
+                    <input type="time" id="wizEndTime" style="height:40px; border-radius:8px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13.5px; font-weight:600; width:100%; background:#fff;" onchange="wizardTriggerPriceEstimate()">
                   </div>
                 </div>
 
                 <!-- Quick Duration Chips -->
-                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                  <span style="font-size:11px; font-weight:700; color:#64748b;">Chọn nhanh thời lượng:</span>
-                  <button type="button" class="wizard-quick-duration-btn active" onclick="wizardSetDuration(1.0, this)">1.0 Giờ</button>
-                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(1.5, this)">1.5 Giờ</button>
-                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(2.0, this)">2.0 Giờ</button>
-                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(3.0, this)">3.0 Giờ</button>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <span style="font-size:12px; font-weight:700; color:#64748b;">Chọn nhanh thời lượng:</span>
+                  <button type="button" class="wizard-quick-duration-btn active" onclick="wizardSetDuration(1.0, this)">1.0 Giờ (60 phút)</button>
+                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(1.5, this)">1.5 Giờ (90 phút)</button>
+                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(2.0, this)">2.0 Giờ (120 phút)</button>
+                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(3.0, this)">3.0 Giờ (180 phút)</button>
                 </div>
               </div>
 
               <!-- Live Conflict & Price Banner -->
-              <div id="wizEstimateNoticeBox" style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <i class="fa-solid fa-circle-check text-success" id="wizEstimateIcon"></i>
-                  <span id="wizEstimateMessage" style="font-size:12.5px; font-weight:600; color:#065f46;">
+              <div id="wizEstimateNoticeBox" style="background:#ecfdf5; border:1.5px solid #a7f3d0; border-radius:12px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <i class="fa-solid fa-circle-check text-success" id="wizEstimateIcon" style="font-size:18px;"></i>
+                  <span id="wizEstimateMessage" style="font-size:13.5px; font-weight:700; color:#065f46;">
                     Vui lòng chọn sân và khung giờ để hệ thống tính giá tự động.
                   </span>
                 </div>
                 <div style="text-align:right;">
-                  <span style="font-size:11px; color:#047857;">Tạm tính tiền sân:</span>
-                  <b id="wizCourtPriceDisplay" style="font-size:14px; color:#047857; margin-left:6px;">0 đ</b>
+                  <span style="font-size:12px; color:#047857; font-weight:600;">Tạm tính tiền sân:</span>
+                  <b id="wizCourtPriceDisplay" style="font-size:17px; color:#047857; margin-left:8px;">0 đ</b>
                 </div>
               </div>
 
@@ -1039,66 +1395,135 @@
               <input type="hidden" id="wizCalculatedCourtAmount" value="0">
             </div>
 
-            <!-- ================= BƯỚC 3: DỊCH VỤ & NƯỚC UỐNG ĐI KÈM ================= -->
-            <div id="wizStepView3" class="wizard-step-content" style="display:none;">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+            <!-- ================= BƯỚC 3: DỊCH VỤ & NƯỚC UỐNG ĐI KÈM (F&B CHUYÊN NGHIỆP) ================= -->
+            <div id="wizStepView3" class="wizard-step-content" style="display:none; max-width: 1300px; margin: 0 auto;">
+              
+              <!-- F&B Header Controls -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:14px;">
                 <div>
-                  <h4 style="margin:0 0 4px; font-size:15px; font-weight:800; color:#0f172a;">Bước 3: Gọi Thêm Nước Uống & Thuê Dụng Cụ (Tùy chọn)</h4>
-                  <p style="margin:0; font-size:12px; color:#64748b;">Lễ tân hỏi nhu cầu khách: nước uống ướp lạnh, khăn lạnh, thuê vợt, cầu thi đấu...</p>
+                  <h4 style="margin:0 0 4px; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-mug-hot text-emerald" style="color:#059669;"></i>
+                    <span>Bước 3: Gọi Thêm Nước Uống, Đồ Ăn & Thuê Dụng Cụ (F&B)</span>
+                  </h4>
+                  <p style="margin:0; font-size:13px; color:#64748b;">Lựa chọn theo từng danh mục hoặc tìm kiếm nhanh. Hình ảnh sản phẩm trực quan, cập nhật tồn kho tức thì.</p>
                 </div>
-                <div style="text-align:right;">
-                  <span style="font-size:11.5px; color:#64748b;">Tổng tiền F&B gọi thêm:</span>
-                  <b id="wizFnbTotalDisplay" style="font-size:15px; color:#059669; margin-left:6px; display:block;">0 đ</b>
+                
+                <!-- Live Cart Summary Badge -->
+                <div style="display:flex; align-items:center; gap:14px; background:#ffffff; border:1.5px solid #86efac; padding:8px 18px; border-radius:14px; box-shadow:0 4px 12px rgba(5,150,105,0.08);">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-basket-shopping" style="color:#059669; font-size:16px;"></i>
+                    <span style="font-size:13px; color:#475569; font-weight:600;">Đã chọn:</span>
+                    <strong id="wizFnbItemCount" style="font-size:14px; color:#059669;">0 món</strong>
+                  </div>
+                  <span style="color:#cbd5e1;">|</span>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-size:13px; color:#475569; font-weight:600;">Tổng tiền F&B:</span>
+                    <b id="wizFnbTotalDisplay" style="font-size:17px; color:#047857; font-weight:800;">0 đ</b>
+                  </div>
                 </div>
               </div>
 
-              <!-- Mini POS Services Grid -->
-              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:10px; max-height:300px; overflow-y:auto; padding-right:4px;" id="wizFnbCatalogGrid">
+              <!-- Filter Bar: Category Tabs + Search Input -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px; background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:10px 14px;">
+                <!-- Category Tabs -->
+                <div style="display:flex; gap:8px; flex-wrap:wrap;" id="wizFnbCategoryTabs">
+                  <button type="button" class="pos-fnb-tab-btn active" onclick="filterWizFnbCategory('ALL', this)">
+                    <i class="fa-solid fa-layer-group me-1"></i> Tất cả (<span th:text="${activeServices != null ? #lists.size(activeServices) : 0}"></span>)
+                  </button>
+                  <button type="button" class="pos-fnb-tab-btn" onclick="filterWizFnbCategory('Thức uống', this)">
+                    <i class="fa-solid fa-bottle-water me-1"></i> Thức uống
+                  </button>
+                  <button type="button" class="pos-fnb-tab-btn" onclick="filterWizFnbCategory('Đồ ăn nhẹ', this)">
+                    <i class="fa-solid fa-cookie-bite me-1"></i> Đồ ăn nhẹ
+                  </button>
+                  <button type="button" class="pos-fnb-tab-btn" onclick="filterWizFnbCategory('Thuê dụng cụ', this)">
+                    <i class="fa-solid fa-table-tennis-paddle-ball me-1"></i> Thuê dụng cụ
+                  </button>
+                  <button type="button" class="pos-fnb-tab-btn" onclick="filterWizFnbCategory('Phụ kiện', this)">
+                    <i class="fa-solid fa-shirt me-1"></i> Phụ kiện
+                  </button>
+                </div>
+
+                <!-- Search Input -->
+                <div style="position:relative; min-width:260px;">
+                  <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; top:12px; color:#94a3b8; font-size:13px;"></i>
+                  <input type="text" id="wizFnbSearchInput" oninput="filterWizFnbSearch(this.value)" placeholder="Tìm món, mã, danh mục..." 
+                         style="width:100%; height:38px; border-radius:20px; border:1.5px solid #cbd5e1; padding:0 14px 0 34px; font-size:13px; font-weight:600; background:#f8fafc;">
+                </div>
+              </div>
+
+              <!-- Rich F&B Product Catalog Grid -->
+              <div class="pos-fnb-catalog-grid" id="wizFnbCatalogGrid">
                 <div th:each="s : ${activeServices}" 
                      class="wiz-fnb-card"
                      th:data-service-id="${s.id}"
                      th:data-service-name="${s.name}"
                      th:data-service-price="${s.price}"
                      th:data-service-unit="${s.unit}"
-                     th:data-service-stock="${s.stock}">
+                     th:data-service-stock="${s.stock}"
+                     th:data-service-cat="${s.category}">
+                  
+                  <!-- Product Image with Category-based Fallback -->
+                  <div class="wiz-fnb-img-box">
+                    <img th:if="${s.imageUrl != null and !#strings.isEmpty(s.imageUrl)}" 
+                         th:src="${s.imageUrl}" 
+                         th:alt="${s.name}" 
+                         onerror="this.onerror=null; this.src='/images/services/drinks.jpg';">
+                    <img th:unless="${s.imageUrl != null and !#strings.isEmpty(s.imageUrl)}" 
+                         th:src="${s.category == 'Thức uống' ? '/images/services/drinks.jpg' : (s.category == 'Đồ ăn nhẹ' ? '/images/services/snacks.jpg' : (s.category == 'Thuê dụng cụ' ? '/images/services/gear.jpg' : '/images/services/accessories.jpg'))}" 
+                         th:alt="${s.name}">
+                  </div>
+
+                  <!-- Product Info -->
                   <div style="flex:1; min-width:0;">
-                    <div style="font-size:12px; font-weight:700; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" th:text="${s.name}"></div>
-                    <div style="font-size:11px; color:#059669; font-weight:700; margin-top:2px;">
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+                      <span class="badge" style="background:#f1f5f9; color:#475569; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;" th:text="${s.category}">Danh mục</span>
+                      <span th:if="${s.stock != null and s.stock > 0}" style="font-size:10.5px; color:#059669; font-weight:600;">Còn [[${s.stock}]] [[${s.unit}]]</span>
+                      <span th:if="${s.stock == null or s.stock <= 0}" style="font-size:10.5px; color:#dc2626; font-weight:700;">Hết hàng</span>
+                    </div>
+                    <div style="font-size:13.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" th:text="${s.name}">Tên dịch vụ</div>
+                    <div style="font-size:12.5px; color:#059669; font-weight:800; margin-top:3px;">
                       <span th:text="${#numbers.formatDecimal(s.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
-                      <span style="font-size:10px; color:#64748b; font-weight:400;" th:text="'/ ' + ${s.unit}"></span>
+                      <span style="font-size:11px; color:#64748b; font-weight:500;" th:text="'/ ' + ${s.unit}"></span>
                     </div>
                   </div>
-                  <div style="display:flex; align-items:center; gap:5px;">
-                    <button type="button" onclick="wizardChangeFnbQty(this, -1)" style="width:24px; height:24px; border-radius:50%; border:1px solid #cbd5e1; background:#fff; cursor:pointer; font-weight:bold; font-size:11px;">-</button>
-                    <span class="wiz-fnb-item-qty" style="font-weight:800; font-size:12px; min-width:16px; text-align:center;">0</span>
-                    <button type="button" onclick="wizardChangeFnbQty(this, 1)" style="width:24px; height:24px; border-radius:50%; border:1px solid #cbd5e1; background:#fff; cursor:pointer; font-weight:bold; font-size:11px;">+</button>
+
+                  <!-- Quantity Stepper Controls -->
+                  <div style="display:flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:20px; padding:3px 6px;">
+                    <button type="button" onclick="wizardChangeFnbQty(this, -1)" style="width:26px; height:26px; border-radius:50%; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; color:#334155; transition:0.15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#fff'">-</button>
+                    <span class="wiz-fnb-item-qty" style="font-weight:800; font-size:13px; min-width:22px; text-align:center; color:#0f172a;">0</span>
+                    <button type="button" onclick="wizardChangeFnbQty(this, 1)" style="width:26px; height:26px; border-radius:50%; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; color:#334155; transition:0.15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#fff'">+</button>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- ================= BƯỚC 4: THANH TOÁN & BÀN GIAO SÂN ================= -->
-            <div id="wizStepView4" class="wizard-step-content" style="display:none;">
-              <div style="margin-bottom: 14px;">
-                <h4 style="margin:0 0 4px; font-size:15px; font-weight:800; color:#0f172a;">Bước 4: Xác Nhận Hóa Đơn & Bàn Giao Nhận Sân</h4>
-                <p style="margin:0; font-size:12px; color:#64748b;">Kiểm tra thông tin lần cuối, thu tiền mặt hoặc quét VietQR, và bàn giao sân cho khách.</p>
+            <div id="wizStepView4" class="wizard-step-content" style="display:none; max-width: 1200px; margin: 0 auto;">
+              <div style="margin-bottom: 18px;">
+                <h4 style="margin:0 0 6px; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
+                  <i class="fa-solid fa-file-invoice-dollar text-emerald" style="color:#059669;"></i>
+                  <span>Bước 4: Xác Nhận Hóa Đơn & Bàn Giao Nhận Sân Ngay</span>
+                </h4>
+                <p style="margin:0; font-size:13px; color:#64748b;">Kiểm tra thông tin lần cuối, thu tiền mặt hoặc quét VietQR, và bàn giao sân cho khách xách vợt vào chơi ngay.</p>
               </div>
 
               <!-- Split Screen Review -->
-              <div style="display:grid; grid-template-columns: 1.15fr 1fr; gap:16px; align-items:start;">
+              <div style="display:grid; grid-template-columns: 1.15fr 1fr; gap:20px; align-items:start;">
                 <!-- Cột trái: Tóm tắt đơn đặt -->
-                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
-                  <h5 style="margin:0 0 10px; font-size:12.5px; font-weight:800; color:#334155; text-transform:uppercase; letter-spacing:0.5px;">
-                    <i class="fa-solid fa-receipt text-primary me-1"></i> Tóm Tắt Phiếu Đặt Sân
+                <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:20px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
+                  <h5 style="margin:0 0 14px; font-size:13.5px; font-weight:800; color:#334155; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-receipt text-primary"></i>
+                    <span>Tóm Tắt Phiếu Đặt Sân & Dịch Vụ</span>
                   </h5>
-                  <div style="display:grid; gap:8px; font-size:12.5px;">
+                  <div style="display:grid; gap:10px; font-size:13.5px;">
                     <div style="display:flex; justify-content:space-between;">
                       <span style="color:#64748b;">Khách hàng:</span>
                       <strong id="wizSummaryCustName" style="color:#0f172a;">---</strong>
                     </div>
                     <div style="display:flex; justify-content:space-between;">
                       <span style="color:#64748b;">Số điện thoại:</span>
-                      <span id="wizSummaryCustPhone" style="font-weight:600;">---</span>
+                      <span id="wizSummaryCustPhone" style="font-weight:700;">---</span>
                     </div>
                     <div style="display:flex; justify-content:space-between;">
                       <span style="color:#64748b;">Sân & Môn:</span>
@@ -1108,50 +1533,50 @@
                       <span style="color:#64748b;">Khung giờ:</span>
                       <b id="wizSummaryTime" style="color:#0f172a;">---</b>
                     </div>
-                    <hr style="border:none; border-top:1px dashed #cbd5e1; margin:4px 0;">
+                    <hr style="border:none; border-top:1px dashed #cbd5e1; margin:6px 0;">
                     <div style="display:flex; justify-content:space-between;">
                       <span style="color:#64748b;">Tiền thuê sân:</span>
                       <span id="wizSummaryCourtFee" style="font-weight:700;">0 đ</span>
                     </div>
                     <div style="display:flex; justify-content:space-between;">
                       <span style="color:#64748b;">Nước uống & Dụng cụ:</span>
-                      <span id="wizSummaryFnbFee" style="font-weight:700; color:#059669;">0 đ</span>
+                      <span id="wizSummaryFnbFee" style="font-weight:800; color:#059669;">0 đ</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                       <span style="color:#64748b;">Khuyến mãi / Giảm giá:</span>
-                      <select id="wizPromotionSelect" onchange="wizardRecalculateTotal()" style="height:30px; font-size:11.5px; border-radius:6px; border:1px solid #cbd5e1; padding:0 8px; max-width:180px;">
+                      <select id="wizPromotionSelect" onchange="wizardRecalculateTotal()" style="height:34px; font-size:12.5px; border-radius:6px; border:1px solid #cbd5e1; padding:0 8px; max-width:200px;">
                         <option value="">Không áp dụng</option>
                         <option th:each="pm : ${promotions}" th:value="${pm.id}" th:text="${pm.name} + ' (-' + ${#numbers.formatDecimal(pm.discountAmount,0,'COMMA',0,'POINT')} + 'đ)'" th:data-discount="${pm.discountAmount}"></option>
                       </select>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:14px; background:#eff6ff; padding:8px 10px; border-radius:8px; border:1px solid #bfdbfe; margin-top:4px;">
+                    <div style="display:flex; justify-content:space-between; font-size:15px; background:#eff6ff; padding:12px 14px; border-radius:10px; border:1.5px solid #bfdbfe; margin-top:6px;">
                       <span style="font-weight:800; color:#1e3a8a;">TỔNG THANH TOÁN:</span>
-                      <b id="wizSummaryGrandTotal" style="font-size:16px; color:#1d4ed8;">0 đ</b>
+                      <b id="wizSummaryGrandTotal" style="font-size:18px; color:#1d4ed8;">0 đ</b>
                     </div>
                   </div>
                 </div>
 
                 <!-- Cột phải: Thu ngân & Bàn giao nhận sân ngay -->
-                <div style="display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; flex-direction:column; gap:16px;">
                   <!-- Phương thức thanh toán -->
-                  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
-                    <label style="font-size:12px; font-weight:700; color:#334155; margin-bottom:8px; display:block;">Hình thức thu ngân tại quầy:</label>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px; margin-bottom:8px;">
-                      <button type="button" class="pos-cat-btn active" id="btnPayCash" onclick="wizardSelectPaymentMethod('Tiền mặt', this)" style="justify-content:center;">
+                  <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
+                    <label style="font-size:13px; font-weight:800; color:#334155; margin-bottom:10px; display:block;">Hình thức thu ngân tại quầy:</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-bottom:10px;">
+                      <button type="button" class="pos-cat-btn active" id="btnPayCash" onclick="wizardSelectPaymentMethod('Tiền mặt', this)" style="justify-content:center; padding:8px;">
                         <i class="fa-solid fa-money-bill-wave"></i> Tiền mặt
                       </button>
-                      <button type="button" class="pos-cat-btn" id="btnPayVietQr" onclick="wizardSelectPaymentMethod('VietQR', this)" style="justify-content:center;">
+                      <button type="button" class="pos-cat-btn" id="btnPayVietQr" onclick="wizardSelectPaymentMethod('VietQR', this)" style="justify-content:center; padding:8px;">
                         <i class="fa-solid fa-qrcode"></i> VietQR
                       </button>
-                      <button type="button" class="pos-cat-btn" id="btnPayLater" onclick="wizardSelectPaymentMethod('Chưa thanh toán', this)" style="justify-content:center;">
+                      <button type="button" class="pos-cat-btn" id="btnPayLater" onclick="wizardSelectPaymentMethod('Chưa thanh toán', this)" style="justify-content:center; padding:8px;">
                         <i class="fa-solid fa-clock"></i> Thu sau
                       </button>
                     </div>
 
                     <!-- Mức thu -->
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
-                      <span style="color:#64748b;">Số tiền thu ngay:</span>
-                      <div style="display:flex; gap:6px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px;">
+                      <span style="color:#64748b; font-weight:600;">Số tiền thu ngay:</span>
+                      <div style="display:flex; gap:8px;">
                         <button type="button" class="wizard-quick-duration-btn active" id="btnPayFull" onclick="wizardSetPayRate(1.0, this)">Thu đủ 100%</button>
                         <button type="button" class="wizard-quick-duration-btn" id="btnPayDeposit" onclick="wizardSetPayRate(0.3, this)">Cọc 30%</button>
                         <button type="button" class="wizard-quick-duration-btn" id="btnPayZero" onclick="wizardSetPayRate(0, this)">0 đ</button>
@@ -1160,18 +1585,18 @@
                   </div>
 
                   <!-- TÙY CHỌN TIẾP NHẬN BÀN GIAO SÂN NGAY -->
-                  <div style="background:#ecfdf5; border:1.5px solid #6ee7b7; border-radius:12px; padding:12px 14px;">
-                    <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
-                      <input type="checkbox" id="wizAutoCheckInCheckbox" checked style="width:18px; height:18px; accent-color:#059669; margin-top:2px;">
+                  <div style="background:#ecfdf5; border:2px solid #6ee7b7; border-radius:14px; padding:16px 18px; box-shadow:0 4px 14px rgba(5,150,105,0.06);">
+                    <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;">
+                      <input type="checkbox" id="wizAutoCheckInCheckbox" checked style="width:20px; height:20px; accent-color:#059669; margin-top:2px;">
                       <div>
-                        <strong style="font-size:13px; color:#064e3b; display:block;">Khách vào nhận sân ngay (Bắt đầu tính giờ thi đấu)</strong>
-                        <span style="font-size:11.5px; color:#047857;">Hệ thống tự động kích hoạt trạng thái "Đang sử dụng". Khách xách vợt vào thi đấu ngay mà không cần thêm bước duyệt hay check-in.</span>
+                        <strong style="font-size:14px; color:#064e3b; display:block;">Khách vào nhận sân ngay (Bắt đầu tính giờ thi đấu)</strong>
+                        <span style="font-size:12px; color:#047857; margin-top:2px; display:block;">Hệ thống tự động kích hoạt trạng thái "Đang sử dụng". Khách xách vợt vào thi đấu ngay mà không cần thêm bước duyệt hay check-in thủ công.</span>
                       </div>
                     </label>
 
-                    <div style="margin-top:8px; border-top:1px dashed #a7f3d0; padding-top:6px;">
-                      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:#065f46;">
-                        <input type="checkbox" id="wizAutoPrintCheckbox" style="accent-color:#059669;">
+                    <div style="margin-top:12px; border-top:1px dashed #a7f3d0; padding-top:10px;">
+                      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12.5px; color:#065f46; font-weight:600;">
+                        <input type="checkbox" id="wizAutoPrintCheckbox" style="accent-color:#059669; width:16px; height:16px;">
                         <span>In phiếu xác nhận biên nhận ngay sau khi hoàn tất</span>
                       </label>
                     </div>
@@ -1184,21 +1609,21 @@
           </div>
 
           <!-- Wizard Footer Controls -->
-          <div class="modal-foot" style="padding: 12px 24px; background: #fafbfc; border-top: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+          <div class="modal-foot" style="padding: 16px 36px; background: #ffffff; border-top: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; box-shadow:0 -2px 10px rgba(0,0,0,0.03);">
             <div>
-              <button type="button" id="wizBtnBack" class="btn" onclick="wizardGoPrev()" style="display:none;">
+              <button type="button" id="wizBtnBack" class="btn" onclick="wizardGoPrev()" style="display:none; padding:10px 20px; font-weight:700;">
                 <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
               </button>
             </div>
-            <div style="display:flex; gap:10px;">
-              <button type="button" class="btn" onclick="closeModal('modalReceptionistWizard')">Hủy bỏ</button>
-              <button type="button" id="wizBtnSkipFnb" class="btn" onclick="wizardSkipFnb()" style="display:none; background:#f1f5f9; color:#475569;">
+            <div style="display:flex; gap:12px;">
+              <button type="button" class="btn" onclick="closeModal('modalReceptionistWizard')" style="padding:10px 20px; font-weight:600;">Hủy bỏ</button>
+              <button type="button" id="wizBtnSkipFnb" class="btn" onclick="wizardSkipFnb()" style="display:none; background:#f1f5f9; color:#475569; padding:10px 20px; font-weight:700;">
                 Bỏ qua F&B
               </button>
-              <button type="button" id="wizBtnNext" class="btn primary" onclick="wizardGoNext()" style="font-weight:800; min-width:140px;">
+              <button type="button" id="wizBtnNext" class="btn primary" onclick="wizardGoNext()" style="font-weight:800; min-width:160px; padding:10px 22px; font-size:14px;">
                 Tiếp tục <i class="fa-solid fa-arrow-right ms-1"></i>
               </button>
-              <button type="button" id="wizBtnSubmit" class="btn" onclick="wizardSubmitBooking()" style="display:none; background:#059669; color:#fff; font-weight:800; min-width:170px; box-shadow:0 2px 10px rgba(5,150,105,0.3);">
+              <button type="button" id="wizBtnSubmit" class="btn" onclick="wizardSubmitBooking()" style="display:none; background:#059669; color:#fff; font-weight:800; min-width:200px; padding:10px 24px; font-size:14px; box-shadow:0 3px 12px rgba(5,150,105,0.35);">
                 <i class="fa-solid fa-check-double me-1"></i> Bàn Giao Sân (F9)
               </button>
             </div>
@@ -1406,78 +1831,118 @@
             </form>
           </div>
 
-          <!-- Timeline Grid Matrix -->
-          <div class="timeline-matrix">
-            <div class="timeline-grid">
-              <!-- Header Row (18 Slots + SÂN + THAO TÁC = 20 Columns) -->
-              <div class="grid-cell grid-time" style="font-weight:900;">SÂN \ KHUNG GIỜ</div>
-              <div class="grid-cell grid-time">05:00</div>
-              <div class="grid-cell grid-time">06:00</div>
-              <div class="grid-cell grid-time">07:00</div>
-              <div class="grid-cell grid-time">08:00</div>
-              <div class="grid-cell grid-time">09:00</div>
-              <div class="grid-cell grid-time">10:00</div>
-              <div class="grid-cell grid-time">11:00</div>
-              <div class="grid-cell grid-time">12:00</div>
-              <div class="grid-cell grid-time">13:00</div>
-              <div class="grid-cell grid-time">14:00</div>
-              <div class="grid-cell grid-time">15:00</div>
-              <div class="grid-cell grid-time">16:00</div>
-              <div class="grid-cell grid-time">17:00</div>
-              <div class="grid-cell grid-time">18:00</div>
-              <div class="grid-cell grid-time">19:00</div>
-              <div class="grid-cell grid-time">20:00</div>
-              <div class="grid-cell grid-time">21:00</div>
-              <div class="grid-cell grid-time">22:00</div>
-              <div class="grid-cell grid-time">THAO TÁC</div>
-
-              <!-- Empty State -->
-              <div th:if="${(timeline == null and timelineCourts == null) or (#lists.isEmpty(timeline != null ? timeline : timelineCourts))}"
-                   style="grid-column: 1 / -1; text-align:center; padding: 40px; background:#fff; border-radius:8px; color:var(--gray-500);">
-                <i class="fa-solid fa-calendar-xmark" style="font-size:32px; color:var(--gray-400); margin-bottom:10px; display:block;"></i>
-                Không tìm thấy sân thể thao phù hợp cho bộ lọc hiện tại
+          <!-- Timeline Split Layout: Cột sân bên trái hoàn toàn tách biệt ngoài khung giờ, không bị đè hay dính vào các ô giờ -->
+          <div class="timeline-split-wrapper">
+            <!-- CỘT 1: BẢNG SÂN (CỐ ĐỊNH HOÀN TOÀN BÊN TRÁI, NẰM NGOÀI KHUNG CUỘN GIỜ) -->
+            <div class="timeline-court-pane">
+              <div class="timeline-court-header">
+                <i class="fa-solid fa-layer-group me-1"></i> SÂN THỂ THAO
               </div>
-
-              <!-- Court Rows -->
               <th:block th:each="row : ${timeline != null ? timeline : timelineCourts}">
-                <!-- Court Name Header -->
-                <div class="grid-cell grid-court">
-                  <span th:text="${row.courtName}">Sân 1</span>
-                  <small style="font-size:9.5px; opacity:0.8; font-weight:600;" th:text="${row.sportName}">Bóng đá</small>
-                </div>
-
-                <!-- 16 Time Slots -->
-                <th:block th:each="slot : ${row.slots}">
-                  <div class="grid-cell"
-                       th:classappend="${slot.cssClass}"
-                       th:data-court-id="${row.courtId}"
-                       th:data-time="${slot.time}"
-                       th:data-booking-id="${slot.bookingId}"
-                       onclick="handleSlotClick(this)"
-                       th:title="${slot.status == 'FREE' ? 'Nhấn để đặt sân lúc ' + slot.time : (slot.customerName != null ? slot.customerName + ' (' + slot.statusLabel + ')' : slot.statusLabel)}">
-                    <span th:if="${slot.status == 'FREE'}" style="opacity:0.6;"><i class="fa-solid fa-plus"></i></span>
-                    <span th:if="${slot.status == 'BUSY'}" style="font-size:10px;"><i class="fa-solid fa-lock"></i> Đã đặt</span>
-                    <span th:if="${slot.status == 'IN_USE'}" style="font-size:10px;"><i class="fa-solid fa-play"></i> Đang dùng</span>
-                    <span th:if="${slot.status == 'MAINT'}" style="font-size:10px;"><i class="fa-solid fa-wrench"></i> Bảo trì</span>
-                  </div>
-                </th:block>
-
-                <!-- Quick Action Buttons -->
-                <div class="grid-cell" style="background:#f8fafc; display:flex; gap:4px; align-items:center; justify-content:center;">
-                  <button type="button" class="btn btn-sm btn-primary" style="font-size:10.5px; padding:0 8px; height:28px;"
-                          th:data-court-id="${row.courtId}"
-                          onclick="quickBookCourt(this.getAttribute('data-court-id'))">
-                    Đặt sân
-                  </button>
-                  <button type="button" class="btn btn-sm" style="font-size:10.5px; padding:0 6px; height:28px; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;"
-                          th:data-court-id="${row.courtId}"
-                          th:data-court-name="${row.courtName}"
-                          onclick="openQuickPosForCourt(this)"
-                          title="Gọi đồ ăn/thức uống nhanh cho sân này">
-                    <i class="fa-solid fa-utensils"></i> F&B
-                  </button>
+                <div class="timeline-court-row" th:title="${row.courtName} + ' (' + ${row.sportName} + ')'">
+                  <span class="court-title" th:text="${row.courtName}">Sân 1</span>
+                  <small class="court-sub" th:text="${row.sportName}">Bóng đá</small>
                 </div>
               </th:block>
+            </div>
+
+            <!-- CỘT 2: KHUNG CÁC Ô KHUNG GIỜ (CHỈ CUỘN NỘI BỘ TRONG KHUNG NÀY) -->
+            <div class="timeline-slots-pane">
+              <div class="timeline-slots-inner">
+                <!-- Hàng khung giờ tiêu đề (36 ô) -->
+                <div class="timeline-slots-header">
+                  <div class="grid-cell grid-time">05:00</div>
+                  <div class="grid-cell grid-time">05:30</div>
+                  <div class="grid-cell grid-time">06:00</div>
+                  <div class="grid-cell grid-time">06:30</div>
+                  <div class="grid-cell grid-time">07:00</div>
+                  <div class="grid-cell grid-time">07:30</div>
+                  <div class="grid-cell grid-time">08:00</div>
+                  <div class="grid-cell grid-time">08:30</div>
+                  <div class="grid-cell grid-time">09:00</div>
+                  <div class="grid-cell grid-time">09:30</div>
+                  <div class="grid-cell grid-time">10:00</div>
+                  <div class="grid-cell grid-time">10:30</div>
+                  <div class="grid-cell grid-time">11:00</div>
+                  <div class="grid-cell grid-time">11:30</div>
+                  <div class="grid-cell grid-time">12:00</div>
+                  <div class="grid-cell grid-time">12:30</div>
+                  <div class="grid-cell grid-time">13:00</div>
+                  <div class="grid-cell grid-time">13:30</div>
+                  <div class="grid-cell grid-time">14:00</div>
+                  <div class="grid-cell grid-time">14:30</div>
+                  <div class="grid-cell grid-time">15:00</div>
+                  <div class="grid-cell grid-time">15:30</div>
+                  <div class="grid-cell grid-time">16:00</div>
+                  <div class="grid-cell grid-time">16:30</div>
+                  <div class="grid-cell grid-time">17:00</div>
+                  <div class="grid-cell grid-time">17:30</div>
+                  <div class="grid-cell grid-time">18:00</div>
+                  <div class="grid-cell grid-time">18:30</div>
+                  <div class="grid-cell grid-time">19:00</div>
+                  <div class="grid-cell grid-time">19:30</div>
+                  <div class="grid-cell grid-time">20:00</div>
+                  <div class="grid-cell grid-time">20:30</div>
+                  <div class="grid-cell grid-time">21:00</div>
+                  <div class="grid-cell grid-time">21:30</div>
+                  <div class="grid-cell grid-time">22:00</div>
+                  <div class="grid-cell grid-time">22:30</div>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${(timeline == null and timelineCourts == null) or (#lists.isEmpty(timeline != null ? timeline : timelineCourts))}"
+                     style="text-align:center; padding: 40px; background:#fff; border-radius:8px; color:var(--gray-500); width:100%;">
+                  <i class="fa-solid fa-calendar-xmark" style="font-size:32px; color:var(--gray-400); margin-bottom:10px; display:block;"></i>
+                  Không tìm thấy sân thể thao phù hợp cho bộ lọc hiện tại
+                </div>
+
+                <!-- Các hàng ô giờ của từng sân (mỗi hàng cao 60px, chuẩn 1-1 với cột sân bên trái) -->
+                <th:block th:each="row : ${timeline != null ? timeline : timelineCourts}">
+                  <div class="timeline-slots-row">
+                    <th:block th:each="slot : ${row.slots}">
+                      <th:block th:unless="${slot.isSpanContinuation}">
+                        <!-- 1. Ô trống 30 phút -->
+                        <div th:if="${slot.status == 'FREE'}"
+                             class="grid-cell slot-free"
+                             th:data-court-id="${row.courtId}"
+                             th:data-time="${slot.time}"
+                             onclick="handleSlotClick(this)"
+                             th:title="'Nhấn để đặt sân lúc ' + ${slot.time}">
+                          <i class="fa-solid fa-plus" style="opacity:0.4; font-size:11px;"></i>
+                        </div>
+
+                        <!-- 2. Ô chữ nhật dài trải dài qua các khung giờ đã đặt: Hiển thị Mã KH - Tên KH -->
+                        <div th:if="${slot.status == 'IN_USE' or slot.status == 'BUSY'}"
+                             class="grid-cell slot-booked-span"
+                             th:classappend="${slot.cssClass}"
+                             th:style="'grid-column: span ' + ${slot.span} + ';'"
+                             th:data-booking-id="${slot.bookingId}"
+                             onclick="openDetailModal(this.getAttribute('data-booking-id'))"
+                             th:title="'Mã: #' + ${slot.bookingId} + ' | Khách: ' + ${slot.customerName} + (${slot.customerPhone != null ? ' (' + slot.customerPhone + ')' : ''}) + ' | Khung giờ: ' + ${slot.timeRange} + ' | Trạng thái: ' + ${slot.statusLabel} + ' • Bấm để xem chi tiết'">
+                          <div class="span-inner">
+                            <div class="span-cust-name">
+                              <i th:class="${slot.status == 'IN_USE' ? 'fa-solid fa-play me-1' : 'fa-solid fa-check me-1'}"></i>
+                              <span th:text="${slot.customerDisplayName}">KH002 - Thụy</span>
+                            </div>
+                            <div class="span-time" th:text="${slot.timeRange}">06:00 - 07:30</div>
+                          </div>
+                        </div>
+
+                        <!-- 3. Bảo trì sân -->
+                        <div th:if="${slot.status == 'MAINT'}"
+                             class="grid-cell slot-maint"
+                             th:style="'grid-column: span ' + ${slot.span} + ';'"
+                             th:title="'Bảo trì sân: ' + ${slot.note}">
+                          <div class="span-inner">
+                            <div class="span-cust-name"><i class="fa-solid fa-wrench me-1"></i> Bảo trì</div>
+                            <div class="span-time" th:if="${slot.note != null}" th:text="${slot.note}">Bảo trì</div>
+                          </div>
+                        </div>
+                      </th:block>
+                    </th:block>
+                  </div>
+                </th:block>
+              </div>
             </div>
           </div>
         </div>
@@ -1571,6 +2036,116 @@
       <div class="modal-foot">
         <button type="button" class="btn" onclick="closeModal('modalExtend')">Hủy</button>
         <button type="submit" class="btn primary"><i class="fa-solid fa-clock"></i> Xác nhận gia hạn</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 2.5: XÁC NHẬN KHÁCH TRẢ SÂN & QUYẾT TOÁN (UC22) -->
+<div class="modal-overlay" id="modalCheckout">
+  <div class="modal-card" style="max-width: 580px; width: 95%;">
+    <div class="modal-head" style="border-bottom: 1px solid #e2e8f0; padding: 16px 20px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:38px; height:38px; border-radius:10px; background:#ecfdf5; color:#057a44; display:flex; align-items:center; justify-content:center; font-size:18px;">
+          <i class="fa-solid fa-flag-checkered"></i>
+        </div>
+        <div>
+          <h3 style="margin:0; font-size:16.5px; font-weight:800; color:#0f172a;">Xác Nhận Khách Trả Sân (Check-out)</h3>
+          <p style="margin:2px 0 0 0; font-size:12px; color:#64748b;">Nghiệm thu giờ chơi, quyết toán dịch vụ và thu tiền còn lại</p>
+        </div>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('modalCheckout')">&times;</button>
+    </div>
+    <form id="formCheckout" method="post" action="">
+      <div class="modal-body" style="padding: 18px 22px;">
+        <!-- Card thông tin khách & sân -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:12.5px; color:#64748b;">Phiếu đặt sân:</span>
+            <span class="badge" style="background:#057a44; color:#fff; font-size:13px; font-weight:700; padding:4px 10px; border-radius:6px;" id="chkBookingIdTxt">#DS000</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;">
+            <span style="color:#64748b;">Khách hàng:</span>
+            <strong id="chkCustomerName" style="color:#0f172a;"></strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;">
+            <span style="color:#64748b;">Số điện thoại:</span>
+            <span id="chkCustomerPhone" style="font-weight:600; color:#334155;"></span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px;">
+            <span style="color:#64748b;">Sân & Khung giờ:</span>
+            <span id="chkCourtTime" style="font-weight:700; color:#057a44;"></span>
+          </div>
+        </div>
+
+        <!-- Bảng kê tài chính chi tiết -->
+        <div style="background:#fff; border:1px solid #cbd5e1; border-radius:12px; padding:16px; margin-bottom:16px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+          <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#64748b; letter-spacing:0.5px; margin-bottom:10px;">
+            <i class="fa-solid fa-receipt text-success"></i> Bảng kê quyết toán chi phí
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+            <span style="color:#475569;">Tiền thuê sân:</span>
+            <span id="chkCourtAmount" style="font-weight:600;">0 đ</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;">
+            <span style="color:#475569;">Dịch vụ F&B / Phụ kiện:</span>
+            <span id="chkServiceAmount" style="font-weight:600; color:#d97706;">0 đ</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:6px; padding-top:6px; border-top:1px dashed #e2e8f0;">
+            <span style="font-weight:700; color:#0f172a;">Tổng tiền phiếu:</span>
+            <b id="chkTotalAmount" style="font-size:14px; color:#0f172a;">0 đ</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:8px;">
+            <span style="color:#057a44;"><i class="fa-solid fa-check-circle"></i> Đã thanh toán / Cọc:</span>
+            <span id="chkPaidAmount" style="color:#057a44; font-weight:700;">- 0 đ</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:#ecfdf5; border-radius:8px; border:1px solid #a7f3d0;">
+            <div>
+              <div style="font-size:13.5px; font-weight:800; color:#065f46;">SỐ TIỀN CẦN THU:</div>
+              <div style="font-size:11px; color:#047857;" id="chkRemainingSubtext">Khách cần thanh toán khi trả sân</div>
+            </div>
+            <div style="font-size:20px; font-weight:900; color:#057a44;" id="chkRemainingAmount">0 đ</div>
+          </div>
+        </div>
+
+        <!-- Phương thức thanh toán phần còn lại (nếu có) -->
+        <div id="chkPaymentMethodWrap" style="margin-bottom:14px;">
+          <label style="display:block; font-size:12.5px; font-weight:700; color:#334155; margin-bottom:6px;">
+            Hình thức thu tiền phần còn lại:
+          </label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <label style="display:flex; align-items:center; gap:8px; border:1.5px solid #cbd5e1; padding:9px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;" id="lblPayCash">
+              <input type="radio" name="paymentMethod" value="Tiền mặt tại quầy" checked onchange="toggleCheckoutPaymentMethod('cash')">
+              <i class="fa-solid fa-money-bill-wave text-success"></i> Tiền mặt tại quầy
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; border:1.5px solid #cbd5e1; padding:9px 12px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600;" id="lblPayQr">
+              <input type="radio" name="paymentMethod" value="Chuyển khoản VietQR" onchange="toggleCheckoutPaymentMethod('qr')">
+              <i class="fa-solid fa-qrcode text-primary"></i> Quét VietQR
+            </label>
+          </div>
+          <!-- Box hiển thị mã VietQR nếu chọn Chuyển khoản -->
+          <div id="chkQrBox" style="display:none; margin-top:12px; text-align:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
+            <div style="font-size:12px; color:#64748b; margin-bottom:6px;">Quét mã VietQR chuyển khoản phần còn lại:</div>
+            <img id="chkVietQrImg" src="" alt="VietQR" style="max-width:180px; height:auto; border-radius:8px; border:1px solid #cbd5e1; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+            <div style="font-size:11.5px; color:#057a44; font-weight:700; margin-top:6px;" id="chkQrAmountTxt">0 đ</div>
+          </div>
+        </div>
+
+        <div class="field mb-3" style="margin-bottom:12px;">
+          <label style="font-size:12.5px; font-weight:600; color:#334155; margin-bottom:4px; display:block;">Ghi chú khi trả sân (tùy chọn):</label>
+          <input type="text" name="note" class="form-control" style="width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:7px 10px; font-size:12.5px;" placeholder="Sân và phụ kiện hoàn trả nguyên vẹn, không hư hại...">
+        </div>
+
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 12px; font-size:12px; color:#166534; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-circle-check fs-6 text-success"></i>
+          <span>Khi bấm xác nhận, sân sẽ tự động chuyển về trạng thái <b>"Hoạt động"</b> sẵn sàng đón lượt khách tiếp theo.</span>
+        </div>
+      </div>
+      <div class="modal-foot" style="padding:14px 22px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn" onclick="closeModal('modalCheckout')" style="padding:8px 16px; border-radius:8px; font-weight:600;">Hủy bỏ</button>
+        <button type="submit" class="btn primary" style="background:#057a44; padding:8px 20px; border-radius:8px; font-weight:700; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-check-double"></i> Xác nhận trả sân & Hoàn tất
+        </button>
       </div>
     </form>
   </div>
@@ -1904,6 +2479,9 @@
         <button type="button" class="btn" id="btnPosFromDetail" style="background:#059669; color:#fff; font-weight:700;" onclick="openPosFromCurrentDetail()" title="Gọi thêm nước uống, đồ ăn nhẹ, thuê vợt bóng cho phiếu này">
           <i class="fa-solid fa-utensils me-1"></i> Mua thêm F&B / Dịch vụ
         </button>
+        <button type="button" class="btn" id="btnCheckoutFromDetail" style="background:#6d28d9; color:#fff; font-weight:700; display:none;" onclick="openCheckoutFromCurrentDetail()" title="Tiến hành trả sân và quyết toán">
+          <i class="fa-solid fa-flag-checkered me-1"></i> Trả sân (Check-out)
+        </button>
       </div>
       <div style="display:flex; gap:8px;">
         <button type="button" class="btn" onclick="printReceipt()"><i class="fa-solid fa-print"></i> In phiếu</button>
@@ -1919,7 +2497,7 @@
 // Chuyển đổi giữa 2 View: Danh sách và Timeline
 function switchView(viewName) {
   const isSchedule = viewName === 'schedule';
-  document.getElementById('viewList').style.display = isSchedule ? 'none' : 'grid';
+  document.getElementById('viewList').style.display = isSchedule ? 'none' : 'block';
   document.getElementById('viewSchedule').style.display = isSchedule ? 'block' : 'none';
 
   document.getElementById('btnTabList').classList.toggle('active', !isSchedule);
@@ -1977,6 +2555,80 @@ function openExtendModal(btn) {
   document.getElementById('extNewEndTime').value = end;
 
   openModal('modalExtend');
+}
+
+// 2.5 Mở Modal Trả Sân & Quyết Toán (UC22)
+function openCheckoutModal(btn) {
+  const id = btn.getAttribute('data-id');
+  const customer = btn.getAttribute('data-customer') || 'Khách vãng lai';
+  const phone = btn.getAttribute('data-phone') || 'N/A';
+  const court = btn.getAttribute('data-court') || 'N/A';
+  const time = btn.getAttribute('data-time') || '';
+  const initialTotal = parseFloat(btn.getAttribute('data-total') || '0');
+  const initialPaid = parseFloat(btn.getAttribute('data-paid') || '0');
+
+  // Gán form action
+  document.getElementById('formCheckout').action = '/admin/bookings/checkout/' + encodeURIComponent(id);
+  document.getElementById('chkBookingIdTxt').innerText = '#' + id;
+  document.getElementById('chkCustomerName').innerText = customer;
+  document.getElementById('chkCustomerPhone').innerText = phone;
+  document.getElementById('chkCourtTime').innerText = court + (time ? ' • ' + time : '');
+
+  // Reset về tiền khởi điểm trong khi load detail chính xác nhất từ server
+  renderCheckoutAmounts(initialTotal, initialPaid, 0, id);
+
+  // Mở modal ngay tức thì để trải nghiệm mượt mà không độ trễ
+  openModal('modalCheckout');
+
+  // Gọi API lấy dữ liệu chi tiết mới nhất (bao gồm cả dịch vụ F&B phát sinh)
+  fetch('/admin/bookings/api/detail/' + encodeURIComponent(id))
+    .then(r => r.json())
+    .then(data => {
+      const total = Number(data.totalAmount || initialTotal);
+      const paid = Number(data.paidAmount || initialPaid);
+      const serviceAmt = Number(data.serviceAmount || 0);
+      renderCheckoutAmounts(total, paid, serviceAmt, id);
+    })
+    .catch(err => {
+      console.warn('Lỗi tải chi tiết quyết toán trả sân:', err);
+    });
+}
+
+function renderCheckoutAmounts(total, paid, serviceAmt, id) {
+  const courtAmt = Math.max(0, total - serviceAmt);
+  const remaining = Math.max(0, total - paid);
+
+  document.getElementById('chkCourtAmount').innerText = courtAmt.toLocaleString('vi-VN') + ' đ';
+  document.getElementById('chkServiceAmount').innerText = serviceAmt.toLocaleString('vi-VN') + ' đ';
+  document.getElementById('chkTotalAmount').innerText = total.toLocaleString('vi-VN') + ' đ';
+  document.getElementById('chkPaidAmount').innerText = '- ' + paid.toLocaleString('vi-VN') + ' đ';
+  document.getElementById('chkRemainingAmount').innerText = remaining.toLocaleString('vi-VN') + ' đ';
+
+  const payWrap = document.getElementById('chkPaymentMethodWrap');
+  const remSubtext = document.getElementById('chkRemainingSubtext');
+  if (remaining <= 0) {
+    payWrap.style.display = 'none';
+    remSubtext.innerText = 'Đã thanh toán đủ 100% - Không cần thu thêm tiền';
+    document.getElementById('chkRemainingAmount').style.color = '#057a44';
+  } else {
+    payWrap.style.display = 'block';
+    remSubtext.innerText = 'Khách cần thanh toán khi trả sân';
+    document.getElementById('chkRemainingAmount').style.color = '#b91c1c';
+
+    // Chuẩn bị mã VietQR
+    const vietQrUrl = "https://img.vietqr.io/image/970422-0901234567-compact2.jpg?amount=" + remaining + "&addInfo=SPORTHUB+TRASAN+" + encodeURIComponent(id) + "&accountName=SPORTHUB+UTE";
+    document.getElementById('chkVietQrImg').src = vietQrUrl;
+    document.getElementById('chkQrAmountTxt').innerText = remaining.toLocaleString('vi-VN') + ' đ';
+  }
+}
+
+function toggleCheckoutPaymentMethod(mode) {
+  const qrBox = document.getElementById('chkQrBox');
+  if (mode === 'qr') {
+    qrBox.style.display = 'block';
+  } else {
+    qrBox.style.display = 'none';
+  }
 }
 
 // 3. Mở Modal Hủy Phiếu (UC20)
@@ -2412,6 +3064,15 @@ function openDetailModal(bookingId) {
       document.getElementById('dtRemaining').innerText = remaining.toLocaleString('vi-VN') + ' đ';
       document.getElementById('dtStatus').innerText = data.status;
 
+      const btnChk = document.getElementById('btnCheckoutFromDetail');
+      if (btnChk) {
+        if (data.status === 'Đang sử dụng') {
+          btnChk.style.display = 'inline-block';
+        } else {
+          btnChk.style.display = 'none';
+        }
+      }
+
       // VietQR Dynamic Generation
       const vietQrUrl = "https://img.vietqr.io/image/970422-0901234567-compact2.jpg?amount=" + remaining + "&addInfo=SPORTHUB+" + encodeURIComponent(data.id) + "&accountName=SPORTHUB+UTE";
       document.getElementById('dtVietQrImg').src = vietQrUrl;
@@ -2472,6 +3133,25 @@ function openPosFromCurrentDetail() {
     }
   };
   openAddServiceModal(dummyBtn);
+}
+
+function openCheckoutFromCurrentDetail() {
+  if (!currentDetailBookingData) return;
+  closeModal('modalDetail');
+
+  const dummyBtn = {
+    getAttribute: function(attr) {
+      if (attr === 'data-id') return currentDetailBookingData.id;
+      if (attr === 'data-customer') return currentDetailBookingData.customerName;
+      if (attr === 'data-phone') return currentDetailBookingData.customerPhone;
+      if (attr === 'data-court') return currentDetailBookingData.courtName;
+      if (attr === 'data-time') return currentDetailBookingData.startTime + ' – ' + currentDetailBookingData.endTime;
+      if (attr === 'data-total') return currentDetailBookingData.totalAmount;
+      if (attr === 'data-paid') return currentDetailBookingData.paidAmount;
+      return null;
+    }
+  };
+  openCheckoutModal(dummyBtn);
 }
 
 function openQuickPosForCourt(btn) {
@@ -2635,6 +3315,11 @@ function handleReceptionQuickSearch(val) {
                     <i class="fa-solid fa-play me-1"></i> Nhận sân ngay
                   </button>
                 ` : ''}
+                ${b.status === 'Đang sử dụng' ? `
+                  <button type="button" class="btn btn-sm" onclick="receptionFastCheckOut('${b.id}', '${b.customerName}', '${b.customerPhone || ''}', '${b.courtName}', '${b.startTime} - ${b.endTime}', ${b.totalAmount || 0}, ${b.paidAmount || 0})" style="background:#6d28d9; color:#fff; font-weight:800; font-size:11.5px; padding:5px 10px; border-radius:6px; border:none; cursor:pointer;" title="Khách trả sân & quyết toán">
+                    <i class="fa-solid fa-flag-checkered me-1"></i> Trả sân
+                  </button>
+                ` : ''}
                 <button type="button" class="btn btn-sm" onclick="receptionOpenPos('${b.id}', '${b.customerName}', '${b.courtName}')" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-weight:700; font-size:11.5px; padding:5px 9px; border-radius:6px;" title="Gọi thêm nước cho phiếu này">
                   <i class="fa-solid fa-mug-hot"></i> + Nước
                 </button>
@@ -2693,6 +3378,23 @@ function receptionFastCheckIn(bookingId, btnEl) {
       alert('Lỗi nhận sân: ' + err);
       if (btnEl) btnEl.disabled = false;
     });
+}
+
+function receptionFastCheckOut(id, customer, phone, court, time, total, paid) {
+  clearReceptionSearch();
+  const dummyBtn = {
+    getAttribute: function(attr) {
+      if (attr === 'data-id') return id;
+      if (attr === 'data-customer') return customer;
+      if (attr === 'data-phone') return phone;
+      if (attr === 'data-court') return court;
+      if (attr === 'data-time') return time;
+      if (attr === 'data-total') return total;
+      if (attr === 'data-paid') return paid;
+      return null;
+    }
+  };
+  openCheckoutModal(dummyBtn);
 }
 
 function receptionOpenPos(id, cust, court) {
@@ -2756,8 +3458,17 @@ function openReceptionistWizard() {
   document.getElementById('wizCourtPriceDisplay').innerText = '0 đ';
   wizardFilterSport('ALL');
 
-  // Step 3 reset
+  // Step 3 (F&B) reset
   document.querySelectorAll('#wizFnbCatalogGrid .wiz-fnb-item-qty').forEach(q => q.innerText = '0');
+  document.querySelectorAll('#wizFnbCatalogGrid .wiz-fnb-card').forEach(c => {
+    c.classList.remove('has-qty');
+    c.style.display = 'flex';
+  });
+  const searchInput = document.getElementById('wizFnbSearchInput');
+  if (searchInput) searchInput.value = '';
+  filterWizFnbCategory('ALL');
+  const countBadge = document.getElementById('wizFnbItemCount');
+  if (countBadge) countBadge.innerText = '0 món';
   document.getElementById('wizFnbTotalDisplay').innerText = '0 đ';
 
   // Step 4 reset
@@ -2765,6 +3476,7 @@ function openReceptionistWizard() {
   if (promoSel) promoSel.selectedIndex = 0;
   document.getElementById('wizAutoCheckInCheckbox').checked = true;
 
+  updatePosLiveClock();
   goToWizardStep(1);
   openModal('modalReceptionistWizard');
 
@@ -2845,9 +3557,40 @@ function wizardGoPrev() {
   }
 }
 
+function togglePosFullscreen() {
+  const modal = document.getElementById('modalReceptionistWizard');
+  if (!modal) return;
+  const isWindowed = modal.classList.toggle('windowed-mode');
+  const icon = document.getElementById('posFsIcon');
+  const text = document.getElementById('posFsText');
+  if (isWindowed) {
+    if (icon) icon.className = 'fa-solid fa-expand';
+    if (text) text.innerText = 'Toàn màn hình';
+  } else {
+    if (icon) icon.className = 'fa-solid fa-compress';
+    if (text) text.innerText = 'Cửa sổ nhỏ';
+  }
+}
+
+function updatePosLiveClock() {
+  const el = document.getElementById('posLiveClock');
+  if (!el) return;
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const mo = String(now.getMonth() + 1).padStart(2, '0');
+  const y = now.getFullYear();
+  el.innerText = `${h}:${m}:${s} - ${d}/${mo}/${y}`;
+}
+
 function wizardSkipFnb() {
   wizFnbItems = {};
   document.querySelectorAll('#wizFnbCatalogGrid .wiz-fnb-item-qty').forEach(q => q.innerText = '0');
+  document.querySelectorAll('#wizFnbCatalogGrid .wiz-fnb-card').forEach(c => c.classList.remove('has-qty'));
+  const countBadge = document.getElementById('wizFnbItemCount');
+  if (countBadge) countBadge.innerText = '0 món';
   document.getElementById('wizFnbTotalDisplay').innerText = '0 đ';
   goToWizardStep(4);
 }
@@ -3057,7 +3800,39 @@ function wizardTriggerPriceEstimate() {
   });
 }
 
-// STEP 3 LOGIC (F&B)
+// STEP 3 LOGIC (F&B CHUYÊN NGHIỆP)
+let wizCurrentFnbCategory = 'ALL';
+
+function filterWizFnbCategory(cat, btnEl) {
+  wizCurrentFnbCategory = cat || 'ALL';
+  if (btnEl) {
+    document.querySelectorAll('#wizFnbCategoryTabs .pos-fnb-tab-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+  }
+  applyWizFnbFilters();
+}
+
+function filterWizFnbSearch(query) {
+  applyWizFnbFilters();
+}
+
+function applyWizFnbFilters() {
+  const searchInput = document.getElementById('wizFnbSearchInput');
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const cards = document.querySelectorAll('#wizFnbCatalogGrid .wiz-fnb-card');
+
+  cards.forEach(card => {
+    const cat = card.getAttribute('data-service-cat') || '';
+    const name = (card.getAttribute('data-service-name') || '').toLowerCase();
+    const id = (card.getAttribute('data-service-id') || '').toLowerCase();
+
+    const matchCat = (wizCurrentFnbCategory === 'ALL' || cat === wizCurrentFnbCategory);
+    const matchSearch = (!query || name.includes(query) || id.includes(query) || cat.toLowerCase().includes(query));
+
+    card.style.display = (matchCat && matchSearch) ? 'flex' : 'none';
+  });
+}
+
 function wizardChangeFnbQty(btnEl, delta) {
   const card = btnEl.closest('.wiz-fnb-card');
   const qtyEl = card.querySelector('.wiz-fnb-item-qty');
@@ -3077,16 +3852,22 @@ function wizardChangeFnbQty(btnEl, delta) {
   qtyEl.innerText = currentQty;
 
   if (currentQty > 0) {
+    card.classList.add('has-qty');
     wizFnbItems[sId] = { id: sId, name: sName, price: sPrice, unit: sUnit, qty: currentQty };
   } else {
+    card.classList.remove('has-qty');
     delete wizFnbItems[sId];
   }
 
-  // Recalculate F&B total
+  // Recalculate F&B total and items count
   let fnbTotal = 0;
+  let fnbCount = 0;
   for (let k in wizFnbItems) {
     fnbTotal += wizFnbItems[k].price * wizFnbItems[k].qty;
+    fnbCount += wizFnbItems[k].qty;
   }
+  const countBadge = document.getElementById('wizFnbItemCount');
+  if (countBadge) countBadge.innerText = fnbCount + ' món';
   document.getElementById('wizFnbTotalDisplay').innerText = fnbTotal.toLocaleString('vi-VN') + ' đ';
 }
 
@@ -3303,12 +4084,18 @@ function quickBookCourt(courtId) {
 // Click vào Timeline Slot
 function handleSlotClick(el) {
   const isFree = el.classList.contains('slot-free');
-  const isBusy = el.classList.contains('slot-busy') || el.classList.contains('slot-inuse');
+  const isBusy = el.classList.contains('slot-busy') || el.classList.contains('slot-inuse') || el.classList.contains('slot-booked-span');
   const bookingId = el.getAttribute('data-booking-id');
 
   if (isBusy && bookingId) {
     openDetailModal(bookingId);
   } else if (isFree) {
+    const isOperatorOnly = document.body.getAttribute('data-role') === 'ROLE_OPERATOR';
+    if (isOperatorOnly) {
+      alert('Tài khoản Kỹ thuật/Vận hành chỉ kiểm tra khung giờ sân trống để bảo dưỡng cơ sở vật chất. Vui lòng liên hệ Lễ tân để lập phiếu đặt sân.');
+      return;
+    }
+
     const courtId = el.getAttribute('data-court-id');
     const time = el.getAttribute('data-time');
 
@@ -3319,8 +4106,11 @@ function handleSlotClick(el) {
     }
     if (time) {
       document.getElementById('wizStartTime').value = time;
-      const h = parseInt(time.split(':')[0], 10) + 1;
-      document.getElementById('wizEndTime').value = String(h).padStart(2, '0') + ':00';
+      const parts = time.split(':');
+      const h = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const endH = h + 1;
+      document.getElementById('wizEndTime').value = String(endH).padStart(2, '0') + ':' + String(m).padStart(2, '0');
     }
     wizardTriggerPriceEstimate();
   }
@@ -3332,6 +4122,13 @@ window.addEventListener('DOMContentLoaded', () => {
   if (urlParams.get('view') === 'schedule' || window.location.hash === '#lich-san') {
     switchView('schedule');
   }
+  if (urlParams.get('view') === 'pos' || window.location.hash === '#pos') {
+    openReceptionistWizard();
+  }
+
+  // Initialize POS live clock
+  updatePosLiveClock();
+  setInterval(updatePosLiveClock, 1000);
 
   // Auto-open modal if editing
   const bookingIdVal = document.getElementById('bookingIdInput') ? document.getElementById('bookingIdInput').value : '';
@@ -3339,9 +4136,10 @@ window.addEventListener('DOMContentLoaded', () => {
     openModal('modalBooking');
   }
 
-  // Backdrop click listener to close modals
+  // Backdrop click listener to close modals (exclude fullscreen workstation)
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
+      if (overlay.id === 'modalReceptionistWizard') return;
       if (e.target === overlay) overlay.classList.remove('active');
     });
   });

@@ -71,6 +71,14 @@ public class PriceServiceImpl implements PriceService {
             throw new IllegalArgumentException("Ngày bắt đầu không được sau ngày kết thúc!");
         }
 
+        if (dto.getDetails() != null) {
+            for (PriceDTO.DetailDTO detailDTO : dto.getDetails()) {
+                if (detailDTO.getPriceAmount() != null && detailDTO.getPriceAmount().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                    throw new IllegalArgumentException("Đơn giá thuê sân phải là số dương lớn hơn 0");
+                }
+            }
+        }
+
         Court court = courtRepository.findById(dto.getCourtId())
                 .orElseThrow(() -> new IllegalArgumentException("Sân không tồn tại"));
 
@@ -108,6 +116,14 @@ public class PriceServiceImpl implements PriceService {
 
     @Override
     public void deletePrice(String id) {
+        Price price = priceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Bảng giá không tồn tại"));
+        java.time.LocalDate today = java.time.LocalDate.now();
+        boolean isActive = (price.getFromDate() == null || !price.getFromDate().isAfter(today)) &&
+                           (price.getToDate() == null || !price.getToDate().isBefore(today));
+        if (isActive) {
+            throw new IllegalArgumentException("Không thể xóa bảng giá đang kích hoạt, chỉ có thể tạo bảng giá mới thay thế!");
+        }
         priceRepository.deleteById(id);
     }
 }

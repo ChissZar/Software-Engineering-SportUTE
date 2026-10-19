@@ -11,6 +11,7 @@ import vn.edu.ute.sportute.dto.request.LoginRequest;
 import vn.edu.ute.sportute.dto.request.RegisterRequest;
 import vn.edu.ute.sportute.dto.request.ResetPasswordRequest;
 import vn.edu.ute.sportute.dto.request.VerifyOtpRequest;
+import vn.edu.ute.sportute.entity.Customer;
 import vn.edu.ute.sportute.enums.OtpType;
 import vn.edu.ute.sportute.repository.AccountRepository;
 import vn.edu.ute.sportute.repository.CustomerRepository;
@@ -20,6 +21,7 @@ import vn.edu.ute.sportute.service.OtpService;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -83,9 +85,22 @@ public class AuthController {
             result.rejectValue("email", "error.email", "Địa chỉ email này đã được đăng ký tài khoản!");
             return "auth/register";
         }
-        if (customerRepository.existsByPhone(request.getPhone())) {
-            result.rejectValue("phone", "error.phone", "Số điện thoại này đã được sử dụng!");
+
+        // Kiểm tra số điện thoại:
+        // Nếu số điện thoại đã thuộc về một khách hàng ĐÃ CÓ tài khoản thì chặn lại
+        Optional<Customer> existingByPhone = customerRepository.findByPhone(request.getPhone());
+        if (existingByPhone.isPresent() && existingByPhone.get().getAccount() != null) {
+            result.rejectValue("phone", "error.phone", "Số điện thoại này đã được liên kết với một tài khoản đang hoạt động! Vui lòng đăng nhập hoặc dùng chức năng quên mật khẩu.");
             return "auth/register";
+        }
+
+        // Kiểm tra email trong hồ sơ khách hàng: nếu email đã thuộc về một khách hàng khác thì báo lỗi
+        Optional<Customer> existingByEmail = customerRepository.findByEmail(request.getEmail());
+        if (existingByEmail.isPresent()) {
+            if (existingByPhone.isEmpty() || !existingByEmail.get().getId().equals(existingByPhone.get().getId())) {
+                result.rejectValue("email", "error.email", "Địa chỉ email này đã được sử dụng bởi một khách hàng khác!");
+                return "auth/register";
+            }
         }
 
         try {
@@ -157,7 +172,8 @@ public class AuthController {
         try {
             authService.registerCustomer(pending);
             otpService.clearOtp(email, OtpType.REGISTER);
-            redirectAttributes.addFlashAttribute("successMessage", "Xác thực OTP thành công! Tài khoản của bạn đã được kích hoạt. Vui lòng đăng nhập.");
+            redirectAttributes.addFlashAttribute("successMessage", 
+                    "Xác thực OTP thành công! Tài khoản của bạn đã được kích hoạt (lịch sử đặt sân tại quầy trước đây nếu có đã được đồng bộ tự động). Vui lòng đăng nhập.");
             return "redirect:/login";
         } catch (Exception e) {
             result.reject("registerError", "Lỗi tạo tài khoản: " + e.getMessage());

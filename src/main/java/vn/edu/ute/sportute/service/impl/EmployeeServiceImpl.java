@@ -132,14 +132,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPosition(dto.getPosition() != null ? dto.getPosition().trim() : "Lễ tân");
         employee.setStatus(dto.getStatus() != null ? dto.getStatus() : "Đang làm");
 
-        // Liên kết hoặc tạo tài khoản hệ thống cho nhân viên (UC07)
+        // Liên kết hoặc tạo/cập nhật tài khoản hệ thống cho nhân viên (UC07, TC_EMP_04)
+        Account account = employee.getAccount();
         if (dto.getUsername() != null && !dto.getUsername().trim().isEmpty()) {
             String uname = dto.getUsername().trim();
             Optional<Account> accOpt = accountRepository.findByUsername(uname);
-            Account account;
             if (accOpt.isPresent()) {
                 account = accOpt.get();
-            } else {
+            } else if (account == null) {
                 account = Account.builder()
                         .id(IdGenerator.generateId("TK"))
                         .username(uname)
@@ -147,18 +147,33 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .email(employee.getEmail())
                         .status("Hoạt động")
                         .build();
+            } else {
+                account.setUsername(uname);
+            }
+        }
 
-                // Xác định vai trò theo chức vụ
-                String defaultRoleId = "VT_LT";
-                if ("Quản lý".equalsIgnoreCase(employee.getPosition())) defaultRoleId = "VT_QL";
-                else if ("Kỹ thuật".equalsIgnoreCase(employee.getPosition()) || "Vận hành".equalsIgnoreCase(employee.getPosition())) defaultRoleId = "VT_VH";
+        if (account != null) {
+            // Xác định vai trò theo chức vụ hoặc roleId được chỉ định (TC_EMP_04: Cập nhật chức vụ tự động nâng/hạ quyền)
+            String targetRoleId = dto.getRoleId();
+            if (targetRoleId == null || targetRoleId.trim().isEmpty()) {
+                if ("Quản lý".equalsIgnoreCase(employee.getPosition())) {
+                    targetRoleId = "VT_QL";
+                } else if ("Kỹ thuật".equalsIgnoreCase(employee.getPosition()) || "Vận hành".equalsIgnoreCase(employee.getPosition())) {
+                    targetRoleId = "VT_VH";
+                } else {
+                    targetRoleId = "VT_LT";
+                }
+            } else if ("Quản lý".equalsIgnoreCase(employee.getPosition())) {
+                targetRoleId = "VT_QL";
+            }
 
-                Optional<Role> roleOpt = roleRepository.findById(defaultRoleId);
+            if (targetRoleId != null) {
+                Optional<Role> roleOpt = roleRepository.findById(targetRoleId);
                 if (roleOpt.isPresent()) {
                     account.setRoles(new HashSet<>(Collections.singletonList(roleOpt.get())));
                 }
-                account = accountRepository.save(account);
             }
+            account = accountRepository.save(account);
             employee.setAccount(account);
         }
 

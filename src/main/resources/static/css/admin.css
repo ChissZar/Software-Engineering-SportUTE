@@ -501,6 +501,7 @@ main,
 }
 
 .bell {
+  display: none !important;
   width: 34px;
   height: 34px;
   border: 1px solid var(--gray-200);
@@ -508,10 +509,8 @@ main,
   color: var(--gray-600);
   font-size: 13px;
   cursor: pointer;
-  display: grid;
   place-items: center;
   border-radius: 50%;
-  /* Circular bell button */
   box-shadow: var(--shadow-xs);
   transition: all 0.15s ease;
 }

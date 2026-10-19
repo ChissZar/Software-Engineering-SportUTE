@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tài khoản cá nhân - SportHub UTE</title>
@@ -1398,16 +1400,16 @@
       <!-- Left: Logo + Greeting -->
       <div class="topbar-left">
         <a href="/customer/booking" class="brand-logo" title="Trang chủ SportUTE">
-          <img src="/images/logo.png" alt="SportHub Logo">
+          <img src="/images/sporthub-logo.png" alt="SportHub Logo" style="height:44px;object-fit:contain;">
         </a>
         <div class="divider-v"></div>
         <div class="greeting-box">
           <div class="greeting-date">
-            <i class="fa-regular fa-calendar" style="color:var(--primary);"></i>
+            <i class="fa-regular fa-calendar-days"></i>
             <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd/MM/yyyy')}">Thứ bảy, 17/10/2026</span>
           </div>
           <div class="greeting-name">
-            Xin chào, <span th:text="${currentUserName != null ? currentUserName : 'Minh Triet'}">Minh Triet</span> 👋
+            Xin chào, <span th:text="${currentUserName != null ? currentUserName : (currentUser != null ? currentUser.fullName : 'Minh Triet')}">Minh Triet</span> 👋
           </div>
         </div>
       </div>
@@ -1424,6 +1426,12 @@
           <i class="fa-solid fa-magnifying-glass search-icon" style="cursor:pointer;" onclick="redirectToSearch()"></i>
           <input type="text" id="courtSearchInput" class="topbar-search-input" placeholder="Tìm sân nhanh..." onkeydown="if(event.key==='Enter') redirectToSearch()">
         </div>
+
+        <a href="/customer/community" class="nav-item">
+          <i class="fa-solid fa-handshake-angle"></i>
+          <span>Ghép Kèo Giao Lưu</span>
+          <span style="font-size:10px;padding:2px 7px;border-radius:9999px;background:linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);color:#fff;font-weight:800;letter-spacing:0.5px;">MỚI</span>
+        </a>
 
         <a href="/customer/history" class="nav-item">
           <i class="fa-regular fa-calendar-check"></i>
@@ -2953,5 +2961,8 @@
       handleHashRouting();
     });
   </script>
+
+  <!-- Real-time SportBot AI Assistant -->
+  <th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
 </body>
 </html>

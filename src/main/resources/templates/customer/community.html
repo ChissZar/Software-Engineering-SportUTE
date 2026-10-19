@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sàn Ghép Kèo & Tìm Đối Thủ Giao Lưu — SportHub</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6.5.1 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #10b981;
+      --primary-subtle: #e6f7ef;
+      --amber: #f59e0b;
+      --amber-dark: #d97706;
+      --amber-light: #fef3c7;
+      --danger: #ef4444;
+      --danger-subtle: #fee2e2;
+      --dark: #0f172a;
+      --gray-900: #1e293b;
+      --gray-700: #334155;
+      --gray-600: #475569;
+      --gray-500: #64748b;
+      --gray-400: #94a3b8;
+      --gray-200: #e2e8f0;
+      --gray-100: #f1f5f9;
+      --gray-50: #f8fafc;
+      --white: #ffffff;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
+      --shadow-lg: 0 12px 30px -4px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #f1f5f9;
+      color: var(--gray-900);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* Topbar */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+    .topbar-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+    .brand-logo img { height: 44px; object-fit: contain; }
+    .divider-v { width: 1px; height: 28px; background: var(--gray-200); }
+    .greeting-box { display: flex; flex-direction: column; gap: 2px; }
+    .greeting-date { font-size: 11.5px; color: var(--gray-500); display: flex; align-items: center; gap: 5px; font-weight: 500; }
+    .greeting-name { font-size: 13.5px; font-weight: 700; color: var(--dark); }
+
+    .topbar-nav { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--gray-600);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-item:hover { background: var(--gray-100); color: var(--dark); }
+    .nav-item.active { background: var(--primary-subtle); color: var(--primary-dark); }
+    .badge-pulse {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    /* Topbar Search Input */
+    .topbar-search-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-100);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9999px;
+      padding: 0 14px;
+      height: 38px;
+      transition: all 0.2s ease;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .topbar-search-wrap:hover {
+      background: var(--white);
+      border-color: var(--gray-300);
+    }
+    .topbar-search-wrap:focus-within {
+      background: var(--white);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .topbar-search-wrap .search-icon {
+      color: var(--gray-400);
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .topbar-search-wrap:focus-within .search-icon {
+      color: var(--primary);
+    }
+    .topbar-search-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      color: var(--dark);
+      width: 130px;
+      transition: width 0.25s ease;
+      font-family: inherit;
+    }
+    .topbar-search-input:focus {
+      width: 170px;
+    }
+    .topbar-search-input::placeholder {
+      color: var(--gray-400);
+      font-size: 12.5px;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+    
+    .btn-icon-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-700);
+      font-size: 16px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .btn-icon-circle:hover {
+      background: var(--gray-100);
+      color: var(--dark);
+    }
+    .badge-dot {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 2px solid var(--white);
+    }
+    .notif-wrapper {
+      position: relative;
+    }
+    .notif-dropdown {
+      position: absolute;
+      top: 48px;
+      right: -10px;
+      width: 360px;
+      max-width: 90vw;
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--gray-200);
+      z-index: 150;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: notifSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .notif-dropdown.show {
+      display: flex;
+    }
+    @keyframes notifSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .notif-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbfc;
+    }
+    .notif-header-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--dark, #0f172a);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-mark-all-read {
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+    .btn-mark-all-read:hover {
+      text-decoration: underline;
+    }
+    .notif-list {
+      max-height: 380px;
+      overflow-y: auto;
+      padding: 6px 0;
+    }
+    .notif-item {
+      padding: 12px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: background 0.18s;
+      border-bottom: 1px solid #f8fafc;
+      position: relative;
+    }
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+    .notif-item.unread {
+      background: #f0fdf4;
+    }
+    .notif-item.unread:hover {
+      background: #e6f9ed;
+    }
+    .notif-item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .notif-item-icon.system { background: #eff6ff; color: #3b82f6; }
+    .notif-item-icon.booking { background: #e6f9ed; color: #059669; }
+    .notif-item-icon.promo { background: #fef3c7; color: #d97706; }
+    .notif-item-content { flex: 1; min-width: 0; }
+    .notif-item-title { font-size: 13px; font-weight: 700; color: var(--dark, #0f172a); margin-bottom: 2px; }
+    .notif-item.unread .notif-item-title { color: #064e3b; font-weight: 800; }
+    .notif-item-desc { font-size: 12px; color: var(--gray-600); line-height: 1.4; }
+    .notif-item-time { font-size: 11px; color: var(--gray-400); margin-top: 4px; display: block; }
+    .notif-empty { padding: 36px 20px; text-align: center; color: var(--gray-400); font-size: 13px; }
+    .notif-empty i { font-size: 32px; color: var(--gray-300); margin-bottom: 8px; display: block; }
+    .user-profile-menu { display: flex; align-items: center; }
+
+    .user-avatar-badge {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: #ffffff; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #ffffff; box-shadow: 0 2px 6px rgba(16,185,129,0.3);
+    }
+
+    /* Main Container */
+    .community-main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 28px 60px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+      border-radius: var(--radius-xl);
+      padding: 36px 40px;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+      margin-bottom: 28px;
+    }
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-text h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-text p {
+      font-size: 15px;
+      color: #a7f3d0;
+      max-width: 680px;
+      line-height: 1.6;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 16px;
+    }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+      text-align: center;
+    }
+    .stat-pill .num {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      display: block;
+    }
+    .stat-pill .label {
+      font-size: 12px;
+      color: #a7f3d0;
+      font-weight: 600;
+    }
+    .btn-create-post {
+      background: #f59e0b;
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 14.5px;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+      transition: all 0.2s;
+    }
+    .btn-create-post:hover {
+      background: #fbbf24;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+    }
+
+    /* Disclaimer / Regulations Box */
+    .disclaimer-card {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 5px solid #f59e0b;
+      border-radius: var(--radius-md);
+      padding: 18px 24px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .disclaimer-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 8px;
+    }
+    .disclaimer-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13.5px;
+      color: #78350f;
+      line-height: 1.6;
+    }
+    .disclaimer-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .disclaimer-list li i {
+      color: #d97706;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .sport-pills {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .sport-pill-btn {
+      padding: 9px 18px;
+      border-radius: 9999px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-700);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .sport-pill-btn:hover {
+      background: var(--gray-100);
+      border-color: var(--gray-400);
+    }
+    .sport-pill-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+
+    /* Match Cards Grid */
+    .match-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 22px;
+    }
+
+    .match-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .match-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: #cbd5e1;
+    }
+    .match-card.matched {
+      opacity: 0.85;
+      background: #fafafa;
+    }
+
+    .card-top-bar {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray-100);
+      background: #f8fafc;
+    }
+    .sport-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .sport-tag.football { background: #dcfce7; color: #15803d; }
+    .sport-tag.badminton { background: #fef3c7; color: #b45309; }
+    .sport-tag.pickleball { background: #fae8ff; color: #86198f; }
+    .sport-tag.basketball { background: #ffedd5; color: #c2410c; }
+
+    .match-status-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-waiting {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+    .status-waiting .dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #10b981;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+    .status-matched {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+    .status-expired {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+    }
+    .status-cancelled {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+    .btn-cancel-post-btn {
+      width: 100%;
+      padding: 11px 20px;
+      border-radius: 9999px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-cancel-post-btn:hover {
+      background: #fee2e2;
+      border-color: #f87171;
+    }
+
+    /* Status Navigation Tabs */
+    .status-tabs-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      background: #ffffff;
+      padding: 10px 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+    }
+    .status-tabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-tab-btn {
+      padding: 9px 18px;
+      border-radius: 9999px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--gray-600);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .status-tab-btn:hover {
+      background: var(--gray-100);
+      color: var(--dark);
+    }
+    .status-tab-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+    }
+    .status-tab-btn.active .tab-badge {
+      background: rgba(255,255,255,0.25);
+      color: #ffffff;
+    }
+    .tab-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      font-weight: 800;
+    }
+    .badge-waiting {
+      background: #ecfdf5;
+      color: #059669;
+    }
+    .badge-matched {
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .status-tab-note {
+      font-size: 13px;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-tab-note strong {
+      color: #059669;
+    }
+
+
+    .card-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .court-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .time-slot-badge {
+      background: #f8fafc;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .time-slot-badge .time {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .time-slot-badge .date {
+      font-size: 13px;
+      color: var(--gray-600);
+      font-weight: 600;
+    }
+
+    .match-tags-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sub-tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+    .sub-tag.level-easy { background: #dcfce7; color: #166534; font-weight: 700; }
+    .sub-tag.level-medium { background: #e0f2fe; color: #075985; font-weight: 700; }
+    .sub-tag.level-pro { background: #fee2e2; color: #991b1b; font-weight: 700; }
+
+    .creator-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px dashed var(--gray-200);
+      border-bottom: 1px dashed var(--gray-200);
+    }
+    .creator-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #e2e8f0; color: #334155;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .creator-info { flex: 1; }
+    .creator-name { font-size: 13.5px; font-weight: 700; color: var(--dark); }
+    .creator-sub { font-size: 12px; color: var(--gray-500); }
+
+    .match-message-quote {
+      background: #f8fafc;
+      border-left: 3px solid var(--primary);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: var(--gray-700);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .matched-opponent-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #166534;
+    }
+    .matched-opponent-box strong { color: #065f46; }
+
+    .card-footer {
+      padding: 14px 20px;
+      background: #ffffff;
+      border-top: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .btn-accept-match {
+      flex: 1;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 11px 18px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-accept-match:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    .btn-report-violation {
+      background: transparent;
+      border: none;
+      color: var(--gray-400);
+      font-size: 12.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .btn-report-violation:hover {
+      background: var(--danger-subtle);
+      color: var(--danger);
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal-dialog {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      max-width: 580px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 20px 24px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 18px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+    .btn-close-modal {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: none; background: transparent; color: var(--gray-500);
+      cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-close-modal:hover { background: var(--gray-200); color: var(--dark); }
+
+    .modal-body {
+      padding: 24px;
+      max-height: 75vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Warning box inside accept modal */
+    .modal-warning-box {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-left: 4px solid #e11d48;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #9f1239;
+      line-height: 1.6;
+    }
+    .modal-warning-box strong { color: #881337; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 13.5px; font-weight: 700; color: var(--gray-700); }
+    .form-control {
+      padding: 11px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+
+    .form-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 6px;
+      cursor: pointer;
+    }
+    .form-check input[type="checkbox"] {
+      width: 18px; height: 18px; margin-top: 2px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .form-check label {
+      font-size: 13px;
+      color: var(--gray-800);
+      font-weight: 600;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      background: #f8fafc;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .btn-secondary {
+      padding: 10px 20px;
+      border-radius: 9999px;
+      border: 1px solid var(--gray-300);
+      background: var(--white);
+      color: var(--gray-700);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: var(--gray-100); }
+    .btn-primary-confirm {
+      padding: 10px 24px;
+      border-radius: 9999px;
+      border: none;
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+    .btn-primary-confirm:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .btn-primary-confirm:not(:disabled):hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Toast */
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 14px 24px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast-popup.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast-popup.success i { color: #10b981; }
+    .toast-popup.error i { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="topbar">
+    <div class="topbar-container">
+      <div class="topbar-left">
+        <a href="/customer/booking" class="brand-logo" title="Trang chủ SportUTE">
+          <img src="/images/sporthub-logo.png" alt="SportHub Logo" style="height:44px;object-fit:contain;">
+        </a>
+        <div class="divider-v"></div>
+        <div class="greeting-box">
+          <div class="greeting-date">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd/MM/yyyy')}">Thứ năm, 15/10/2026</span>
+          </div>
+          <div class="greeting-name">
+            Xin chào, <span th:text="${currentUserName != null ? currentUserName : (currentUser != null ? currentUser.fullName : 'Minh Triet')}">Minh Triet</span> 👋
+          </div>
+        </div>
+      </div>
+
+      <nav class="topbar-nav">
+        <a href="/customer/booking" class="nav-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Trang chủ</span>
+        </a>
+
+        <!-- Ô Tìm Sân Nhanh trên topbar -->
+        <div class="topbar-search-wrap" title="Tìm nhanh sân theo tên, môn hoặc địa điểm">
+          <i class="fa-solid fa-magnifying-glass search-icon" style="cursor:pointer;" onclick="redirectToSearch()"></i>
+          <input type="text" id="courtSearchInput" class="topbar-search-input" placeholder="Tìm sân nhanh..." onkeydown="if(event.key==='Enter') redirectToSearch()">
+        </div>
+
+        <a href="/customer/community" class="nav-item active">
+          <i class="fa-solid fa-handshake-angle"></i>
+          <span>Ghép Kèo Giao Lưu</span>
+          <span style="font-size:10px;padding:2px 7px;border-radius:9999px;background:linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);color:#fff;font-weight:800;letter-spacing:0.5px;">MỚI</span>
+        </a>
+
+        <a href="/customer/history" class="nav-item">
+          <i class="fa-regular fa-calendar-check"></i>
+          <span>Lịch đặt của tôi</span>
+        </a>
+
+        <a href="/customer/profile" class="nav-item">
+          <i class="fa-regular fa-user"></i>
+          <span>Tài khoản</span>
+        </a>
+      </nav>
+
+      <div class="topbar-right">
+        <!-- Notification Dropdown Wrap -->
+        <div class="notif-wrapper" id="notifWrapper">
+          <button type="button" class="btn-icon-circle" id="btnNotifBell" title="Thông báo hệ thống" onclick="toggleNotifDropdown(event)">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge-dot" id="notifBadgeDot" style="display:none;"></span>
+          </button>
+
+          <!-- Notification Dropdown Popover -->
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <span class="notif-header-title"><i class="fa-solid fa-bell text-success"></i> Thông báo</span>
+              <button type="button" class="btn-mark-all-read" onclick="markAllNotificationsAsRead()">Đánh dấu đã đọc</button>
+            </div>
+            <div class="notif-list" id="notifListContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="user-profile-menu">
+          <a href="/customer/profile" title="Xem hồ sơ cá nhân" style="display:inline-flex; align-items:center; text-decoration:none;">
+            <div class="user-avatar-badge" th:if="${currentUser == null or currentUser.customAvatarUrl == null}" th:text="${currentUser != null ? currentUser.avatarInitials : (currentUserName != null ? #strings.substring(currentUserName, 0, 1) : 'KH')}" style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(16,185,129,0.3);">KH</div>
+            <img class="user-avatar-img user-custom-avatar" th:if="${currentUser != null and currentUser.customAvatarUrl != null}" th:src="${currentUser.customAvatarUrl}" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(16,185,129,0.3);" alt="Avatar">
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Community Content -->
+  <main class="community-main">
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1>
+            <span>Sàn Ghép Kèo & Tìm Đối Thủ</span> 
+            <span style="font-size:24px;">🤝⚽🏸🎾</span>
+          </h1>
+          <p>
+            Không lo thiếu người, không sợ hủy trận! Kết nối nhanh chóng với các đội thể thao cùng khu vực Thủ Đức & TP.HCM, giao lưu cọ xát văn minh, thỏa sức so tài trên sân đấu.
+          </p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-pill">
+            <span class="num" th:text="${waitingCount}">3</span>
+            <span class="label">Kèo đang tìm đối</span>
+          </div>
+          <a href="/customer/history" class="btn-create-post" style="text-decoration:none;" title="Tạo bài đăng tìm đối thủ từ phiếu đặt sân của bạn">
+            <i class="fa-regular fa-calendar-check"></i> Tìm đối từ lịch đặt sân
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Disclaimer & Regulations Box -->
+    <div class="disclaimer-card">
+      <div class="disclaimer-header">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>QUY ĐỊNH GIAO LƯU & TUYÊN BỐ TRÁCH NHIỆM TỪ SPORTHUB</span>
+      </div>
+      <ul class="disclaimer-list">
+        <li>
+          <i class="fa-solid fa-circle-check"></i>
+          <span><strong>Trách nhiệm thanh toán tiền sân:</strong> Toàn bộ tiền thuê sân & tiền cọc VietQR do <u>chính người đặt sân chịu trách nhiệm thanh toán</u> cho Trung tâm. SportHub không can thiệp và không chịu trách nhiệm về nghĩa vụ tài chính giữa hai bên đối thủ.</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-handshake"></i>
+          <span><strong>Tự thỏa thuận chi phí:</strong> Hai bên tự liên hệ qua Số điện thoại/Zalo để thỏa thuận chia tiền sân (50/50, bên thua trả, hoặc mời nước giao lưu).</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-users"></i>
+          <span><strong>Chủ động lực lượng:</strong> Người đặt sân nên chủ động chuẩn bị đủ số lượng người chơi để đề phòng trường hợp không có đối thủ nhận kèo hoặc đối thủ bận đột xuất.</span>
+        </li>
+        <li>
+          <i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>
+          <span><strong style="color:#b91c1c;">Cảnh cáo nghiêm khắc hành vi bùng kèo:</strong> Người nhận kèo cam kết đến đúng giờ. Trường hợp cố ý nhận kèo nhưng không đến sẽ bị <u>hệ thống ghi nhận vi phạm, gửi cảnh cáo và khóa vĩnh viễn quyền tham gia ghép kèo</u>.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Status Info Bar -->
+    <div class="status-tabs-container">
+      <div class="status-tabs">
+        <div class="status-tab-btn active" style="cursor:default;">
+          <i class="fa-solid fa-fire" style="color:#f59e0b;"></i>
+          <span>Kèo đang mở tìm đối thủ</span>
+          <span class="tab-badge badge-waiting" id="tabBadgeWaiting" th:text="${waitingCount}">3</span>
+        </div>
+      </div>
+
+      <div class="status-tab-note">
+        <i class="fa-solid fa-circle-info" style="color:#059669;"></i>
+        <span id="statusTabNoteText">Chỉ hiển thị các kèo <strong>đang mở và chưa quá giờ thi đấu</strong> để bạn sẵn sàng nhận trận. Kèo đã ghép đối thủ hoặc quá giờ sẽ tự động được ẩn khỏi danh sách.</span>
+      </div>
+    </div>
+
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+      <div class="sport-pills" id="sportFilterPills">
+        <button type="button" class="sport-pill-btn active" data-sport="ALL" onclick="filterBySport('ALL')">
+          <i class="fa-solid fa-border-all"></i> Tất cả môn
+        </button>
+        <button type="button" class="sport-pill-btn" data-sport="Bóng đá" onclick="filterBySport('Bóng đá')">
+          ⚽ Bóng đá
+        </button>
+        <button type="button" class="sport-pill-btn" data-sport="Cầu lông" onclick="filterBySport('Cầu lông')">
+          🏸 Cầu lông
+        </button>
+        <button type="button" class="sport-pill-btn" data-sport="Pickleball" onclick="filterBySport('Pickleball')">
+          🎾 Pickleball
+        </button>
+        <button type="button" class="sport-pill-btn" data-sport="Bóng rổ" onclick="filterBySport('Bóng rổ')">
+          🏀 Bóng rổ
+        </button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:13.5px;color:var(--gray-600);font-weight:600;"><i class="fa-regular fa-calendar"></i> Lọc theo ngày:</span>
+        <input type="date" id="dateFilterInput" class="form-control" style="padding:6px 12px;font-size:13.5px;width:160px;" onchange="filterByDate(this.value)">
+      </div>
+    </div>
+
+    <!-- Match Cards Grid -->
+    <div class="match-grid" id="matchGridContainer">
+      <!-- Thymeleaf Render Loop -->
+      <div th:each="post : ${allPosts}" 
+           class="match-card" 
+           th:classappend="${post.status == 'MATCHED' ? 'matched' : (post.status == 'EXPIRED' ? 'expired' : (post.status == 'CANCELLED' ? 'cancelled' : ''))}"
+           th:data-sport="${post.sportName}"
+           th:data-date="${post.matchDate}"
+           th:data-status="${post.status}">
+
+        <!-- Top Bar -->
+        <div class="card-top-bar">
+          <span class="sport-tag" 
+                th:classappend="${post.sportName == 'Bóng đá' ? 'football' : (post.sportName == 'Cầu lông' ? 'badminton' : (post.sportName == 'Pickleball' ? 'pickleball' : 'basketball'))}">
+            <span th:text="${post.sportName == 'Bóng đá' ? '⚽' : (post.sportName == 'Cầu lông' ? '🏸' : (post.sportName == 'Pickleball' ? '🎾' : '🏀'))}">⚽</span>
+            <span th:text="${post.sportName}">Bóng đá</span>
+          </span>
+
+          <span th:if="${post.status == 'WAITING'}" class="match-status-badge status-waiting">
+            <span class="dot"></span> Đang chờ đối thủ
+          </span>
+          <span th:if="${post.status == 'MATCHED'}" class="match-status-badge status-matched">
+            <i class="fa-solid fa-circle-check" style="color:#059669;"></i> Đã ghép đối thủ
+          </span>
+          <span th:if="${post.status == 'EXPIRED'}" class="match-status-badge status-expired">
+            <i class="fa-solid fa-hourglass-end"></i> Đã quá giờ thi đấu
+          </span>
+          <span th:if="${post.status == 'CANCELLED'}" class="match-status-badge status-cancelled">
+            <i class="fa-solid fa-ban"></i> Đã hủy kèo
+          </span>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body">
+          <div class="court-title">
+            <span th:text="${post.courtName}">Sân bóng đá 1</span>
+            <span style="font-size:12px;color:var(--gray-500);font-weight:600;" th:text="'#' + ${post.id}">#KEO-101</span>
+          </div>
+
+          <div class="time-slot-badge">
+            <div class="time">
+              <i class="fa-regular fa-clock"></i>
+              <span th:text="${post.startTime + ' – ' + post.endTime}">19:00 – 21:00</span>
+            </div>
+            <div class="date">
+              <i class="fa-regular fa-calendar"></i>
+              <span th:text="${post.matchDate}">2026-10-19</span>
+            </div>
+          </div>
+
+          <div class="match-tags-row">
+            <span class="sub-tag" 
+                  th:classappend="${#strings.contains(post.skillLevel, 'Mới') ? 'level-easy' : (#strings.contains(post.skillLevel, 'Khá') ? 'level-pro' : 'level-medium')}"
+                  th:text="${post.skillLevel}">Trung bình / Phong trào</span>
+            <span class="sub-tag" th:text="${post.teamSize}">5 vs 5</span>
+            <span class="sub-tag" style="background:#f1f5f9;color:#0f172a;" th:text="${post.durationMinutes + ' phút'}">120 phút</span>
+          </div>
+
+          <!-- Creator Box -->
+          <div class="creator-box">
+            <div class="creator-avatar" th:text="${#strings.substring(post.creatorName != null ? post.creatorName : 'Triet', 0, 1)}">T</div>
+            <div class="creator-info">
+              <div class="creator-name" th:text="${post.creatorName}">Nguyễn Văn Triết</div>
+              <div class="creator-sub">
+                <i class="fa-solid fa-phone" style="color:#059669;font-size:11px;"></i>
+                <span th:text="${post.status == 'MATCHED' ? post.creatorPhone : (#strings.substring(post.creatorPhone, 0, 4) + '***' + #strings.substring(post.creatorPhone, 7))}">0901***567</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div class="match-message-quote">
+            <i class="fa-solid fa-quote-left" style="font-size:11px;opacity:0.6;margin-right:4px;"></i>
+            <span th:text="${post.message}">Giao lưu cọ xát cuối tuần, share 50% tiền sân vui vẻ!</span>
+          </div>
+
+          <!-- If already matched, show opponent info -->
+          <div th:if="${post.status == 'MATCHED'}" class="matched-opponent-box">
+            <div>🤝 <strong>Đối thủ đã nhận:</strong> <span th:text="${post.opponentName}">Trần Nam</span> (<span th:text="${post.opponentPhone}">0912 345 678</span>)</div>
+            <div th:if="${post.opponentMessage != null and !#strings.isEmpty(post.opponentMessage)}" style="margin-top:4px;font-style:italic;color:#15803d;" th:text="'“' + ${post.opponentMessage} + '”'">“Sẵn sàng ra sân!”</div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+          <!-- Nếu là kèo WAITING và người xem chính là người tạo: Hiển thị nút Gỡ bài của tôi -->
+          <button th:if="${post.status == 'WAITING' and customer != null and (post.creatorPhone == customer.phone or post.creatorName == customer.fullName)}"
+                  type="button" 
+                  class="btn-cancel-post-btn"
+                  th:data-post-id="${post.id}"
+                  onclick="confirmCancelMyPost(this)">
+            <i class="fa-solid fa-trash-can"></i> Gỡ bài tìm đối của tôi
+          </button>
+
+          <!-- Nếu là kèo WAITING và người xem là người khác: Hiển thị nút Bắt đối / Nhận kèo -->
+          <button th:if="${post.status == 'WAITING' and (customer == null or (post.creatorPhone != customer.phone and post.creatorName != customer.fullName))}" 
+                  type="button" 
+                  class="btn-accept-match"
+                  th:data-post-id="${post.id}"
+                  th:data-sport-name="${post.sportName}"
+                  th:data-court-name="${post.courtName}"
+                  th:data-match-date="${post.matchDate}"
+                  th:data-match-time="${post.startTime + ' – ' + post.endTime}"
+                  th:data-creator-name="${post.creatorName}"
+                  onclick="openAcceptFromButton(this)">
+            <i class="fa-solid fa-handshake"></i> Bắt Đối / Nhận Kèo
+          </button>
+
+          <div th:if="${post.status == 'MATCHED'}" style="width:100%;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:13px;color:#059669;font-weight:700;"><i class="fa-solid fa-circle-check"></i> Đã chốt đối thủ</span>
+            <button type="button" 
+                    class="btn-report-violation" 
+                    th:data-post-id="${post.id}" 
+                    th:data-opponent-name="${post.opponentName}"
+                    onclick="openReportFromButton(this)" 
+                    title="Báo cáo nếu đối thủ không đến / bùng kèo">
+              <i class="fa-solid fa-triangle-exclamation"></i> Báo bùng kèo
+            </button>
+          </div>
+
+          <div th:if="${post.status == 'EXPIRED'}" style="width:100%;text-align:center;font-size:13px;color:var(--gray-500);font-weight:600;padding:6px 0;">
+            <i class="fa-regular fa-clock"></i> Đã qua giờ thi đấu (Hết hạn tìm đối)
+          </div>
+
+          <div th:if="${post.status == 'CANCELLED'}" style="width:100%;text-align:center;font-size:13px;color:#b91c1c;font-weight:600;padding:6px 0;">
+            <i class="fa-solid fa-circle-xmark"></i> Kèo đã gỡ / Hủy theo phiếu đặt sân
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================================
+       MODAL: POPUP XÁC NHẬN NHẬN KÈO & CAM KẾT VĂN MINH (STRICT COMMITMENT)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="modalAcceptMatch">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-handshake text-success" style="color:#059669;"></i> Xác Nhận Bắt Đối / Nhận Kèo</h3>
+        <button type="button" class="btn-close-modal" onclick="closeAcceptMatchModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Match summary banner -->
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;line-height:1.6;font-size:13.5px;">
+          <div>🏟️ <strong>Sân thi đấu:</strong> <span id="modalCourtSummary" style="font-weight:700;color:#0f172a;">Sân bóng đá 1</span></div>
+          <div>⏰ <strong>Thời gian:</strong> <span id="modalTimeSummary" style="color:#059669;font-weight:700;">19:00 - 21:00 (Hôm nay)</span></div>
+          <div>👤 <strong>Người tạo sân:</strong> <span id="modalCreatorSummary" style="font-weight:700;">Nguyễn Văn Triết</span></div>
+        </div>
+
+        <!-- Strict Warning Box (Cảnh cáo vi phạm theo yêu cầu người dùng) -->
+        <div class="modal-warning-box">
+          <div style="font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:16px;"></i>
+            CẢNH BÁO TỪ HỆ THỐNG SPORTHUB:
+          </div>
+          <p>
+            • Quý khách cam kết sẽ có mặt đúng giờ và chủ động liên hệ với chủ sân để giao lưu thể thao nghiêm túc, văn minh.<br>
+            • <strong>Nghiêm cấm hành vi "bùng kèo / nhận rồi không đến":</strong> Nếu cố ý nhận kèo nhưng không đến thi đấu mà không báo trước, hệ thống sẽ <u>ghi nhận vi phạm, gửi cảnh cáo tài khoản và khóa vĩnh viễn quyền tham gia ghép đối thủ</u> trên toàn hệ thống SportHub!
+          </p>
+        </div>
+
+        <input type="hidden" id="acceptPostId">
+
+        <div class="form-group">
+          <label>Họ và tên của bạn <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="inputOpponentName" class="form-control" placeholder="Ví dụ: Trần Văn Nam" th:value="${customer != null ? customer.fullName : ''}">
+        </div>
+
+        <div class="form-group">
+          <label>Số điện thoại liên hệ (có Zalo) <span style="color:#ef4444;">*</span></label>
+          <input type="tel" id="inputOpponentPhone" class="form-control" placeholder="Ví dụ: 0912 345 678" th:value="${customer != null ? customer.phone : ''}">
+        </div>
+
+        <div class="form-group">
+          <label>Email nhận thông báo kết nối</label>
+          <input type="email" id="inputOpponentEmail" class="form-control" placeholder="email@gmail.com" th:value="${customer != null ? customer.email : ''}">
+        </div>
+
+        <div class="form-group">
+          <label>Lời nhắn gửi đến chủ sân</label>
+          <textarea id="inputOpponentMsg" class="form-control" rows="2" placeholder="Ví dụ: Đội mình đã chuẩn bị đủ 6 bạn, hẹn gặp các bạn lúc 19h tại sân nhé!"></textarea>
+        </div>
+
+        <!-- Checkbox Cam Kết bắt buộc -->
+        <div class="form-check">
+          <input type="checkbox" id="checkCommitment" onchange="toggleConfirmButton()">
+          <label for="checkCommitment">
+            Tôi đã đọc rõ quy định, hiểu rằng tiền sân do người đặt chịu trách nhiệm và <strong>cam kết sẽ đến thi đấu đúng giờ, không bùng kèo</strong>.
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeAcceptMatchModal()">Suy nghĩ lại</button>
+        <button type="button" class="btn-primary-confirm" id="btnConfirmAccept" onclick="submitAcceptMatch()" disabled>
+          <i class="fa-solid fa-circle-check"></i> Xác Nhận Nhận Kèo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Detail Modal -->
+  <div class="notif-modal-backdrop" id="notifDetailModal" onclick="handleNotifModalBackdrop(event)">
+    <div class="notif-modal-card">
+      <div class="notif-modal-header">
+        <div class="notif-modal-header-title">
+          <i class="fa-solid fa-bell text-success" id="notifModalIcon"></i>
+          <span id="notifModalHeaderTitle">Chi tiết thông báo</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeNotifModal()" title="Đóng" style="font-size: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: none; background: #f1f5f9; cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="notif-modal-body">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span id="notifModalBadge" style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: #e6f9ed; color: #059669;">Hệ thống</span>
+          <span id="notifModalTime" style="font-size: 12px; color: #94a3b8;"><i class="fa-regular fa-clock"></i> Vừa xong</span>
+        </div>
+        <h3 id="notifModalTitle" style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 12px; line-height: 1.4;">Tiêu đề thông báo</h3>
+        <div id="notifModalContent" style="font-size: 14px; color: #334155; line-height: 1.6; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; white-space: pre-line;">
+          Nội dung thông báo
+        </div>
+        <div id="notifModalExtraDetails" style="display: none; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;"></div>
+      </div>
+      <div class="notif-modal-footer">
+        <button type="button" id="btnNotifActionSecondary" class="btn-secondary" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; font-weight: 600; font-size: 13px;" onclick="closeNotifModal()">Đóng</button>
+        <button type="button" id="btnNotifActionPrimary" class="btn-primary" style="padding: 8px 18px; border-radius: 8px; border: none; background: #059669; color: #fff; cursor: pointer; font-weight: 700; font-size: 13px; display: none;" onclick="closeNotifModal()">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: BÁO CÁO ĐỐI THỦ BÙNG KÈO (VIOLATION REPORT)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="modalReport">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 style="color:#ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Báo Cáo Đối Thủ Bùng Kèo</h3>
+        <button type="button" class="btn-close-modal" onclick="closeReportModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13.5px;color:var(--gray-700);">
+          Hệ thống SportHub bảo vệ quyền lợi cộng đồng thể thao văn minh. Mọi hành vi nhận kèo rồi không đến sẽ bị cảnh cáo và cấm vĩnh viễn.
+        </p>
+        <input type="hidden" id="reportPostId">
+        <div class="form-group">
+          <label>Đối thủ bị báo cáo</label>
+          <input type="text" id="reportOpponentName" class="form-control" readonly style="background:#f1f5f9;">
+        </div>
+        <div class="form-group">
+          <label>Lý do vi phạm</label>
+          <select id="reportReasonSelect" class="form-control">
+            <option value="Đối thủ không đến thi đấu và không báo trước">Đối thủ không đến thi đấu và không báo trước</option>
+            <option value="Không thể liên lạc được (thuê bao / không bắt máy)">Không thể liên lạc được (thuê bao / không bắt máy)</option>
+            <option value="Đến trễ hơn 30 phút làm lỡ giờ thi đấu">Đến trễ hơn 30 phút làm lỡ giờ thi đấu</option>
+            <option value="Có thái độ va chạm, phi thể thao">Có thái độ va chạm, phi thể thao</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeReportModal()">Hủy</button>
+        <button type="button" class="btn-primary-confirm" style="background:#ef4444;" onclick="submitReportViolation()">
+          <i class="fa-solid fa-gavel"></i> Gửi Cảnh Cáo Vi Phạm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Popup -->
+  <div class="toast-popup" id="appToast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Thực hiện thành công!</span>
+  </div>
+
+  <!-- JavaScript -->
+  <script th:inline="javascript">
+    const CURRENT_USER_KEY = /*[[${currentUser != null and currentUser.customerId != null ? currentUser.customerId : (currentUser != null ? currentUser.username : 'guest')}]]*/ 'guest';
+    const AVATAR_KEY = 'sporthub_custom_avatar_' + CURRENT_USER_KEY;
+    const NOTIF_KEY = 'sporthub_notifications_' + CURRENT_USER_KEY;
+
+    function redirectToSearch() {
+      const val = document.getElementById('courtSearchInput')?.value.trim();
+      window.location.href = '/customer/booking' + (val ? ('?search=' + encodeURIComponent(val)) : '');
+    }
+
+    // =========================================================================
+    // NOTIFICATION DROPDOWN SYSTEM
+    // =========================================================================
+    const DEFAULT_NOTIFICATIONS = [
+      {
+        id: 'notif_welcome',
+        type: 'system',
+        title: 'Chào mừng bạn đến với SportHub!',
+        time: 'Hôm nay',
+        dateStr: '17/10/2026',
+        desc: 'Hệ thống đặt sân thể thao trực tuyến chính thức đi vào hoạt động với nhiều tiện ích.',
+        content: 'Chào mừng quý khách đến với SportHub - Hệ thống quản lý và đặt sân thể thao thông minh!\n\nChúng tôi cung cấp đầy đủ các tiện ích:\n• Đặt sân trực tuyến giữ chỗ tức thì\n• Thanh toán cọc bảo lãnh VietQR tự động\n• Sàn giao lưu kết nối đối thủ thi đấu\n• Trợ lý AI SportBot hỗ trợ tư vấn 24/7\n\nChúc bạn có những giờ phút rèn luyện thể thao tuyệt vời!',
+        unread: false,
+        extraData: null
+      }
+    ];
+
+    function getNotifications() {
+      try {
+        const stored = localStorage.getItem(NOTIF_KEY);
+        if (!stored) {
+          localStorage.setItem(NOTIF_KEY, JSON.stringify(DEFAULT_NOTIFICATIONS));
+          return DEFAULT_NOTIFICATIONS;
+        }
+        return JSON.parse(stored);
+      } catch (e) {
+        return DEFAULT_NOTIFICATIONS;
+      }
+    }
+
+    function saveNotifications(list) {
+      localStorage.setItem(NOTIF_KEY, JSON.stringify(list));
+      updateNotifBadge();
+      renderNotifications();
+    }
+
+    function updateNotifBadge() {
+      const list = getNotifications();
+      const unreadCount = list.filter(n => n.unread).length;
+      const dot = document.getElementById('notifBadgeDot');
+      if (dot) {
+        dot.style.display = (unreadCount > 0) ? 'block' : 'none';
+      }
+    }
+
+    function toggleNotifDropdown(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+          renderNotifications();
+        }
+      }
+    }
+
+    function closeNotifDropdown() {
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    }
+
+    function renderNotifications() {
+      const container = document.getElementById('notifListContainer');
+      if (!container) return;
+
+      const list = getNotifications();
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="notif-empty">
+            <i class="fa-regular fa-bell-slash"></i>
+            <div class="notif-empty-text">Hiện chưa có thông báo nào</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(item => {
+        let iconHtml = '<i class="fa-solid fa-bell"></i>';
+        let iconClass = 'system';
+        if (item.type === 'booking') {
+          iconHtml = '<i class="fa-solid fa-calendar-check"></i>';
+          iconClass = 'booking';
+        } else if (item.type === 'promo') {
+          iconHtml = '<i class="fa-solid fa-tag"></i>';
+          iconClass = 'promo';
+        }
+
+        return `
+          <div class="notif-item ${item.unread ? 'unread' : ''}" onclick="openNotifDetail('${item.id}')">
+            <div class="notif-item-icon ${iconClass}">
+              ${iconHtml}
+            </div>
+            <div class="notif-item-content">
+              <div class="notif-item-title">
+                <span>${item.title}</span>
+                ${item.unread ? '<span class="notif-unread-dot"></span>' : ''}
+              </div>
+              <div class="notif-item-desc">${item.desc || ''}</div>
+              <span class="notif-item-time">${item.time || ''}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function markAllNotificationsAsRead() {
+      const list = getNotifications();
+      list.forEach(n => n.unread = false);
+      saveNotifications(list);
+    }
+
+    function openNotifDetail(id) {
+      const list = getNotifications();
+      const item = list.find(n => n.id === id);
+      if (!item) return;
+
+      item.unread = false;
+      saveNotifications(list);
+      closeNotifDropdown();
+
+      document.getElementById('notifModalHeaderTitle').textContent = 'Chi tiết thông báo';
+      document.getElementById('notifModalTitle').textContent = item.title;
+      document.getElementById('notifModalContent').textContent = item.content || item.desc;
+      document.getElementById('notifModalTime').innerHTML = `<i class="fa-regular fa-clock"></i> ${item.time || item.dateStr || ''}`;
+
+      const modal = document.getElementById('notifDetailModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeNotifModal() {
+      const modal = document.getElementById('notifDetailModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function handleNotifModalBackdrop(e) {
+      if (e.target.id === 'notifDetailModal') {
+        closeNotifModal();
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#notifWrapper')) {
+        closeNotifDropdown();
+      }
+    });
+
+    // =========================================================================
+    // MATCHMAKING FILTERING (CHỈ HIỂN THỊ KÈO CHỜ ĐỐI THỦ WAITING)
+    // =========================================================================
+    function filterBySport(sport) {
+      document.querySelectorAll('.sport-pill-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.querySelector(`.sport-pill-btn[data-sport="${sport}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      applyClientFilters();
+    }
+
+    function filterByDate(date) {
+      applyClientFilters();
+    }
+
+    function applyClientFilters() {
+      const activeSportBtn = document.querySelector('.sport-pill-btn.active');
+      const sport = activeSportBtn ? activeSportBtn.getAttribute('data-sport') : 'ALL';
+      const date = document.getElementById('dateFilterInput').value;
+
+      let visibleCount = 0;
+      const cards = document.querySelectorAll('.match-card');
+      cards.forEach(card => {
+        const cardSport = card.getAttribute('data-sport');
+        const cardDate = card.getAttribute('data-date');
+        const cardStatus = card.getAttribute('data-status');
+
+        // Chỉ hiển thị các kèo WAITING (chưa có đối thủ)
+        let isWaiting = (cardStatus === 'WAITING');
+        let matchSport = (sport === 'ALL' || cardSport === sport);
+        let matchDate = (!date || cardDate === date);
+
+        if (isWaiting && matchSport && matchDate) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Show/hide empty state
+      let emptyMsg = document.getElementById('matchEmptyState');
+      if (!emptyMsg) {
+        emptyMsg = document.createElement('div');
+        emptyMsg.id = 'matchEmptyState';
+        emptyMsg.innerHTML = `
+          <div style="text-align:center;padding:50px 20px;grid-column: 1 / -1;background:#ffffff;border-radius:16px;border:1px dashed #cbd5e1;margin-top:10px;">
+            <div style="font-size:42px;margin-bottom:10px;">🏟️</div>
+            <h3 style="font-size:17px;font-weight:700;color:var(--dark);margin-bottom:6px;">Hiện chưa có kèo nào đang tìm đối thủ</h3>
+            <p style="font-size:13.5px;color:var(--gray-500);max-width:460px;margin:0 auto 16px;">Tất cả các kèo hiện tại đã tìm được đối thủ hoặc đã qua giờ thi đấu. Nếu bạn đã đặt sân, hãy vào mục Lịch đặt của tôi để mở kèo tìm đối thủ nhé!</p>
+            <a href="/customer/history" class="btn-create-post" style="display:inline-flex;text-decoration:none;">
+              <i class="fa-regular fa-calendar-check"></i> Đến Lịch Đặt Của Tôi
+            </a>
+          </div>
+        `;
+        const container = document.getElementById('matchGridContainer');
+        if (container) container.appendChild(emptyMsg);
+      }
+      if (emptyMsg) {
+        emptyMsg.style.display = (visibleCount === 0) ? 'block' : 'none';
+      }
+    }
+
+    // Button helpers
+    function openAcceptFromButton(btn) {
+      const id = btn.getAttribute('data-post-id');
+      const sport = btn.getAttribute('data-sport-name');
+      const court = btn.getAttribute('data-court-name');
+      const date = btn.getAttribute('data-match-date');
+      const time = btn.getAttribute('data-match-time');
+      const creator = btn.getAttribute('data-creator-name');
+      openAcceptMatchModal(id, sport, court, date, time, creator);
+    }
+
+    function openReportFromButton(btn) {
+      const id = btn.getAttribute('data-post-id');
+      const opponent = btn.getAttribute('data-opponent-name');
+      openReportModal(id, opponent);
+    }
+
+    // Accept Match Modal
+    function openAcceptMatchModal(id, sport, court, date, time, creator) {
+      document.getElementById('acceptPostId').value = id;
+      document.getElementById('modalCourtSummary').textContent = court + ' (' + sport + ')';
+      document.getElementById('modalTimeSummary').textContent = time + ' (' + date + ')';
+      document.getElementById('modalCreatorSummary').textContent = creator;
+
+      document.getElementById('checkCommitment').checked = false;
+      document.getElementById('btnConfirmAccept').disabled = true;
+
+      document.getElementById('modalAcceptMatch').classList.add('show');
+    }
+
+    function closeAcceptMatchModal() {
+      document.getElementById('modalAcceptMatch').classList.remove('show');
+    }
+
+    function toggleConfirmButton() {
+      const checked = document.getElementById('checkCommitment').checked;
+      document.getElementById('btnConfirmAccept').disabled = !checked;
+    }
+
+    async function submitAcceptMatch() {
+      const postId = document.getElementById('acceptPostId').value;
+      const opponentName = document.getElementById('inputOpponentName').value.trim();
+      const opponentPhone = document.getElementById('inputOpponentPhone').value.trim();
+      const opponentEmail = document.getElementById('inputOpponentEmail').value.trim();
+      const message = document.getElementById('inputOpponentMsg').value.trim();
+
+      if (!opponentName || !opponentPhone) {
+        showToast('Vui lòng nhập họ tên và số điện thoại liên hệ!', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/customer/community/api/accept', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId, opponentName, opponentPhone, opponentEmail, message })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeAcceptMatchModal();
+          showToast('🎉 Nhận kèo thành công! Đã gửi thông báo cho chủ sân.', 'success');
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          showToast(data.message || 'Lỗi nhận kèo', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi kết nối máy chủ!', 'error');
+      }
+    }
+
+    // Report Violation Modal
+    function openReportModal(id, opponent) {
+      document.getElementById('reportPostId').value = id;
+      document.getElementById('reportOpponentName').value = opponent || 'Đối thủ';
+      document.getElementById('modalReport').classList.add('show');
+    }
+
+    function closeReportModal() {
+      document.getElementById('modalReport').classList.remove('show');
+    }
+
+    async function submitReportViolation() {
+      const postId = document.getElementById('reportPostId').value;
+      const reason = document.getElementById('reportReasonSelect').value;
+
+      try {
+        const res = await fetch('/customer/community/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId, reason })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeReportModal();
+          showToast('⚠️ Đã tiếp nhận báo cáo và gửi cảnh cáo tới đối thủ!', 'success');
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          showToast(data.message || 'Lỗi báo cáo', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi kết nối máy chủ!', 'error');
+      }
+    }
+
+    // Toast helper
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('appToast');
+      const m = document.getElementById('toastMsg');
+      if (!t || !m) return;
+      m.textContent = msg;
+      t.className = 'toast-popup show ' + type;
+      setTimeout(() => { t.className = 'toast-popup'; }, 3500);
+    }
+
+    // Cancel My Post
+    async function confirmCancelMyPost(btn) {
+      const postId = btn.getAttribute('data-post-id');
+      if (!confirm('Bạn có chắc chắn muốn gỡ bài đăng tìm đối thủ này không?')) {
+        return;
+      }
+      try {
+        const res = await fetch('/customer/community/api/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('✅ Đã gỡ bài tìm đối thủ thành công!', 'success');
+          setTimeout(() => window.location.reload(), 1200);
+        } else {
+          showToast(data.message || 'Lỗi khi gỡ bài', 'error');
+        }
+      } catch (e) {
+        showToast('Lỗi kết nối máy chủ!', 'error');
+      }
+    }
+
+    // Auto apply filter on initial page load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNotifBadge();
+
+      const savedAvatar = sessionStorage.getItem(AVATAR_KEY) || localStorage.getItem(AVATAR_KEY);
+      if (savedAvatar) {
+        document.querySelectorAll('.user-avatar-img').forEach(img => {
+          if (!img.getAttribute('src') || img.src.includes('user_avatar')) {
+            img.src = savedAvatar;
+            img.style.display = 'block';
+          }
+        });
+        document.querySelectorAll('.user-avatar-badge').forEach(b => {
+          b.style.display = 'none';
+        });
+      }
+
+      applyClientFilters();
+    });
+  </script>
+
+  <!-- Include Chatbot Mascot Widget -->
+  <div th:replace="~{fragments/chatbot :: chatbot}"></div>
+
+</body>
+</html>

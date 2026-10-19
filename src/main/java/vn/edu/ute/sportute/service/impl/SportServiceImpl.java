@@ -50,21 +50,29 @@ public class SportServiceImpl implements SportService {
 
     @Override
     public void saveSport(SportDTO dto) {
-        Sport sport;
-        if (dto.getId() == null || dto.getId().trim().isEmpty()) {
-            if (sportRepository.findByName(dto.getName()).isPresent()) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Tên môn thể thao không được để trống!");
+        }
+        String trimmedName = dto.getName().trim();
+        java.util.Optional<Sport> existingOpt = sportRepository.findByName(trimmedName);
+        if (existingOpt.isPresent()) {
+            if (dto.getId() == null || dto.getId().trim().isEmpty() || !existingOpt.get().getId().equals(dto.getId().trim())) {
                 throw new IllegalArgumentException("Tên môn thể thao đã tồn tại!");
             }
+        }
+
+        Sport sport;
+        if (dto.getId() == null || dto.getId().trim().isEmpty()) {
             sport = Sport.builder()
                     .id(IdGenerator.generateId("M"))
-                    .name(dto.getName())
+                    .name(trimmedName)
                     .description(dto.getDescription())
                     .status(dto.getStatus() != null ? dto.getStatus() : "Hoạt động")
                     .build();
         } else {
-            sport = sportRepository.findById(dto.getId())
+            sport = sportRepository.findById(dto.getId().trim())
                     .orElseThrow(() -> new IllegalArgumentException("Môn không tồn tại: " + dto.getId()));
-            sport.setName(dto.getName());
+            sport.setName(trimmedName);
             sport.setDescription(dto.getDescription());
             sport.setStatus(dto.getStatus());
         }

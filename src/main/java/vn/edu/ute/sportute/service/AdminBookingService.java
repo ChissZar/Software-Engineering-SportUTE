@@ -25,6 +25,7 @@ public interface AdminBookingService {
 
     // 5. Trả sân (UC22 - Check-out)
     void checkOutBooking(String id);
+    void checkOutBooking(String id, String paymentMethod, String note);
 
     // 6. Gia hạn sân (UC23)
     void extendBooking(ExtendBookingDTO dto);

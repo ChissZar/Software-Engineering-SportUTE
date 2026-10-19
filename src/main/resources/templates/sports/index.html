@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
+  <link rel="icon" type="image/png" th:href="@{/images/sporthub-logo-single.png}">
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicon.ico}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>SportHub — Quản lý môn thể thao</title>
@@ -90,12 +92,12 @@
                     <table id="sportsTable">
                         <thead>
                             <tr>
-                                <th style="width: 70px;">Hình ảnh</th>
-                                <th style="width: 110px;">Mã môn</th>
-                                <th style="width: 200px;">Tên môn thể thao</th>
+                                <th style="width: 80px;">Hình ảnh</th>
+                                <th style="width: 120px;">Mã môn</th>
+                                <th style="width: 180px;">Tên môn thể thao</th>
                                 <th>Mô tả chi tiết</th>
                                 <th style="width: 140px;">Trạng thái</th>
-                                <th class="text-end" style="width: 200px;">Thao tác</th>
+                                <th class="text-end" style="width: 140px;">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -107,7 +109,7 @@
                                 onclick="handleSportRowClick(this, event)"
                                 style="cursor:pointer;"
                                 title="Bấm vào dòng để xem chi tiết đầy đủ môn này">
-                                <td>
+                                <td style="vertical-align: middle;">
                                     <img th:src="${s.name != null and #strings.contains(s.name, 'đá') ? '/images/courts/soccer.jpg' : (s.name != null and #strings.contains(s.name, 'lông') ? '/images/courts/badminton.jpg' : (s.name != null and #strings.contains(s.name, 'rổ') ? '/images/courts/basketball.jpg' : (s.name != null and #strings.contains(s.name, 'Pickleball') ? '/images/courts/pickleball.jpg' : '/images/courts/badminton.jpg')))}"
                                          alt="Sport thumbnail"
                                          style="width: 46px; height: 46px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; transition: transform 0.15s ease;"
@@ -119,38 +121,32 @@
                                          onclick="openSportViewModal(this)"
                                          title="Bấm để xem chi tiết môn thể thao">
                                 </td>
-                                <td class="fw-bold" style="color: var(--primary);" th:text="${s.id}"></td>
-                                <td class="fw-semibold">
+                                <td class="fw-bold" style="color: var(--primary); vertical-align: middle;" th:text="${s.id}"></td>
+                                <td class="fw-semibold" style="vertical-align: middle;">
                                     <span th:text="${s.name}"></span>
                                 </td>
-                                <td class="text-muted" th:text="${s.description != null && !s.description.isEmpty() ? s.description : 'Chưa có mô tả'}"></td>
-                                <td>
+                                <td class="text-muted" style="line-height: 1.5; vertical-align: middle;" th:text="${s.description != null && !s.description.isEmpty() ? s.description : 'Chưa có mô tả'}"></td>
+                                <td style="vertical-align: middle;">
                                     <span class="badge" th:classappend="${s.status == 'Hoạt động' ? 'status-active' : 'status-disabled'}" th:text="${s.status}"></span>
                                 </td>
-                                <td class="text-end">
-                                    <button type="button" class="btn btn-sm"
-                                            th:data-id="${s.id}"
-                                            th:data-name="${s.name}"
-                                            th:data-desc="${s.description != null ? s.description : ''}"
-                                            th:data-status="${s.status}"
-                                            onclick="openSportViewModal(this)"
-                                            title="Xem chi tiết đầy đủ">
-                                        <i class="fa-regular fa-eye"></i> Chi tiết
-                                    </button>
-                                    <button type="button" class="btn btn-sm"
-                                            th:data-id="${s.id}"
-                                            th:data-name="${s.name}"
-                                            th:data-desc="${s.description != null ? s.description : ''}"
-                                            th:data-status="${s.status}"
-                                            onclick="editSport(this)">
-                                        <i class="fa-solid fa-pen" style="color: var(--primary);"></i> Sửa
-                                    </button>
-                                    <form th:action="@{/admin/sports/toggle/{id}(id=${s.id})}" method="post" class="d-inline"
-                                          onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái môn này?');">
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Đổi trạng thái kinh doanh">
-                                            <i class="fa-solid fa-power-off"></i>
+                                <td class="text-end" style="white-space: nowrap; vertical-align: middle;">
+                                    <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                        <button type="button" class="btn btn-sm"
+                                                th:data-id="${s.id}"
+                                                th:data-name="${s.name}"
+                                                th:data-desc="${s.description != null ? s.description : ''}"
+                                                th:data-status="${s.status}"
+                                                onclick="editSport(this)"
+                                                title="Sửa thông tin môn">
+                                            <i class="fa-solid fa-pen" style="color: var(--primary);"></i> Sửa
                                         </button>
-                                    </form>
+                                        <form th:action="@{/admin/sports/toggle/{id}(id=${s.id})}" method="post" class="d-inline" style="margin: 0;"
+                                              onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái môn này?');">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Đổi trạng thái kinh doanh">
+                                                <i class="fa-solid fa-power-off"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(sports)}">

@@ -113,6 +113,10 @@ public class CustomerServiceImpl implements CustomerService {
         if (dto.getPhone() == null || dto.getPhone().trim().isEmpty()) {
             throw new IllegalArgumentException("Số điện thoại khách hàng không được để trống");
         }
+        String cleanPhone = dto.getPhone().trim().replaceAll("[\\s.-]", "");
+        if (!cleanPhone.matches("^0\\d{9}$")) {
+            throw new IllegalArgumentException("Số điện thoại phải gồm 10 chữ số hợp lệ");
+        }
 
         Customer customer;
         if (dto.getId() != null && !dto.getId().trim().isEmpty()) {

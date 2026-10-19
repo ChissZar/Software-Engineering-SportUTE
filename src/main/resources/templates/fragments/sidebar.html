@@ -17,15 +17,15 @@
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Tổng quan</span>
             </a>
-            <a th:if="${currentUser == null or currentUser.canManagePayments or currentUser.admin or currentUser.manager}" 
-               href="/admin/bookings" th:classappend="${activeMenu == 'bookings' ? 'active' : ''}">
-                <i class="fa-regular fa-calendar-check"></i>
+            <a href="/admin/bookings?view=schedule" th:classappend="${activeMenu == 'schedule' ? 'active' : ''}">
+                <i class="fa-regular fa-calendar-days"></i>
                 <span>Đặt sân</span>
                 <span class="pill-count">Live</span>
             </a>
-            <a href="/admin/bookings?view=schedule" th:classappend="${activeMenu == 'schedule' ? 'active' : ''}">
-                <i class="fa-regular fa-calendar-days"></i>
-                <span>Lịch sân (Timeline)</span>
+            <a th:if="${currentUser == null or currentUser.canManagePayments or currentUser.admin or currentUser.manager}" 
+               href="/admin/bookings" th:classappend="${activeMenu == 'bookings' ? 'active' : ''}">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Danh sách đặt</span>
             </a>
             <a th:if="${currentUser == null or currentUser.canManageCenter or currentUser.operator}" 
                href="/admin/courts" th:classappend="${activeMenu == 'courts' ? 'active' : ''}">

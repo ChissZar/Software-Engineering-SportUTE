@@ -14,6 +14,7 @@ import vn.edu.ute.sportute.service.AuthService;
 import vn.edu.ute.sportute.util.IdGenerator;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -40,8 +41,17 @@ public class AuthServiceImpl implements AuthService {
         if (accountRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email này đã được đăng ký tài khoản!");
         }
-        if (customerRepository.existsByPhone(request.getPhone())) {
-            throw new IllegalArgumentException("Số điện thoại này đã được sử dụng!");
+
+        Optional<Customer> existingByPhone = customerRepository.findByPhone(request.getPhone());
+        if (existingByPhone.isPresent() && existingByPhone.get().getAccount() != null) {
+            throw new IllegalArgumentException("Số điện thoại này đã được liên kết với một tài khoản đang hoạt động!");
+        }
+
+        Optional<Customer> existingByEmail = customerRepository.findByEmail(request.getEmail());
+        if (existingByEmail.isPresent()) {
+            if (existingByPhone.isEmpty() || !existingByEmail.get().getId().equals(existingByPhone.get().getId())) {
+                throw new IllegalArgumentException("Địa chỉ email này đã được sử dụng bởi một khách hàng khác!");
+            }
         }
 
         // 2. Tìm hoặc khởi tạo vai trò mặc định: ROLE_CUSTOMER
@@ -71,16 +81,26 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         Account savedAccount = accountRepository.save(account);
 
-        // 4. Tạo hồ sơ KHACHHANG liên kết với TAIKHOAN vừa tạo
-        Customer customer = Customer.builder()
-                .id(IdGenerator.generateId("KH"))
-                .fullName(request.getFullName())
-                .phone(request.getPhone())
-                .email(request.getEmail())
-                .status("Hoạt động")
-                .account(savedAccount)
-                .build();
-        customerRepository.save(customer);
+        // 4. Liên kết với hồ sơ KHACHHANG cũ (nếu từng đặt tại quầy) hoặc tạo mới
+        if (existingByPhone.isPresent()) {
+            Customer customer = existingByPhone.get();
+            customer.setAccount(savedAccount);
+            customer.setEmail(request.getEmail());
+            if (request.getFullName() != null && !request.getFullName().isBlank()) {
+                customer.setFullName(request.getFullName().trim());
+            }
+            customerRepository.save(customer);
+        } else {
+            Customer customer = Customer.builder()
+                    .id(IdGenerator.generateId("KH"))
+                    .fullName(request.getFullName())
+                    .phone(request.getPhone())
+                    .email(request.getEmail())
+                    .status("Hoạt động")
+                    .account(savedAccount)
+                    .build();
+            customerRepository.save(customer);
+        }
 
         return savedAccount;
     }
