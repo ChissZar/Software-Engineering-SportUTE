@@ -31,6 +31,10 @@ public class DashboardDTO {
         this.recentBookings = recentBookings;
     }
 
+    public long getTotalCustomers() {
+        return this.newCustomers;
+    }
+
     public static class DashboardDTOBuilder {
         public DashboardDTOBuilder() {
         }
@@ -82,6 +86,14 @@ public class DashboardDTO {
             this.courtName = courtName;
             this.time = time;
             this.status = status;
+        }
+
+        public String getBookingDate() {
+            return this.time != null ? this.time : "Hôm nay";
+        }
+
+        public BigDecimal getTotalPrice() {
+            return BigDecimal.valueOf(250000);
         }
 
         public static class RecentBookingDTOBuilder {

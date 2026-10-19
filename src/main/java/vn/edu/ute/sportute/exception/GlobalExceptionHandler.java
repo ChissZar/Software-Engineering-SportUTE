@@ -52,6 +52,15 @@ public class GlobalExceptionHandler {
         return resolveResponse(defaultMsg, request, redirectAttributes, model, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public Object handleNoResourceFoundException(org.springframework.web.servlet.resource.NoResourceFoundException ex,
+                                                 HttpServletRequest request,
+                                                 RedirectAttributes redirectAttributes,
+                                                 Model model) {
+        log.debug("Resource not found on [{}]: {}", request.getRequestURI(), ex.getMessage());
+        return resolveResponse("Tài nguyên không tồn tại: " + request.getRequestURI(), request, redirectAttributes, model, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public Object handleGeneralException(Exception ex,
                                          HttpServletRequest request,

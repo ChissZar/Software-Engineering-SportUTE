@@ -1,0 +1,2316 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* ==========================================================================
+     COLOR SYSTEM - AQUASHINE CLEAN & MODERN (TUNED WITH SPORTHUB EMERALD)
+     ========================================================================== */
+  --primary: #059669;
+  --primary-hover: #047857;
+  --primary-active: #065f46;
+  --primary-subtle: #ecfdf5;
+  --primary-border: #a7f3d0;
+  --primary-glow: rgba(5, 150, 105, 0.15);
+
+  /* Clean Pure White Sidebar (AquaShine Standard) */
+  --sidebar-bg: #ffffff;
+  --sidebar-surface: #f8fafc;
+  --sidebar-border: #edf2f7;
+  --sidebar-text: #64748b;
+  --sidebar-text-hover: #0f172a;
+  --sidebar-active-bg: #ecfdf5;
+  /* Soft emerald rounded pill */
+  --sidebar-active-text: #059669;
+  /* Vibrant emerald text */
+
+  /* Functional Accents */
+  --amber: #f59e0b;
+  --amber-subtle: #fef3c7;
+  --amber-border: #fde68a;
+  --amber-text: #92400e;
+
+  --blue: #3b82f6;
+  --blue-subtle: #e0f2fe;
+  --blue-border: #bae6fd;
+  --blue-text: #0369a1;
+
+  --purple: #8b5cf6;
+  --purple-subtle: #f3e8ff;
+  --purple-border: #e9d5ff;
+  --purple-text: #7e22ce;
+
+  --red: #ef4444;
+  --red-subtle: #fee2e2;
+  --red-border: #fecaca;
+  --red-text: #b91c1c;
+
+  /* Neutrals & Slate Grays */
+  --gray-900: #0f172a;
+  --gray-800: #1e293b;
+  --gray-700: #334155;
+  --gray-600: #475569;
+  --gray-500: #64748b;
+  --gray-400: #94a3b8;
+  --gray-300: #cbd5e1;
+  --gray-200: #e2e8f0;
+  --gray-100: #f1f5f9;
+  --gray-50: #f8fafc;
+  --white: #ffffff;
+
+  /* Canvas & Cards */
+  --bg: #eaf5ef;
+  /* Soft pleasant light-green mint canvas matching user interface */
+  --card: #ffffff;
+  --line: #edf2f7;
+  /* Clean subtle 1px card divider */
+  --line-light: #f8fafc;
+
+  /* Radii (AquaShine Rounded Look) */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  /* Shadows (Subtle, Clean) */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 16px 0 rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 24px -3px rgba(0, 0, 0, 0.06);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   RESET & TYPOGRAPHY
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--gray-700);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s ease;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* ==========================================================================
+   APP GRID LAYOUT
+   ========================================================================== */
+.app {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ==========================================================================
+   SIDEBAR (PURE WHITE CLEAN - AQUASHINE BALANCED & FITTED STANDARD)
+   ========================================================================== */
+aside,
+.sidebar-wrapper {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  padding: 12px 11px 10px 11px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 50;
+  border-right: 1px solid var(--sidebar-border);
+  scrollbar-width: none;
+  /* Firefox: hide scrollbar */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+  box-sizing: border-box;
+}
+
+aside::-webkit-scrollbar,
+.sidebar-wrapper::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari: hide scrollbar completely */
+  width: 0px;
+  height: 0px;
+}
+
+aside::-webkit-scrollbar-thumb,
+.sidebar-wrapper::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Brand Header (Centered & Crisp) */
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px 22px 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--sidebar-border);
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.brand,
+.brand-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  width: 100%;
+}
+
+.brand-logo,
+.brand-img {
+  display: block;
+  height: 48px;
+  width: auto;
+  max-width: 185px;
+  object-fit: contain;
+  transform: scaleY(1.15);
+  transform-origin: center center;
+  margin: 0 auto;
+}
+
+/* Navigation Links & Groups (Comfortable & Airy Spacing) */
+.nav,
+nav.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nav-group:not(:first-child) {
+  border-top: 1px solid var(--sidebar-border);
+  padding-top: 12px;
+}
+
+.nav-title {
+  font-size: 11px;
+  color: #0f172a;
+  /* Bold dark slate - in đậm, sắc nét, tương phản cao */
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  /* Extra bold */
+  padding: 0 10px 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.nav a,
+nav.nav a.nav-link {
+  height: 33px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav a:hover,
+nav.nav a.nav-link:hover {
+  background: var(--gray-50);
+  color: var(--gray-900);
+}
+
+.nav a.active,
+nav.nav a.nav-link.active {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  font-weight: 600 !important;
+}
+
+.nav a.active::before,
+nav.nav a.nav-link.active::before {
+  display: none !important;
+}
+
+.nav a i,
+nav.nav a.nav-link i {
+  font-size: 13.5px;
+  width: 17px;
+  text-align: center;
+  flex: none;
+  color: var(--gray-400);
+  transition: color 0.15s ease;
+}
+
+.nav a:hover i,
+nav.nav a.nav-link:hover i {
+  color: var(--gray-900);
+}
+
+.nav a.active i,
+nav.nav a.nav-link.active i {
+  color: #059669 !important;
+}
+
+.nav .pill-count {
+  margin-left: auto;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: #dcfce7;
+  color: #15803d;
+  line-height: 1.2;
+}
+
+/* Sidebar Footer: Sits comfortably below groups, filling the height naturally */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--sidebar-border);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sidebar-logout-form {
+  width: 100%;
+  margin: 0;
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.sidebar-logout-btn i {
+  font-size: 13.5px;
+  width: 17px;
+  text-align: center;
+  flex: none;
+  color: var(--gray-400);
+  transition: color 0.15s ease;
+}
+
+.sidebar-logout-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.sidebar-logout-btn:hover i {
+  color: #dc2626;
+}
+
+
+
+/* ==========================================================================
+   TOPBAR (AQUASHINE PILL CAPSULE STYLE)
+   ========================================================================== */
+main,
+.admin-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.topbar {
+  height: 48px;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+  white-space: nowrap !important;
+}
+
+.centername {
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gray-700);
+  white-space: nowrap !important;
+  flex: none;
+}
+
+.centername>div,
+.centername span {
+  white-space: nowrap !important;
+}
+
+.mini-logo,
+.centername .badge-org {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--primary-subtle);
+  color: var(--primary);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 12px;
+  flex: none;
+}
+
+.topbar-center {
+  flex: 1;
+  max-width: 440px;
+  min-width: 200px;
+}
+
+.search {
+  position: relative;
+  width: 100%;
+}
+
+.search input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--gray-200);
+  background: var(--gray-50);
+  border-radius: var(--radius-full);
+  /* Pill search input */
+  padding: 0 44px 0 36px;
+  font-size: 13px;
+  color: var(--gray-900);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search input:focus {
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.search svg,
+.search i {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+  color: var(--gray-400);
+  pointer-events: none;
+}
+
+.search-badge {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-400);
+  background: var(--white);
+  padding: 1px 5px;
+  border-radius: 5px;
+  border: 1px solid var(--gray-200);
+  pointer-events: none;
+}
+
+.topbar-right,
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: end;
+  white-space: nowrap !important;
+}
+
+.bell {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-600);
+  font-size: 13px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  /* Circular bell button */
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s ease;
+}
+
+.bell:hover {
+  background: var(--gray-50);
+  color: var(--gray-900);
+  border-color: var(--gray-300);
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px 3px 3px;
+  border-radius: var(--radius-full);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+}
+
+.topbar-user .avatar,
+.account .avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  /* Circular avatar */
+  background: var(--primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 11.5px;
+  flex: none;
+}
+
+.topbar-user-info {
+  line-height: 1.25;
+}
+
+.topbar-user-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--gray-800);
+  display: block;
+}
+
+.topbar-user-role {
+  font-size: 10.5px;
+  color: var(--gray-500);
+}
+
+.btn-logout {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #fee2e2;
+  background: #fef2f2;
+  color: var(--red);
+  border-radius: var(--radius-full);
+  /* Clean pill logout button */
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-logout:hover {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ==========================================================================
+   PAGE HEADER (AQUASHINE STANDARD)
+   ========================================================================= */
+.content {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 12px 20px 24px;
+  width: 100%;
+}
+
+.pagehead,
+.page-header,
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+  padding: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  min-height: auto !important;
+}
+
+.pagehead::before,
+.pagehead::after,
+.welcome::before,
+.welcome::after {
+  display: none !important;
+}
+
+.pagehead-left,
+.welcome-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pagehead-icon {
+  display: none;
+}
+
+.pagehead h1,
+.page-header h1,
+.welcome h1 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.pagehead p,
+.page-header p,
+.welcome p {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.pagehead-actions,
+.page-actions,
+.welcome-actions,
+.quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   KPI SUMMARY METRIC CARDS (EXACT AQUASHINE 4-CARD STYLE)
+   ========================================================================== */
+.summary,
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.metric,
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  /* Rounded-2xl */
+  box-shadow: var(--shadow-xs);
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 125px;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.metric:hover,
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+
+.metric-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.metric-icon.green,
+.metric:nth-child(1) .metric-icon {
+  background: var(--primary-subtle);
+  color: var(--primary);
+}
+
+.metric-icon.blue,
+.metric:nth-child(2) .metric-icon {
+  background: var(--blue-subtle);
+  color: var(--blue);
+}
+
+.metric-icon.amber,
+.metric:nth-child(3) .metric-icon {
+  background: var(--amber-subtle);
+  color: var(--amber);
+}
+
+.metric-icon.purple,
+.metric:nth-child(4) .metric-icon {
+  background: var(--purple-subtle);
+  color: var(--purple);
+}
+
+.metric label,
+.stat-label {
+  font-size: 13px;
+  color: var(--gray-500);
+  font-weight: 600;
+  display: block;
+}
+
+.metric strong,
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gray-900);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 2px 0;
+}
+
+.metric small,
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+  width: fit-content;
+  border: none;
+}
+
+.metric:nth-child(2) small {
+  background: var(--blue-subtle);
+  color: var(--blue-text);
+}
+
+.metric:nth-child(3) small {
+  background: var(--amber-subtle);
+  color: var(--amber-text);
+}
+
+.metric:nth-child(4) small {
+  background: var(--purple-subtle);
+  color: var(--purple-text);
+}
+
+/* ==========================================================================
+   CARDS & SURFACES (AQUASHINE 20PX RADIUS)
+   ========================================================================== */
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow-xs);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.card-head,
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.card-head h2,
+.head h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.card-head p,
+.head p {
+  font-size: 12.5px;
+  color: var(--gray-500);
+  margin: 2px 0 0;
+}
+
+/* ==========================================================================
+   BUTTONS (AQUASHINE PILL BUTTONS)
+   ========================================================================== */
+.btn,
+.btn-emerald,
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: var(--radius-full);
+  /* Pill buttons */
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-700);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.btn:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+  color: var(--gray-900);
+}
+
+.btn.primary,
+.btn-primary,
+.btn-emerald {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25) !important;
+}
+
+.btn.primary:hover,
+.btn-primary:hover,
+.btn-emerald:hover {
+  background: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+.btn-dark {
+  background: var(--gray-900) !important;
+  color: #ffffff !important;
+  border-color: var(--gray-900) !important;
+}
+
+.btn-dark:hover {
+  background: var(--gray-800) !important;
+}
+
+.btn-subtle {
+  background: var(--primary-subtle);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
+}
+
+.btn-subtle:hover {
+  background: #d1fae5;
+  color: var(--primary-active);
+}
+
+.btn-sm,
+.btn-action-sm {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--gray-200);
+  background: #ffffff;
+  color: var(--gray-700);
+  white-space: nowrap !important;
+}
+
+.btn-sm:hover,
+.btn-action-sm:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+  color: var(--gray-900);
+}
+
+.btn-danger,
+.btn-sm.btn-danger {
+  color: var(--red);
+  border-color: var(--red-border);
+  background: var(--red-subtle);
+}
+
+.btn-danger:hover,
+.btn-sm.btn-danger:hover {
+  background: #fee2e2;
+}
+
+.btn-success,
+.btn-sm.btn-success {
+  color: var(--primary);
+  border-color: var(--primary-border);
+  background: var(--primary-subtle);
+}
+
+.btn-success:hover,
+.btn-sm.btn-success:hover {
+  background: #d1fae5;
+}
+
+/* ==========================================================================
+   FORM CONTROLS & INPUTS (AQUASHINE SOFT 12PX RADIUS)
+   ========================================================================== */
+.field,
+.form-group {
+  margin-bottom: 16px;
+}
+
+.field label,
+.form-group label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select,
+.field textarea,
+.form-group input,
+.form-group select,
+.form-group textarea,
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+select,
+textarea {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  color: var(--gray-900);
+  background: #ffffff;
+  outline: none;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+textarea {
+  height: auto !important;
+  padding: 10px 14px !important;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-glow) !important;
+  background: #ffffff !important;
+}
+
+input[readonly],
+select[disabled] {
+  background-color: var(--gray-50) !important;
+  color: var(--gray-600) !important;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   STATUS BADGES & PILLS (AQUASHINE PILL CAPSULES)
+   ========================================================================== */
+.badge,
+.badge-status,
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge.status-active,
+.badge-status.active,
+.badge-active {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.badge.status-inuse,
+.badge-inuse {
+  background: var(--blue-subtle);
+  color: var(--blue-text);
+  border: 1px solid var(--blue-border);
+}
+
+.badge.status-maint,
+.badge-status.locked,
+.badge-maint {
+  background: var(--amber-subtle);
+  color: var(--amber-text);
+  border: 1px solid var(--amber-border);
+}
+
+.badge.status-disabled,
+.badge.status-cancel,
+.badge-danger {
+  background: var(--red-subtle);
+  color: var(--red-text);
+  border: 1px solid var(--red-border);
+}
+
+/* Position Badges */
+.pos-manager {
+  background: var(--purple-subtle);
+  color: var(--purple-text);
+  border: 1px solid var(--purple-border);
+}
+
+.pos-reception {
+  background: var(--blue-subtle);
+  color: var(--blue-text);
+  border: 1px solid var(--blue-border);
+}
+
+.pos-tech {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-200);
+}
+
+/* ==========================================================================
+   DATA TABLES (AQUASHINE CLEAN SOFT STYLE)
+   ========================================================================== */
+.tablewrap,
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+}
+
+table,
+table.user-table,
+table.table-modern {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+table th,
+table.user-table th {
+  background: var(--gray-50);
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: capitalize;
+  /* Clean capitalize instead of aggressive caps */
+  border-bottom: 1px solid var(--line);
+}
+
+table td,
+table.user-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--gray-50);
+  vertical-align: middle;
+  color: var(--gray-800);
+}
+
+table tr:last-child td,
+table.user-table tr:last-child td {
+  border-bottom: none;
+}
+
+table tr:hover td,
+table.user-table tr:hover td {
+  background-color: var(--gray-50);
+}
+
+/* ==========================================================================
+   TWO-COLUMN MANAGEMENT LAYOUT
+   ========================================================================== */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) 370px;
+  gap: 20px;
+  align-items: start;
+}
+
+.formcard {
+  position: sticky;
+  top: 84px;
+}
+
+/* ==========================================================================
+   HORIZONTAL DATA-ENTRY FORM & SCROLLABLE TABLE
+   ========================================================================== */
+.formcard-horizontal {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.2s ease;
+}
+
+.formcard-horizontal .form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.formcard-horizontal .form-head h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-grid-horizontal {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px 14px;
+  align-items: flex-end;
+}
+
+.form-grid-horizontal .field {
+  margin-bottom: 0;
+}
+
+.form-grid-horizontal .form-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Table with Internal Scroll & Sticky Header */
+.tablewrap-scroll {
+  max-height: 480px;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-300) transparent;
+}
+
+.tablewrap-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tablewrap-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--gray-300);
+  border-radius: 999px;
+}
+
+.tablewrap-scroll table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--gray-50);
+  box-shadow: 0 1px 0 var(--line);
+}
+
+/* ==========================================================================
+   MODAL DIALOG SYSTEM (PREMIUM FROSTED GLASS & POP-IN ANIMATION)
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.active {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  transform: scale(0.95);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active .modal-card {
+  transform: scale(1);
+}
+
+.modal-head {
+  padding: 16px 24px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gray-900);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--gray-400);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+.modal-close:hover {
+  background: var(--gray-200);
+  color: var(--gray-800);
+}
+
+.modal-body {
+  padding: 24px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.modal-foot {
+  padding: 14px 24px;
+  background: var(--gray-50);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Modal Form Grid Helpers */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 1200px) {
+
+  .summary,
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .formcard {
+    position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 76px 1fr;
+  }
+
+  .brand-logo,
+  .brand-img {
+    display: none;
+  }
+
+  .brand,
+  .brand-link {
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .brand::before {
+    content: "SH";
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--primary);
+  }
+
+  .nav-title,
+  .nav a span,
+  .nav .pill-count,
+  .sidebar-footer .user-info {
+    display: none;
+  }
+
+  .nav a {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar-footer {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    display: block;
+  }
+
+  aside,
+  .sidebar-wrapper {
+    display: none;
+  }
+
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .topbar-center {
+    display: none;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .summary,
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==========================================================================
+   AQUASHINE REFERENCE DESIGN EXTENSIONS (1:1 PIXEL-PERFECT)
+   ========================================================================== */
+.stat-cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stat-card-aquashine {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  min-height: 100px;
+}
+
+.stat-card-aquashine:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  border-color: var(--gray-300);
+}
+
+.stat-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--gray-500);
+}
+
+.stat-icon-blue {
+  color: #3b82f6;
+  font-size: 13px;
+  width: 16px;
+  text-align: center;
+}
+
+.stat-val-aquashine {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--gray-900);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 5px 0 6px;
+}
+
+.stat-bottom {
+  display: flex;
+  align-items: center;
+}
+
+.pill-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.pill-chip.green {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.pill-chip.blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.pill-chip.red {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.pill-chip.amber {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* AquaShine Middle Row: Spline Chart & Radial Occupancy */
+.dashgrid-aquashine {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(340px, 1.1fr);
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.aquashine-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 15px 18px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  margin-bottom: 12px;
+}
+
+.overview-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.overview-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-circle-blue {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+
+.overview-title-row h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.overview-amount-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-amount {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gray-900);
+  letter-spacing: -0.02em;
+}
+
+.trend-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 11px;
+}
+
+.alert-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.alert-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-title-row h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.filter-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-pill.active {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.filter-pill.warning {
+  background: #fef9c3;
+  color: #ca8a04;
+}
+
+.gauge-wrap {
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-center-label {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.gauge-percent {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gray-900);
+  display: block;
+  letter-spacing: -0.02em;
+}
+
+/* Full-Width Recent Transactions Table (AquaShine Standard) */
+.table-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.table-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-card-title h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.btn-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn-filter-pill:hover {
+  background: #f1f5f9;
+  color: var(--gray-900);
+}
+
+.aquashine-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.aquashine-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.aquashine-table thead tr {
+  background: #f8fafc;
+}
+
+.aquashine-table thead th {
+  padding: 12px 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: left;
+  border: none;
+}
+
+.aquashine-table thead th:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.aquashine-table thead th:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.aquashine-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.aquashine-table tbody tr:hover {
+  background: #fcfdfe;
+}
+
+.aquashine-table tbody td {
+  padding: 15px 18px;
+  font-size: 13.5px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.activity-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-name {
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+@media (max-width: 1200px) {
+  .stat-cards-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .dashgrid-aquashine {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-cards-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==========================================================================
+   VIEWPORT HEIGHT OPTIMIZATION (EVEN RHYTHM ACROSS ALL VIEWPORT SIZES)
+   ========================================================================== */
+@media (max-height: 750px) {
+
+  aside,
+  .sidebar-wrapper {
+    padding: 10px 10px 8px 10px;
+  }
+
+  .brand-row {
+    padding: 4px 6px 8px 6px;
+    margin-bottom: 6px;
+  }
+
+  .brand-logo,
+  .brand-img {
+    height: 40px;
+    max-width: 170px;
+  }
+
+  .nav,
+  nav.nav {
+    gap: 8px;
+  }
+
+  .nav-group {
+    gap: 2px;
+  }
+
+  .nav-group:not(:first-child) {
+    border-top: 1px solid var(--sidebar-border);
+    padding-top: 8px;
+  }
+
+  .nav-title {
+    font-size: 10.5px;
+    padding: 0 8px 3px 8px;
+  }
+
+  .nav a,
+  nav.nav a.nav-link {
+    height: 30.5px;
+    font-size: 12.5px;
+    gap: 9px;
+    padding: 0 8px;
+  }
+
+  .sidebar-footer {
+    padding-top: 8px;
+  }
+
+  .sidebar-logout-btn {
+    height: 30.5px;
+    font-size: 12.5px;
+    padding: 0 8px;
+    gap: 9px;
+  }
+}
+
+@media (max-height: 680px) {
+
+  aside,
+  .sidebar-wrapper {
+    padding: 8px 8px 6px 8px;
+  }
+
+  .brand-row {
+    padding: 2px 4px 6px;
+    margin-bottom: 4px;
+  }
+
+  .brand-logo,
+  .brand-img {
+    height: 32px;
+    max-width: 145px;
+  }
+
+  .nav,
+  nav.nav {
+    gap: 4px;
+  }
+
+  .nav-group {
+    gap: 1px;
+  }
+
+  .nav-group:not(:first-child) {
+    border-top: 1px solid var(--sidebar-border);
+    padding-top: 4px;
+  }
+
+  .nav-title {
+    font-size: 9.5px;
+    padding: 0 6px 1px 6px;
+  }
+
+  .nav a,
+  nav.nav a.nav-link {
+    height: 26px;
+    font-size: 11.5px;
+    gap: 7px;
+    padding: 0 7px;
+  }
+
+  .nav a i,
+  nav.nav a.nav-link i {
+    font-size: 12px;
+    width: 15px;
+  }
+
+  .sidebar-footer {
+    padding-top: 4px;
+  }
+
+  .sidebar-logout-btn {
+    height: 26px;
+    font-size: 11.5px;
+    padding: 0 7px;
+    gap: 7px;
+  }
+
+  .sidebar-logout-btn i {
+    font-size: 12px;
+    width: 15px;
+  }
+
+  .topbar {
+    height: 44px;
+  }
+
+  .content {
+    padding: 10px 18px 20px;
+  }
+
+  .stat-card-aquashine {
+    min-height: 85px;
+    padding: 10px 12px;
+  }
+
+  .stat-val-aquashine {
+    font-size: 22px;
+    margin: 4px 0 5px;
+  }
+
+  .gauge-wrap {
+    height: 150px;
+  }
+}
+
+@media (max-height: 580px) {
+
+  aside,
+  .sidebar-wrapper {
+    padding: 4px 6px;
+  }
+
+  .brand-row {
+    padding: 1px 2px 4px;
+    margin-bottom: 2px;
+  }
+
+  .brand-logo,
+  .brand-img {
+    height: 26px;
+    max-width: 130px;
+  }
+
+  .nav,
+  nav.nav {
+    gap: 2px;
+  }
+
+  .nav-group {
+    gap: 0.5px;
+  }
+
+  .nav-group:not(:first-child) {
+    border-top: 1px solid var(--sidebar-border);
+    padding-top: 3px;
+  }
+
+  .nav-title {
+    font-size: 9px;
+    padding: 0 4px 1px 4px;
+  }
+
+  .nav a,
+  nav.nav a.nav-link {
+    height: 24px;
+    font-size: 11px;
+    gap: 6px;
+    padding: 0 5px;
+  }
+
+  .nav a i,
+  nav.nav a.nav-link i {
+    font-size: 11px;
+    width: 14px;
+  }
+
+  .sidebar-footer {
+    padding-top: 3px;
+  }
+
+  .sidebar-logout-btn {
+    height: 24px;
+    font-size: 11px;
+    padding: 0 5px;
+    gap: 6px;
+  }
+
+  .sidebar-logout-btn i {
+    font-size: 11px;
+    width: 14px;
+  }
+
+  .topbar {
+    height: 40px;
+  }
+
+  .content {
+    padding: 6px 12px 14px;
+  }
+}
+
+/* ==========================================================================
+   LOGOUT CONFIRMATION MODAL (AQUASHINE PREMIUM STANDARD)
+   ========================================================================== */
+.logout-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.logout-modal-backdrop.show {
+  display: flex !important;
+}
+
+.logout-modal-card {
+  background: #ffffff;
+  border-radius: 24px;
+  max-width: 440px;
+  width: 100%;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+  animation: logoutScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes logoutScaleUp {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.logout-modal-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 18px;
+  box-shadow: 0 8px 16px -4px rgba(239, 68, 68, 0.2);
+}
+
+.logout-modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.logout-modal-desc {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.logout-modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-logout-cancel {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-logout-cancel:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-logout-confirm {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: none;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  font-family: inherit;
+}
+
+.btn-logout-confirm:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+/* ==========================================================================
+   HORIZONTAL TOP NAVIGATION BAR (FOR RECEPTIONIST & OPERATOR ROLES)
+   Maximizes screen width for Court Timeline Grid & Operational Matrix
+   ========================================================================== */
+.horizontal-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper,
+.horizontal-layout .sidebar-wrapper {
+  position: sticky !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 24px !important;
+  background: #ffffff !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--sidebar-border) !important;
+  z-index: 1000 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .brand-row {
+  width: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-bottom: none !important;
+  flex-shrink: 0 !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .brand-img {
+  height: 38px !important;
+  max-height: 38px !important;
+  width: auto !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .nav {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 20px !important;
+  padding: 0 !important;
+  flex: 1 !important;
+  overflow-x: auto !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .nav-group {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .nav-title {
+  display: none !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .nav a {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 14px !important;
+  border-radius: var(--radius-full) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+  color: var(--sidebar-text) !important;
+  transition: all 0.15s ease !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .nav a:hover {
+  background: var(--sidebar-surface) !important;
+  color: var(--sidebar-text-hover) !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .nav a.active {
+  background: var(--primary-subtle) !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .sidebar-footer {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-top: none !important;
+  width: auto !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+/* Hide duplicate second topbar in horizontal layout */
+.horizontal-layout header.topbar {
+  display: none !important;
+}
+
+/* Chuông thông báo trên thanh taskbar ngang */
+.horizontal-topbar-bell {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--gray-200);
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-600);
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.horizontal-topbar-bell:hover {
+  background: var(--gray-100);
+  color: var(--primary);
+  border-color: var(--primary-border);
+}
+.horizontal-topbar-bell .bell-badge-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+}
+
+/* Khối thông tin tài khoản trên taskbar ngang */
+.horizontal-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 5px;
+  border-radius: 30px;
+  background: #f8fafc;
+  border: 1px solid var(--gray-200);
+}
+.horizontal-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(5, 150, 105, 0.25);
+  flex-shrink: 0;
+}
+.horizontal-user-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.horizontal-user-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--gray-900);
+  white-space: nowrap;
+}
+.horizontal-user-role {
+  font-size: 11px;
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+
+/* Default vertical sidebar: hide horizontal-specific items */
+aside.sidebar-wrapper:not(.horizontal-nav) .horizontal-topbar-bell,
+aside.sidebar-wrapper:not(.horizontal-nav) .horizontal-topbar-user {
+  display: none !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .sidebar-logout-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  border-radius: var(--radius-full) !important;
+  border: 1px solid #fee2e2 !important;
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.horizontal-layout aside.sidebar-wrapper .sidebar-logout-btn:hover {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  transform: translateY(-1px) !important;
+}
+
+.horizontal-layout main {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 !important;
+}

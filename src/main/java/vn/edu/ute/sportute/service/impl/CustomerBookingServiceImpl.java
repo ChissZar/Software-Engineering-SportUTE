@@ -1,5 +1,6 @@
 package vn.edu.ute.sportute.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.edu.ute.sportute.dto.request.AdminBookingDTO;
@@ -9,6 +10,7 @@ import vn.edu.ute.sportute.dto.response.CustomerCourtCardDTO;
 import vn.edu.ute.sportute.entity.*;
 import vn.edu.ute.sportute.repository.*;
 import vn.edu.ute.sportute.service.CustomerBookingService;
+import vn.edu.ute.sportute.service.EmailService;
 import vn.edu.ute.sportute.util.IdGenerator;
 
 import java.math.BigDecimal;
@@ -23,6 +25,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CustomerBookingServiceImpl implements CustomerBookingService {
+
+    @Autowired(required = false)
+    private EmailService emailService;
 
     private final CourtRepository courtRepository;
     private final BookingRepository bookingRepository;
@@ -170,7 +175,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     }
 
     @Override
-    public void bookCourtOnline(CustomerBookingRequestDTO request, String accountUsernameOrEmail) {
+    public Booking bookCourtOnline(CustomerBookingRequestDTO request, String accountUsernameOrEmail) {
         LocalDateTime startDateTime = LocalDateTime.of(request.getBookingDate(), request.getStartTime());
         LocalDateTime endDateTime = startDateTime.plusMinutes(request.getDurationMinutes());
 
@@ -197,7 +202,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                 .customer(customer)
                 .employee(null) // Đặt online không qua nhân viên lễ tân lập
                 .bookingPolicy(defaultPolicy)
-                .status("Chờ xác nhận") // Lưu ở trạng thái Chờ xác nhận theo quy định cọc
+                .status("Đã xác nhận") // Thanh toán thành công -> chuyển thẳng sang Đã xác nhận giữ sân
                 .build();
 
         BookingDetail detail = BookingDetail.builder()
@@ -211,7 +216,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         booking.getBookingDetails().add(detail);
         Booking savedBooking = bookingRepository.save(booking);
 
-        // 4. Lưu nghĩa vụ thanh toán tạm tính (Cọc)
+        // 4. Lưu nghĩa vụ thanh toán (Cọc hoặc Toàn phần)
         BigDecimal total = request.getTotalAmount();
         if (total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
             BigDecimal hourlyRate = getCourtHourlyRate(court.getId(), request.getBookingDate(), court.getSport());
@@ -219,14 +224,55 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                     .divide(BigDecimal.valueOf(60), 0, RoundingMode.HALF_UP);
         }
 
+        if (request.getDiscountAmount() != null && request.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0) {
+            total = total.subtract(request.getDiscountAmount());
+            if (total.compareTo(BigDecimal.ZERO) < 0) total = BigDecimal.ZERO;
+        }
+
+        BigDecimal payAmount = total;
+        String transType = "Thanh toán";
+        if ("DEPOSIT_30".equalsIgnoreCase(request.getDepositChoice())) {
+            payAmount = total.multiply(BigDecimal.valueOf(30)).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
+            transType = "Cọc";
+        }
+
+        String pMethod = (request.getPaymentMethod() != null && !request.getPaymentMethod().isBlank())
+                ? request.getPaymentMethod() : "Chuyển khoản VietQR";
+        if (pMethod.length() > 30) pMethod = pMethod.substring(0, 30);
+
         Payment payment = Payment.builder()
                 .id(IdGenerator.generateId("GD"))
                 .booking(savedBooking)
-                .transactionType("Cọc")
-                .amount(total)
-                .paymentMethod("Chuyển khoản")
+                .transactionType(transType)
+                .amount(payAmount)
+                .paymentMethod(pMethod)
                 .build();
         paymentRepository.save(payment);
+
+        // 5. Tự động gửi Vé điện tử chính thức qua Email cho khách hàng (chạy bất đồng bộ để phản hồi web tức thì)
+        if (emailService != null) {
+            String custEmail = (customer != null && customer.getEmail() != null) ? customer.getEmail().trim() : null;
+            if (custEmail == null || custEmail.isBlank()) {
+                if (customer != null && customer.getAccount() != null && customer.getAccount().getEmail() != null) {
+                    custEmail = customer.getAccount().getEmail().trim();
+                }
+            }
+            if (custEmail != null && custEmail.contains("@")) {
+                final String targetEmail = custEmail;
+                final String custName = (customer != null && customer.getFullName() != null) ? customer.getFullName() : "Quý khách";
+                final BigDecimal depPaid = payAmount;
+                final BigDecimal remAtCounter = total.subtract(payAmount);
+                java.util.concurrent.CompletableFuture.runAsync(() -> {
+                    try {
+                        emailService.sendBookingTicketEmail(targetEmail, custName, savedBooking, depPaid, remAtCounter);
+                    } catch (Exception ex) {
+                        System.err.println("[CustomerBookingService] Lỗi gửi email vé điện tử: " + ex.getMessage());
+                    }
+                });
+            }
+        }
+
+        return savedBooking;
     }
 
     @Override

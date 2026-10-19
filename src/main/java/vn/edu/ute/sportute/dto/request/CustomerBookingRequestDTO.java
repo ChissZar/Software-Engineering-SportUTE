@@ -12,16 +12,20 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomerBookingRequestDTO {
     @NotBlank(message = "Vui lòng chọn sân")
     private String courtId;
 
     @NotNull(message = "Vui lòng chọn ngày thuê")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate bookingDate;
 
     @NotNull(message = "Vui lòng chọn giờ bắt đầu")
     @DateTimeFormat(pattern = "HH:mm")
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
     @Builder.Default
@@ -31,21 +35,13 @@ public class CustomerBookingRequestDTO {
 
     private String note;
 
-    public CustomerBookingRequestDTO() {
-        this.durationMinutes = 120;
-    }
+    @Builder.Default
+    private String paymentMethod = "Chuyển khoản VietQR";
 
-    public CustomerBookingRequestDTO(String courtId, LocalDate bookingDate, LocalTime startTime,
-                                     int durationMinutes, BigDecimal totalAmount, String note) {
-        this.courtId = courtId;
-        this.bookingDate = bookingDate;
-        this.startTime = startTime;
-        this.durationMinutes = durationMinutes;
-        this.totalAmount = totalAmount;
-        this.note = note;
-    }
-    public static class CustomerBookingRequestDTOBuilder {
-        public CustomerBookingRequestDTOBuilder() {
-        }
-    }
+    @Builder.Default
+    private String depositChoice = "DEPOSIT_30";
+
+    private String voucherCode;
+
+    private BigDecimal discountAmount;
 }

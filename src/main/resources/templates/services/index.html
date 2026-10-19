@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SportHub — Quản lý Dịch vụ, Nước uống & Phụ kiện</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Font Awesome 6.5.1 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Unified Admin Design System -->
+<link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+<div class="app">
+  <!-- Shared Sidebar -->
+  <div th:replace="~{fragments/sidebar :: sidebar('services')}"></div>
+
+  <main>
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="centername">
+          <div class="mini-logo"><i class="fa-solid fa-bottle-water"></i></div>
+          <span>Trung tâm Thể thao SportHub</span>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <form class="search" action="/admin/services" method="get">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm theo mã, tên món, loại dịch vụ...">
+        </form>
+      </div>
+      <div class="topbar-right">
+        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <div class="topbar-user">
+          <div class="avatar" th:text="${currentUser != null ? currentUser.avatarInitials : 'QL'}">QL</div>
+          <div class="topbar-user-info">
+            <span class="topbar-user-name" th:text="${currentUser != null ? currentUser.fullName : 'Quản lý trung tâm'}">Quản lý trung tâm</span>
+            <span class="topbar-user-role" th:text="${currentUser != null ? currentUser.roleName : 'Quản trị viên'}">Quản trị viên</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Flash Messages -->
+      <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+      </div>
+
+      <!-- Pagehead Banner -->
+      <section class="pagehead">
+        <div class="pagehead-left">
+          <div class="pagehead-icon">
+            <i class="fa-solid fa-mug-hot"></i>
+          </div>
+          <div>
+            <h1>Quản lý Dịch vụ, Nước uống & Thuê dụng cụ</h1>
+            <p>Hệ sinh thái tiện ích đi kèm: giải khát bù khoáng, đồ ăn nhẹ, cho thuê vợt/bóng và phụ kiện thể thao</p>
+          </div>
+        </div>
+        <div class="pagehead-actions">
+          <button type="button" class="btn primary" onclick="openServiceCreateModal()">
+            <i class="fa-solid fa-plus"></i> Thêm mặt hàng mới
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI Metrics -->
+      <section class="summary" style="grid-template-columns: repeat(5, minmax(0, 1fr));">
+        <div class="metric">
+          <div class="metric-icon green"><i class="fa-solid fa-boxes-stacked"></i></div>
+          <div>
+            <label>Tổng mặt hàng</label>
+            <strong th:text="${stats != null and stats['total'] != null ? stats['total'] : 0}">0</strong>
+            <small>Đang quản lý</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon blue"><i class="fa-solid fa-bottle-water"></i></div>
+          <div>
+            <label>Nước giải khát</label>
+            <strong th:text="${stats != null and stats['drinks'] != null ? stats['drinks'] : 0}">0</strong>
+            <small>Bù khoáng & Tăng lực</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon amber"><i class="fa-solid fa-burger"></i></div>
+          <div>
+            <label>Đồ ăn nhẹ</label>
+            <strong th:text="${stats != null and stats['food'] != null ? stats['food'] : 0}">0</strong>
+            <small>Bổ sung năng lượng</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon purple"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
+          <div>
+            <label>Thuê dụng cụ</label>
+            <strong th:text="${stats != null and stats['gear'] != null ? stats['gear'] : 0}">0</strong>
+            <small>Vợt, bóng, áo bib</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon green" style="background:#ecfdf5; color:#047857;"><i class="fa-solid fa-shield-heart"></i></div>
+          <div>
+            <label>Phụ kiện thi đấu</label>
+            <strong th:text="${stats != null and stats['accessories'] != null ? stats['accessories'] : 0}">0</strong>
+            <small>Vớ, quấn cán, băng gối</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- 100% Full-Width Card (Option 1) -->
+      <section class="card" style="width: 100%;">
+        <div class="card-head">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <h2>Danh mục sản phẩm & Dịch vụ tiện ích</h2>
+            <span class="badge status-inuse" th:text="${services != null ? #lists.size(services) + ' mặt hàng' : '0 mặt hàng'}">0 mặt hàng</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="position:relative; width: 240px;">
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--gray-400); font-size:12px;"></i>
+              <input type="text" id="serviceQuickSearch" placeholder="Tìm kiếm nhanh tên, phân loại..." oninput="filterServicesClient(this.value)" style="height:34px; padding-left:30px; padding-right:10px; border-radius:8px; border:1px solid var(--line); font-size:12px; width:100%; background:#ffffff;">
+            </div>
+            <form action="/admin/services" method="get" style="display:flex; gap:8px; margin:0;">
+              <input type="hidden" name="keyword" th:value="${currentKeyword}">
+              <select name="category" onchange="this.form.submit()" style="height:34px; font-size:12px; border-radius:8px; border:1px solid var(--line); padding:0 10px; background:var(--gray-50);">
+                <option value="Tất cả" th:selected="${currentCategory == null or currentCategory == 'Tất cả'}">Tất cả danh mục</option>
+                <option value="Thức uống" th:selected="${currentCategory == 'Thức uống'}">Nước giải khát</option>
+                <option value="Đồ ăn nhẹ" th:selected="${currentCategory == 'Đồ ăn nhẹ'}">Đồ ăn nhẹ</option>
+                <option value="Thuê dụng cụ" th:selected="${currentCategory == 'Thuê dụng cụ'}">Thuê dụng cụ</option>
+                <option value="Phụ kiện" th:selected="${currentCategory == 'Phụ kiện'}">Phụ kiện thi đấu</option>
+              </select>
+            </form>
+          </div>
+        </div>
+
+        <div class="tablewrap tablewrap-scroll">
+          <table id="servicesTable">
+            <thead>
+              <tr>
+                <th style="width: 70px;">Hình ảnh</th>
+                <th style="width: 80px;">Mã</th>
+                <th>Tên sản phẩm / Dịch vụ</th>
+                <th>Phân loại</th>
+                <th>Đơn vị tính</th>
+                <th>Đơn giá</th>
+                <th>Tồn kho</th>
+                <th>Trạng thái</th>
+                <th style="text-align:right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="s : ${services}"
+                  th:data-id="${s.id}"
+                  th:data-name="${s.name}"
+                  th:data-cat="${s.category}"
+                  th:data-unit="${s.unit}"
+                  th:data-price="${s.price}"
+                  th:data-stock="${s.stock}"
+                  th:data-status="${s.status}"
+                  onclick="handleServiceRowClick(this, event)"
+                  style="cursor:pointer;"
+                  title="Bấm vào dòng để xem chi tiết đầy đủ mặt hàng này">
+                <td>
+                  <img th:src="${(s.imageUrl != null and (#strings.startsWith(s.imageUrl, 'http://') or #strings.startsWith(s.imageUrl, 'https://') or #strings.startsWith(s.imageUrl, '/uploads/'))) ? s.imageUrl : (s.category == 'Thức uống' ? '/images/services/drinks.jpg' : (s.category == 'Đồ ăn nhẹ' ? '/images/services/snacks.jpg' : (s.category == 'Thuê dụng cụ' ? '/images/services/gear.jpg' : '/images/services/accessories.jpg')))}"
+                       alt="Service thumbnail"
+                       th:data-fallback="${s.category == 'Thức uống' ? '/images/services/drinks.jpg' : (s.category == 'Đồ ăn nhẹ' ? '/images/services/snacks.jpg' : (s.category == 'Thuê dụng cụ' ? '/images/services/gear.jpg' : '/images/services/accessories.jpg'))}"
+                       onerror="this.onerror=null; this.src=(this.getAttribute('data-fallback') || '/images/services/drinks.jpg');"
+                       style="width: 46px; height: 46px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; transition: transform 0.15s ease;"
+                       onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'"
+                       th:data-id="${s.id}"
+                       th:data-name="${s.name}"
+                       th:data-cat="${s.category}"
+                       th:data-unit="${s.unit}"
+                       th:data-price="${s.price}"
+                       th:data-stock="${s.stock}"
+                       th:data-status="${s.status}"
+                       th:data-img="${s.imageUrl}"
+                       onclick="openServiceViewModal(this)"
+                       title="Bấm để xem chi tiết sản phẩm">
+                </td>
+                <td style="font-weight:800; color:var(--primary);" th:text="${s.id}"></td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <i th:class="${s.category == 'Thức uống' ? 'fa-solid fa-bottle-water text-primary' : (s.category == 'Đồ ăn nhẹ' ? 'fa-solid fa-cookie-bite text-warning' : (s.category == 'Thuê dụng cụ' ? 'fa-solid fa-table-tennis-paddle-ball text-info' : 'fa-solid fa-shield-heart text-success'))}"></i>
+                    <b th:text="${s.name}"></b>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${s.category == 'Thức uống' ? 'status-active' : (s.category == 'Đồ ăn nhẹ' ? 'status-maint' : (s.category == 'Thuê dụng cụ' ? 'status-inuse' : 'status-active'))}"
+                        th:text="${s.category}"></span>
+                </td>
+                <td>
+                  <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--line);" th:text="${s.unit}"></span>
+                </td>
+                <td>
+                  <strong style="color:var(--primary-dark); font-size:13.5px;" th:text="${#numbers.formatDecimal(s.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                </td>
+                <td>
+                  <span th:if="${s.stock > 10}" class="badge status-inuse" th:text="${s.stock} + ' ' + ${s.unit}"></span>
+                  <span th:if="${s.stock <= 10 and s.stock > 0}" class="badge status-maint" title="Sắp hết hàng" th:text="'Còn ' + ${s.stock} + ' ' + ${s.unit}"></span>
+                  <span th:if="${s.stock <= 0}" class="badge status-disabled" th:text="'Hết hàng'"></span>
+                </td>
+                <td>
+                  <span class="badge" th:classappend="${s.status == 'Đang bán' ? 'status-active' : 'status-disabled'}" th:text="${s.status}"></span>
+                </td>
+                <td style="text-align:right; white-space:nowrap;">
+                  <button type="button" class="btn btn-sm"
+                          th:data-id="${s.id}"
+                          th:data-name="${s.name}"
+                          th:data-cat="${s.category}"
+                          th:data-unit="${s.unit}"
+                          th:data-price="${s.price}"
+                          th:data-stock="${s.stock}"
+                          th:data-status="${s.status}"
+                          th:data-img="${s.imageUrl}"
+                          onclick="openServiceViewModal(this)"
+                          title="Xem chi tiết đầy đủ">
+                    <i class="fa-regular fa-eye"></i> Chi tiết
+                  </button>
+                  <button type="button" class="btn btn-sm"
+                          th:data-id="${s.id}"
+                          th:data-name="${s.name}"
+                          th:data-cat="${s.category}"
+                          th:data-unit="${s.unit}"
+                          th:data-price="${s.price}"
+                          th:data-stock="${s.stock}"
+                          th:data-status="${s.status}"
+                          th:data-img="${s.imageUrl}"
+                          onclick="openServiceEditModal(this)">
+                    <i class="fa-solid fa-pen" style="color:var(--primary);"></i> Sửa
+                  </button>
+                  <form th:action="@{/admin/services/toggle/{id}(id=${s.id})}" method="post" style="display:inline;"
+                        onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái kinh doanh của mặt hàng này?');">
+                    <button type="submit" class="btn btn-sm" th:classappend="${s.status == 'Đang bán' ? 'btn-danger' : 'btn-confirm'}" title="Đổi trạng thái kinh doanh">
+                      <i class="fa-solid fa-power-off"></i>
+                    </button>
+                  </form>
+                  <form th:action="@{/admin/services/delete/{id}(id=${s.id})}" method="post" style="display:inline;"
+                        onsubmit="return confirm('Bạn có chắc muốn xóa mặt hàng này khỏi hệ thống?');">
+                    <button type="submit" class="btn btn-sm btn-danger" title="Xóa mặt hàng">
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${services == null or #lists.isEmpty(services)}">
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="fa-solid fa-inbox fs-2 mb-2 d-block"></i>
+                  Không tìm thấy dịch vụ hoặc sản phẩm nào.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Modal CRUD Dịch vụ / Sản phẩm (Option 1) -->
+<div class="modal-overlay" id="serviceModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="serviceModalTitle"><i class="fa-solid fa-bottle-water" style="color:var(--primary);"></i> Thêm Mặt Hàng / Dịch Vụ Mới</h3>
+      <button type="button" class="modal-close" onclick="closeServiceModal()">&times;</button>
+    </div>
+    <form th:action="@{/admin/services/save}" th:object="${serviceDTO}" method="post" enctype="multipart/form-data">
+      <div class="modal-body">
+        <input type="hidden" th:field="*{id}" id="modalServiceId">
+
+        <div class="field">
+          <label>Tên sản phẩm / Dịch vụ (*)</label>
+          <input type="text" th:field="*{name}" id="modalServiceName" placeholder="Ví dụ: Nước Revive Chanh Muối, Thuê vợt Yonex..." required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="field">
+            <label>Phân loại (*)</label>
+            <select th:field="*{category}" id="modalServiceCategory" required>
+              <option value="Thức uống">Nước giải khát / Bù khoáng</option>
+              <option value="Đồ ăn nhẹ">Đồ ăn nhẹ / Dinh dưỡng</option>
+              <option value="Thuê dụng cụ">Thuê dụng cụ (Vợt, bóng...)</option>
+              <option value="Phụ kiện">Phụ kiện thi đấu (Vớ, quấn cán...)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Đơn vị tính (*)</label>
+            <select th:field="*{unit}" id="modalServiceUnit" required>
+              <option value="Chai">Chai</option>
+              <option value="Lon">Lon</option>
+              <option value="Cái">Cái</option>
+              <option value="Cây">Cây (Vợt)</option>
+              <option value="Quả">Quả (Bóng)</option>
+              <option value="Đôi">Đôi (Vớ, giày)</option>
+              <option value="Giờ">Giờ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="field">
+            <label>Đơn giá bán / thuê (VNĐ) (*)</label>
+            <input type="number" th:field="*{price}" id="modalServicePrice" min="0" step="1000" placeholder="Ví dụ: 15000" required>
+          </div>
+
+          <div class="field">
+            <label>Số lượng tồn kho (*)</label>
+            <input type="number" th:field="*{stock}" id="modalServiceStock" min="0" placeholder="Ví dụ: 50" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Tải ảnh sản phẩm (Lưu trữ đám mây Cloudinary / Máy chủ)</label>
+          <input type="file" name="imageFile" id="modalServiceImageFile" accept="image/*" style="padding:6px; font-size:12px; height:auto;">
+          <input type="hidden" th:field="*{imageUrl}" id="modalServiceImageUrl">
+          <small style="color:var(--gray-500); font-size:11px;">Hỗ trợ định dạng JPG, PNG, WEBP (tối đa 10MB). Tự động đẩy lên Cloudinary.</small>
+        </div>
+
+        <div class="field mb-0">
+          <label>Trạng thái kinh doanh</label>
+          <select th:field="*{status}" id="modalServiceStatus">
+            <option value="Đang bán">Đang bán</option>
+            <option value="Tạm ngưng">Tạm ngưng</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeServiceModal()">Hủy bỏ</button>
+        <button type="submit" class="btn primary">
+          <i class="fa-solid fa-floppy-disk"></i> Lưu mặt hàng
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     MODAL: XEM CHI TIẾT SẢN PHẨM / DỊCH VỤ (POPUP THÔNG TIN ĐẦY ĐỦ)
+     ========================================================================== -->
+<div class="modal-overlay" id="serviceViewModal">
+  <div class="modal-card" style="max-width: 520px;">
+    <div class="modal-head">
+      <h3 style="display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-circle-info" style="color:var(--primary);"></i>
+        <span>Chi tiết mặt hàng / Dịch vụ</span>
+      </h3>
+      <button type="button" class="modal-close" onclick="closeServiceViewModal()">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 20px;">
+      <div style="position:relative; width:100%; height:180px; border-radius:12px; overflow:hidden; margin-bottom:16px; border:1px solid var(--line);">
+        <img id="viewServiceImg" src="/images/services/drinks.jpg" alt="Service Photo" style="width:100%; height:100%; object-fit:cover;">
+        <span id="viewServiceStatusBadge" class="badge status-active" style="position:absolute; top:12px; right:12px; font-size:12px; padding:6px 14px; box-shadow:var(--shadow-sm);">Đang bán</span>
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <div>
+          <span style="font-size:12px; color:var(--gray-500); font-weight:700;" id="viewServiceId">#DV01</span>
+          <h2 style="font-size:20px; font-weight:800; color:var(--gray-900); margin:2px 0 0 0;" id="viewServiceName">Nước khoáng bù điện giải Pocari Sweat</h2>
+        </div>
+        <span class="badge" style="background:var(--primary-subtle); color:var(--primary); font-size:12px; padding:6px 12px; border:1px solid var(--primary-border);" id="viewServiceCat">
+          Nước giải khát
+        </span>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin-bottom:14px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div>
+          <div style="font-size:11px; color:var(--gray-500); text-transform:uppercase; font-weight:700;">Đơn giá niêm yết</div>
+          <div style="font-weight:800; color:var(--primary); font-size:16px; margin-top:2px;" id="viewServicePrice">15.000 đ</div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--gray-500); text-transform:uppercase; font-weight:700;">Tồn kho khả dụng</div>
+          <div style="font-weight:700; color:var(--gray-800); font-size:14px; margin-top:2px;" id="viewServiceStock">Còn 45 chai</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="font-size:12px; font-weight:800; color:var(--gray-700); margin-bottom:6px;">Chính sách & Hướng dẫn phục vụ:</div>
+        <div style="font-size:13px; color:var(--gray-600); line-height:1.5; background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 14px;" id="viewServiceDesc">
+          Sản phẩm luôn được ướp lạnh sẵn tại quầy lễ tân SportHub. Khách hàng có thể mua trực tiếp tại quầy hoặc yêu cầu nhân viên mang ra sân thi đấu.
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn primary" onclick="closeServiceViewModal()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openServiceViewModal(btn) {
+    const id = btn.getAttribute('data-id');
+    const name = btn.getAttribute('data-name');
+    const cat = btn.getAttribute('data-cat');
+    const unit = btn.getAttribute('data-unit') || 'cái';
+    const price = btn.getAttribute('data-price') || '0';
+    const stock = btn.getAttribute('data-stock') || '0';
+    const status = btn.getAttribute('data-status') || 'Đang bán';
+
+    document.getElementById('viewServiceId').innerText = '#' + id;
+    document.getElementById('viewServiceName').innerText = name;
+    document.getElementById('viewServiceCat').innerText = cat;
+    document.getElementById('viewServicePrice').innerText = Number(price).toLocaleString('vi-VN') + ' đ / ' + unit;
+    document.getElementById('viewServiceStock').innerText = 'Còn ' + stock + ' ' + unit;
+
+    const customImg = btn.getAttribute('data-img');
+    let imgUrl = (customImg && customImg.trim() !== '') ? customImg : '/images/services/drinks.jpg';
+    if (!customImg || customImg.trim() === '') {
+      if (cat === 'Thức uống') imgUrl = '/images/services/drinks.jpg';
+      else if (cat === 'Đồ ăn nhẹ') imgUrl = '/images/services/snacks.jpg';
+      else if (cat === 'Thuê dụng cụ') imgUrl = '/images/services/gear.jpg';
+      else if (cat === 'Phụ kiện') imgUrl = '/images/services/accessories.jpg';
+    }
+    document.getElementById('viewServiceImg').src = imgUrl;
+
+    const badge = document.getElementById('viewServiceStatusBadge');
+    badge.innerText = status;
+    badge.className = 'badge ' + (status === 'Đang bán' ? 'status-active' : 'status-disabled');
+
+    document.getElementById('serviceViewModal').classList.add('active');
+  }
+
+  function closeServiceViewModal() {
+    document.getElementById('serviceViewModal').classList.remove('active');
+  }
+
+  function handleServiceRowClick(row, event) {
+    if (event.target.closest('button, a, input, select, form')) return;
+    openServiceViewModal(row);
+  }
+
+  function filterServicesClient(query) {
+    const q = (query || '').toLowerCase().trim();
+    document.querySelectorAll('#servicesTable tbody tr').forEach(tr => {
+      const text = tr.innerText.toLowerCase();
+      tr.style.display = text.includes(q) ? '' : 'none';
+    });
+  }
+
+  function openServiceCreateModal() {
+    document.getElementById('modalServiceId').value = '';
+    document.getElementById('modalServiceName').value = '';
+    document.getElementById('modalServiceCategory').value = 'Thức uống';
+    document.getElementById('modalServiceUnit').value = 'Chai';
+    document.getElementById('modalServicePrice').value = '';
+    document.getElementById('modalServiceStock').value = '50';
+    document.getElementById('modalServiceStatus').value = 'Đang bán';
+    const imgHidden = document.getElementById('modalServiceImageUrl');
+    if (imgHidden) imgHidden.value = '';
+    document.getElementById('serviceModalTitle').innerHTML = '<i class="fa-solid fa-bottle-water" style="color:var(--primary);"></i> Thêm Mặt Hàng / Dịch Vụ Mới';
+    document.getElementById('serviceModal').classList.add('active');
+  }
+
+  function openServiceEditModal(btn) {
+    const id = btn.getAttribute('data-id');
+    const name = btn.getAttribute('data-name');
+    const cat = btn.getAttribute('data-cat');
+    const unit = btn.getAttribute('data-unit');
+    const price = btn.getAttribute('data-price');
+    const stock = btn.getAttribute('data-stock');
+    const status = btn.getAttribute('data-status');
+    const img = btn.getAttribute('data-img');
+
+    document.getElementById('modalServiceId').value = id;
+    document.getElementById('modalServiceName').value = name;
+    document.getElementById('modalServiceCategory').value = cat;
+    document.getElementById('modalServiceUnit').value = unit;
+    document.getElementById('modalServicePrice').value = price;
+    document.getElementById('modalServiceStock').value = stock;
+    document.getElementById('modalServiceStatus').value = status;
+    const imgHidden = document.getElementById('modalServiceImageUrl');
+    if (imgHidden) imgHidden.value = img || '';
+    document.getElementById('serviceModalTitle').innerHTML = '<i class="fa-solid fa-pen" style="color:var(--primary);"></i> Chỉnh Sửa: ' + name;
+    document.getElementById('serviceModal').classList.add('active');
+  }
+
+  function closeServiceModal() {
+    document.getElementById('serviceModal').classList.remove('active');
+  }
+
+  document.getElementById('serviceModal').addEventListener('click', function(e) {
+    if (e.target === this) closeServiceModal();
+  });
+</script>
+</body>
+</html>

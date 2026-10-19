@@ -95,7 +95,9 @@ public class PaymentServiceImpl implements PaymentService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalThu = list.stream()
-                .filter(p -> "Thu".equalsIgnoreCase(p.getTransactionType()))
+                .filter(p -> p.getTransactionType() != null &&
+                        ("Thu".equalsIgnoreCase(p.getTransactionType()) ||
+                         "Thanh toán".equalsIgnoreCase(p.getTransactionType())))
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

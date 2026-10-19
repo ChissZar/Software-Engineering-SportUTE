@@ -14,10 +14,16 @@ import java.util.Optional;
 public interface PriceRepository extends JpaRepository<Price, String> {
     List<Price> findByCourt_Id(String courtId);
 
-    // Lấy bảng giá đang có hiệu lực tại một ngày cụ thể
+    // Lấy danh sách bảng giá đang có hiệu lực tại một ngày cụ thể (ưu tiên bảng giá mới nhất theo ngày bắt đầu)
     @Query("SELECT p FROM Price p WHERE p.court.id = :courtId " +
            "AND p.fromDate <= :targetDate " +
-           "AND (p.toDate IS NULL OR p.toDate >= :targetDate)")
-    Optional<Price> findEffectivePrice(@Param("courtId") String courtId,
-                                       @Param("targetDate") LocalDate targetDate);
+           "AND (p.toDate IS NULL OR p.toDate >= :targetDate) " +
+           "ORDER BY p.fromDate DESC")
+    List<Price> findEffectivePricesList(@Param("courtId") String courtId,
+                                        @Param("targetDate") LocalDate targetDate);
+
+    default Optional<Price> findEffectivePrice(String courtId, LocalDate targetDate) {
+        List<Price> prices = findEffectivePricesList(courtId, targetDate);
+        return prices.isEmpty() ? Optional.empty() : Optional.of(prices.get(0));
+    }
 }

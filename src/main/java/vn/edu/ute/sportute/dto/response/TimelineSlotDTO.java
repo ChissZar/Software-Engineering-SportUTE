@@ -8,7 +8,7 @@ import lombok.*;
 public class TimelineSlotDTO {
     private String time;         // e.g. "06:00"
     private String status;       // "free", "confirmed", "inuse", "maintenance"
-    private String statusLabel;  // "Trống", "Đã đặt", "Đang dùng", "Bảo trì"
+    private String statusLabel;  // "Trống", "Đã xác nhận", "Đang dùng", "Bảo trì"
     private String cssClass;     // "slot-free", "slot-busy", "slot-inuse", "slot-maint"
     private String bookingId;    // e.g. "DS0101" (if booked/in use)
     private String customerName; // e.g. "Nguyễn Minh Anh"

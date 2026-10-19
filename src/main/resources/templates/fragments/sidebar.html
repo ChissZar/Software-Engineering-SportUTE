@@ -1,84 +1,188 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<body>
-<div th:fragment="sidebar(activeMenu)" class="sidebar-wrapper d-flex flex-column justify-content-between p-3"
-     style="width: 250px; min-height: 100vh; background: linear-gradient(180deg, #061f25, #082c2f); color: #fff;">
-    <div>
-        <!-- Brand -->
-        <div class="mb-3 px-1 text-center">
-            <div class="p-2 rounded-3 d-flex align-items-center justify-content-center"
-                 style="background: linear-gradient(135deg, rgba(255,255,255,.97), rgba(238,251,245,.92)); border: 1px solid rgba(96,243,165,.25); box-shadow: 0 4px 12px rgba(0,0,0,.15); min-height: 60px;">
-                <img th:src="@{/images/sporthub-logo.png}" alt="SportHub" class="img-fluid" style="max-height: 44px; object-fit: contain;">
+<aside th:fragment="sidebar(activeMenu)" class="sidebar-wrapper" th:classappend="${currentUser != null and currentUser.horizontalNav ? 'horizontal-nav' : ''}">
+    <!-- Brand Logo Header (Centered Clean) -->
+    <div class="brand-row">
+        <a href="/admin/dashboard" class="brand-link" title="SportHub Admin Portal">
+            <img th:src="@{/images/sporthub-logo.png}" alt="SportHub" class="brand-img">
+        </a>
+    </div>
+
+    <!-- Menu Navigation -->
+    <nav class="nav">
+        <!-- Group 1: Vận hành trung tâm -->
+        <div class="nav-group">
+            <div class="nav-title">Vận hành</div>
+            <a href="/admin/dashboard" th:classappend="${activeMenu == 'dashboard' ? 'active' : ''}">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManagePayments or currentUser.admin or currentUser.manager}" 
+               href="/admin/bookings" th:classappend="${activeMenu == 'bookings' ? 'active' : ''}">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span>Đặt sân</span>
+                <span class="pill-count">Live</span>
+            </a>
+            <a href="/admin/bookings?view=schedule" th:classappend="${activeMenu == 'schedule' ? 'active' : ''}">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>Lịch sân (Timeline)</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageCenter or currentUser.operator}" 
+               href="/admin/courts" th:classappend="${activeMenu == 'courts' ? 'active' : ''}">
+                <i class="fa-solid fa-table-cells-large"></i>
+                <span>Sân thể thao</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageCenter}" 
+               href="/admin/sports" th:classappend="${activeMenu == 'sports' ? 'active' : ''}">
+                <i class="fa-solid fa-futbol"></i>
+                <span>Môn thể thao</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageCenter}" 
+               href="/admin/prices" th:classappend="${activeMenu == 'prices' ? 'active' : ''}">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                <span>Bảng giá & Khung giờ</span>
+            </a>
+        </div>
+
+        <!-- Group 2: Kinh doanh & Khách hàng -->
+        <div class="nav-group" th:if="${currentUser == null or currentUser.canManagePayments or currentUser.canManageCenter}">
+            <div class="nav-title">Kinh doanh</div>
+            <a th:if="${currentUser == null or currentUser.canManageCustomers}" 
+               href="/admin/customers" th:classappend="${activeMenu == 'customers' ? 'active' : ''}">
+                <i class="fa-solid fa-users"></i>
+                <span>Khách hàng</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManagePayments}" 
+               href="/admin/payments" th:classappend="${activeMenu == 'payments' ? 'active' : ''}">
+                <i class="fa-solid fa-receipt"></i>
+                <span>Thanh toán & Thu cọc</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageCenter}" 
+               href="/admin/services" th:classappend="${activeMenu == 'services' ? 'active' : ''}">
+                <i class="fa-solid fa-bottle-water"></i>
+                <span>Dịch vụ & Tiện ích</span>
+                <span class="pill-count" style="background:#ecfdf5; color:#059669; font-size:10px;">F&B</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageCenter}" 
+               href="/admin/promotions" th:classappend="${activeMenu == 'promotions' ? 'active' : ''}">
+                <i class="fa-solid fa-tags"></i>
+                <span>Khuyến mãi & Voucher</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageCenter}" 
+               href="/admin/reports" th:classappend="${activeMenu == 'reports' ? 'active' : ''}">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Báo cáo & Phân tích</span>
+            </a>
+        </div>
+
+        <!-- Group 3: Hệ thống & Bảo mật -->
+        <div class="nav-group" th:if="${currentUser == null or currentUser.canManageSystem or currentUser.canManageMaintenance}">
+            <div class="nav-title">Hệ thống</div>
+            <a th:if="${currentUser == null or currentUser.canManageSystem}" 
+               href="/admin/employees" th:classappend="${activeMenu == 'employees' ? 'active' : ''}">
+                <i class="fa-solid fa-user-tie"></i>
+                <span>Nhân viên</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageMaintenance}" 
+               href="/admin/maintenance" th:classappend="${activeMenu == 'maintenance' ? 'active' : ''}">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                <span>Lịch bảo trì</span>
+            </a>
+            <a th:if="${currentUser == null or currentUser.canManageSystem}" 
+               href="/admin/permissions" th:classappend="${activeMenu == 'permissions' ? 'active' : ''}">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Phân quyền (RBAC)</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Sidebar Footer / Right Actions: Chuông thông báo + Thông tin tài khoản + Đăng xuất -->
+    <div class="sidebar-footer">
+        <!-- Chuông thông báo (hiển thị rõ trên taskbar ngang của Lễ tân & Vận hành) -->
+        <button type="button" class="horizontal-topbar-bell" title="Thông báo hệ thống" onclick="alert('Hiện tại không có thông báo mới.')">
+            <i class="fa-regular fa-bell"></i>
+            <span class="bell-badge-dot"></span>
+        </button>
+
+        <!-- Khung tên & phân quyền người dùng -->
+        <div class="horizontal-topbar-user" th:if="${currentUser != null}">
+            <div class="horizontal-avatar" th:text="${currentUser.avatarInitials}">LT</div>
+            <div class="horizontal-user-details">
+                <span class="horizontal-user-name" th:text="${currentUser.fullName}">Lê Thị Thu Hà</span>
+                <span class="horizontal-user-role" th:text="${currentUser.roleName}">Lễ tân quầy</span>
             </div>
         </div>
 
-        <!-- Menu Navigation -->
-        <nav class="nav flex-column gap-1">
-            <a href="/admin/dashboard" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'dashboard' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-chart-pie"></i> Tổng quan
-            </a>
-            <a href="/admin/bookings" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'bookings' ? 'active bg-success text-white' : ''}">
-                <i class="fa-regular fa-calendar-check"></i> Đặt sân
-            </a>
-            <a href="/admin/bookings" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'schedule' ? 'active bg-success text-white' : ''}">
-                <i class="fa-regular fa-calendar-days"></i> Lịch sân
-            </a>
-            <a href="/admin/courts" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'courts' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-table-cells-large"></i> Sân thể thao
-            </a>
-            <a href="/admin/customers" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'customers' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-users"></i> Khách hàng
-            </a>
-            <a href="/admin/employees" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'employees' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-user-tie"></i> Nhân viên
-            </a>
-            <a href="/admin/payments" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'payments' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-receipt"></i> Thanh toán
-            </a>
-            <a href="/admin/promotions" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'promotions' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-tags"></i> Khuyến mãi
-            </a>
-            <a href="/admin/maintenance" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'maintenance' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-wrench"></i> Bảo trì
-            </a>
-            <a href="/admin/reports" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'reports' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-chart-line"></i> Báo cáo
-            </a>
-            <a href="/admin/permissions" class="nav-link text-white-50 px-3 py-2 rounded-3 d-flex align-items-center gap-3"
-               th:classappend="${activeMenu == 'permissions' ? 'active bg-success text-white' : ''}">
-                <i class="fa-solid fa-shield-halved"></i> Phân quyền (RBAC)
-            </a>
-        </nav>
+        <button type="button" class="sidebar-logout-btn" title="Đăng xuất khỏi hệ thống" onclick="openAdminLogoutModal()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Đăng xuất</span>
+        </button>
     </div>
 
-    <!-- User / Logout -->
-    <div class="border-top border-secondary pt-3 px-2">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center text-white fw-bold"
-                     style="width: 36px; height: 36px;">QL</div>
-                <div>
-                    <div class="fw-semibold text-white" style="font-size: 13px;">Quản lý trung tâm</div>
-                    <div class="text-white-50" style="font-size: 11px;">Quản trị viên</div>
-                </div>
-            </div>
-            <form th:action="@{/logout}" method="post" class="m-0">
-                <button type="submit" class="btn btn-sm btn-link text-danger p-0">
-                    <i class="fa-solid fa-arrow-right-from-bracket fs-5"></i>
-                </button>
-            </form>
+    <!-- Logout Confirmation Modal (Chuyên nghiệp, đồng bộ 100% với Customer Portal) -->
+    <div class="logout-modal-backdrop" id="adminLogoutConfirmModal" onclick="handleAdminLogoutBackdrop(event)">
+      <div class="logout-modal-card">
+        <div class="logout-modal-icon">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </div>
+        <h3 class="logout-modal-title">Xác nhận đăng xuất</h3>
+        <p class="logout-modal-desc">
+          Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc SportHub không?<br>
+          Mọi dữ liệu làm việc hiện tại của bạn đã được lưu an toàn.
+        </p>
+        <div class="logout-modal-actions">
+          <button type="button" class="btn-logout-cancel" onclick="closeAdminLogoutModal()">Hủy bỏ</button>
+          <button type="button" class="btn-logout-confirm" onclick="confirmAdminLogout()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất ngay
+          </button>
+        </div>
+      </div>
     </div>
-</div>
+
+    <form id="adminLogoutForm" th:action="@{/logout}" method="post" style="display:none;"></form>
+
+    <script>
+      function openAdminLogoutModal() {
+        var modal = document.getElementById('adminLogoutConfirmModal');
+        if (modal) {
+          modal.classList.add('show');
+        }
+      }
+
+      function closeAdminLogoutModal() {
+        var modal = document.getElementById('adminLogoutConfirmModal');
+        if (modal) {
+          modal.classList.remove('show');
+        }
+      }
+
+      function handleAdminLogoutBackdrop(event) {
+        if (event && event.target && event.target.id === 'adminLogoutConfirmModal') {
+          closeAdminLogoutModal();
+        }
+      }
+
+      function confirmAdminLogout() {
+        var form = document.getElementById('adminLogoutForm');
+        if (form) {
+          form.submit();
+        }
+      }
+    </script>
+
+    <script th:if="${currentUser != null and currentUser.horizontalNav}">
+      (function() {
+        function applyHorizontalLayout() {
+          var app = document.querySelector('.app');
+          if (app) app.classList.add('horizontal-layout');
+          document.body.classList.add('has-horizontal-nav');
+        }
+        applyHorizontalLayout();
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', applyHorizontalLayout);
+        }
+      })();
+    </script>
+</aside>
 </body>
 </html>

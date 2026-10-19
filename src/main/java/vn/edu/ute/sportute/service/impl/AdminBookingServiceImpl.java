@@ -108,11 +108,15 @@ public class AdminBookingServiceImpl implements AdminBookingService {
             return cust;
         }
 
+        String defaultEmail = (email != null && !email.trim().isEmpty())
+                ? email.trim()
+                : ("guest." + cleanPhone + "@sporthub.local");
+
         Customer newCust = Customer.builder()
                 .id(IdGenerator.generateId("KH"))
                 .fullName((fullName != null && !fullName.trim().isEmpty()) ? fullName.trim() : "Khách lẻ " + cleanPhone)
                 .phone(cleanPhone)
-                .email(email != null && !email.trim().isEmpty() ? email.trim() : null)
+                .email(defaultEmail)
                 .address(address != null && !address.trim().isEmpty() ? address.trim() : "Khách tại quầy")
                 .status("Hoạt động")
                 .build();
@@ -242,6 +246,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         }
 
         Booking savedBooking = bookingRepository.save(booking);
+        dto.setId(savedBooking.getId());
 
         // Lưu / cập nhật giao dịch thanh toán
         if (totalAmount != null && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
@@ -567,8 +572,8 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 .filter(m -> m.getStartDate().isBefore(endOfDay) && m.getEndDate().isAfter(startOfDay))
                 .collect(Collectors.toList());
 
-        // Các mốc giờ từ 06:00 đến 22:00
-        int[] hours = {6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22};
+        // Các mốc giờ từ 05:00 đến 23:00 (18 khung giờ)
+        int[] hours = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22};
 
         for (Court court : courts) {
             List<TimelineSlotDTO> slots = new ArrayList<>();
@@ -589,7 +594,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 if (maint.isPresent()) {
                     slots.add(TimelineSlotDTO.builder()
                             .time(timeStr)
-                            .status("maintenance")
+                            .status("MAINT")
                             .statusLabel("Bảo trì")
                             .cssClass("slot-maint")
                             .note(maint.get().getReason() != null ? maint.get().getReason() : "Bảo trì sân")
@@ -611,7 +616,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     if ("Đang sử dụng".equalsIgnoreCase(bStatus)) {
                         slots.add(TimelineSlotDTO.builder()
                                 .time(timeStr)
-                                .status("inuse")
+                                .status("IN_USE")
                                 .statusLabel("Đang dùng")
                                 .cssClass("slot-inuse")
                                 .bookingId(b.getId())
@@ -620,7 +625,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     } else {
                         slots.add(TimelineSlotDTO.builder()
                                 .time(timeStr)
-                                .status("confirmed")
+                                .status("BUSY")
                                 .statusLabel("Đã đặt")
                                 .cssClass("slot-busy")
                                 .bookingId(b.getId())
@@ -633,7 +638,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 // 3. Trống
                 slots.add(TimelineSlotDTO.builder()
                         .time(timeStr)
-                        .status("free")
+                        .status("FREE")
                         .statusLabel("Trống")
                         .cssClass("slot-free")
                         .build());
@@ -809,6 +814,19 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         BigDecimal cancelRate = b.getBookingPolicy() != null && b.getBookingPolicy().getCancellationFeeRate() != null 
                 ? b.getBookingPolicy().getCancellationFeeRate() : BigDecimal.valueOf(10.0);
 
+        // Dịch vụ F&B và thuê dụng cụ phát sinh
+        BigDecimal serviceTotal = BigDecimal.ZERO;
+        String serviceSummary = "";
+        if (b.getServiceDetails() != null && !b.getServiceDetails().isEmpty()) {
+            serviceTotal = b.getServiceDetails().stream()
+                    .map(vn.edu.ute.sportute.entity.BookingServiceDetail::getSubtotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            serviceSummary = b.getServiceDetails().stream()
+                    .map(d -> d.getQuantity() + "x " + (d.getServiceItem() != null ? d.getServiceItem().getName() : "Món"))
+                    .collect(java.util.stream.Collectors.joining(", "));
+        }
+
+        totalAmount = totalAmount.add(serviceTotal);
         BigDecimal depositAmount = totalAmount.multiply(depRate).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
         BigDecimal remainingAmount = totalAmount.subtract(paidAmount);
         if (remainingAmount.compareTo(BigDecimal.ZERO) < 0) remainingAmount = BigDecimal.ZERO;
@@ -836,6 +854,8 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 .paidAmount(paidAmount)
                 .depositAmount(depositAmount)
                 .remainingAmount(remainingAmount)
+                .serviceAmount(serviceTotal)
+                .serviceSummary(serviceSummary)
                 .policyId(policyId)
                 .policyName(policyName)
                 .depositRate(depRate)

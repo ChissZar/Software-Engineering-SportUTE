@@ -44,7 +44,7 @@
 
     body {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background-color: #f6f9f8;
+      background-color: #eaf5ef;
       color: var(--gray-900);
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
@@ -136,6 +136,8 @@
       font-weight: 600;
       color: var(--gray-600);
       transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .nav-item:hover {
@@ -146,6 +148,51 @@
     .nav-item.active {
       background: var(--primary-subtle);
       color: var(--primary-dark);
+    }
+
+    /* Topbar Search Input */
+    .topbar-search-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-100);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9999px;
+      padding: 0 14px;
+      height: 38px;
+      width: 220px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .topbar-search-wrap:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+    }
+    .topbar-search-wrap:focus-within {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+    }
+    .topbar-search-wrap .search-icon {
+      color: var(--gray-400);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .topbar-search-wrap:focus-within .search-icon {
+      color: var(--primary);
+    }
+    .topbar-search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13px;
+      color: var(--gray-900);
+      width: 100%;
+    }
+    .topbar-search-input::placeholder {
+      color: var(--gray-400);
+      font-size: 12.5px;
     }
 
     .topbar-right {
@@ -179,6 +226,205 @@
       background: #ef4444;
       border-radius: 50%;
       border: 2px solid var(--white);
+    }
+
+    /* Notification Wrap & Dropdown */
+    .notif-wrapper {
+      position: relative;
+    }
+    .notif-dropdown {
+      position: absolute;
+      top: 48px;
+      right: -10px;
+      width: 360px;
+      max-width: 90vw;
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--gray-200);
+      z-index: 150;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: notifSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .notif-dropdown.show {
+      display: flex;
+    }
+    @keyframes notifSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .notif-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbfc;
+    }
+    .notif-header-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--dark, #0f172a);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-mark-all-read {
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+    .btn-mark-all-read:hover {
+      text-decoration: underline;
+    }
+    .notif-list {
+      max-height: 380px;
+      overflow-y: auto;
+      padding: 6px 0;
+    }
+    .notif-item {
+      padding: 12px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: background 0.18s;
+      border-bottom: 1px solid #f8fafc;
+      position: relative;
+    }
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+    .notif-item.unread {
+      background: #f0fdf4;
+    }
+    .notif-item.unread:hover {
+      background: #e6f9ed;
+    }
+    .notif-item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .notif-item-icon.system { background: #eff6ff; color: #3b82f6; }
+    .notif-item-icon.booking { background: #e6f9ed; color: #059669; }
+    .notif-item-icon.promo { background: #fef3c7; color: #d97706; }
+    .notif-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .notif-item-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark, #0f172a);
+      margin-bottom: 2px;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .notif-item.unread .notif-item-title {
+      color: #064e3b;
+      font-weight: 800;
+    }
+    .notif-item-desc {
+      font-size: 12px;
+      color: var(--gray-600);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .notif-item-time {
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 4px;
+      display: block;
+    }
+    .notif-unread-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+    .notif-empty {
+      padding: 36px 20px;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 13px;
+    }
+    .notif-empty i {
+      font-size: 32px;
+      color: var(--gray-300);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* Notification Detail Modal */
+    .notif-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 250;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .notif-modal-backdrop.show {
+      display: flex;
+    }
+    .notif-modal-card {
+      background: var(--white);
+      border-radius: 20px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease;
+    }
+    .notif-modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbfc;
+    }
+    .notif-modal-header-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--dark, #0f172a);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notif-modal-body {
+      padding: 22px;
+    }
+    .notif-modal-footer {
+      padding: 14px 22px;
+      border-top: 1px solid var(--gray-100);
+      background: #fafbfc;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
     }
 
     .user-profile-menu {
@@ -668,7 +914,105 @@
       .filter-card { flex-direction: column; align-items: flex-start; }
       .search-input { width: 100%; }
     }
-  </style>
+  
+    /* Logout Confirmation Modal */
+    .logout-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .logout-modal-backdrop.show {
+      display: flex;
+    }
+    .logout-modal-card {
+      background: #ffffff;
+      border-radius: 24px;
+      max-width: 440px;
+      width: 100%;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+      animation: logoutScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes logoutScaleUp {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .logout-modal-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 18px;
+      box-shadow: 0 8px 16px -4px rgba(239, 68, 68, 0.2);
+    }
+    .logout-modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .logout-modal-desc {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .logout-modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn-logout-cancel {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout-cancel:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .btn-logout-confirm {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: none;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    .btn-logout-confirm:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+
+</style>
 </head>
 <body>
 
@@ -700,17 +1044,16 @@
           <i class="fa-solid fa-house"></i>
           <span>Trang chủ</span>
         </a>
-        <a href="/customer/booking#searchBarSection" class="nav-item">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Tìm sân</span>
-        </a>
+
+        <!-- Ô Tìm Sân Nhanh trên topbar -->
+        <div class="topbar-search-wrap" title="Tìm nhanh sân theo tên, môn hoặc địa điểm">
+          <i class="fa-solid fa-magnifying-glass search-icon" style="cursor:pointer;" onclick="redirectToSearch()"></i>
+          <input type="text" id="courtSearchInput" class="topbar-search-input" placeholder="Tìm sân nhanh..." onkeydown="if(event.key==='Enter') redirectToSearch()">
+        </div>
+
         <a href="/customer/history" class="nav-item active">
           <i class="fa-regular fa-calendar-check"></i>
           <span>Lịch đặt của tôi</span>
-        </a>
-        <a href="/customer/booking#courtsSection" class="nav-item">
-          <i class="fa-regular fa-heart"></i>
-          <span>Yêu thích</span>
         </a>
         <a href="/customer/profile" class="nav-item">
           <i class="fa-regular fa-user"></i>
@@ -719,21 +1062,30 @@
       </nav>
 
       <div class="topbar-right">
-        <button type="button" class="btn-icon-circle" title="Thông báo hệ thống" onclick="alert('Không có thông báo mới')">
-          <i class="fa-regular fa-bell"></i>
-          <span class="badge-dot"></span>
-        </button>
+        <!-- Notification Dropdown Wrap -->
+        <div class="notif-wrapper" id="notifWrapper">
+          <button type="button" class="btn-icon-circle" id="btnNotifBell" title="Thông báo hệ thống" onclick="toggleNotifDropdown(event)">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge-dot" id="notifBadgeDot" style="display:none;"></span>
+          </button>
+
+          <!-- Notification Dropdown Popover -->
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <span class="notif-header-title"><i class="fa-solid fa-bell text-success"></i> Thông báo</span>
+              <button type="button" class="btn-mark-all-read" onclick="markAllNotificationsAsRead()">Đánh dấu đã đọc</button>
+            </div>
+            <div class="notif-list" id="notifListContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
 
         <div class="user-profile-menu">
-          <a href="/customer/profile" title="Xem hồ sơ cá nhân">
-            <img src="/images/user_avatar.jpg" alt="Avatar" class="user-avatar-img">
+          <a href="/customer/profile" title="Xem hồ sơ cá nhân" style="display:inline-flex; align-items:center; text-decoration:none;">
+            <div class="user-avatar-badge" th:if="${currentUser == null or currentUser.customAvatarUrl == null}" th:text="${currentUser != null ? currentUser.avatarInitials : 'KH'}" style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(16,185,129,0.3);">KH</div>
+            <img class="user-avatar-img user-custom-avatar" th:if="${currentUser != null and currentUser.customAvatarUrl != null}" th:src="${currentUser.customAvatarUrl}" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(16,185,129,0.3);" alt="Avatar">
           </a>
-
-          <form th:action="@{/logout}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống SportHub?');">
-            <button type="submit" class="btn-logout" title="Đăng xuất">
-              <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-          </form>
         </div>
       </div>
     </div>
@@ -922,11 +1274,15 @@
                   <i class="fa-regular fa-eye"></i> Chi tiết
                 </button>
 
+                <!-- Hóa đơn PDF -->
+                <a th:href="@{'/customer/booking/export-pdf/' + ${b.id}}" target="_blank" class="btn-action" style="color:#b91c1c; border-color:#fecaca; background:#fff5f5; text-decoration:none;" title="Tải hóa đơn PDF">
+                  <i class="fa-solid fa-file-pdf"></i> Hóa đơn PDF
+                </a>
+
                 <!-- Hủy phiếu (chỉ hiển thị khi Chờ xác nhận hoặc Đã xác nhận) -->
                 <form th:if="${b.status == 'Chờ xác nhận' or b.status == 'Đã xác nhận'}"
-                      th:action="@{'/customer/history/cancel/' + ${b.id}}" method="post" style="margin:0"
-                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy phiếu #' + '[[${b.id}]]' + '? Tiền cọc sẽ được hoàn lại theo chính sách hủy sân.');">
-                  <button type="submit" class="btn-action danger">
+                      th:action="@{'/customer/history/cancel/' + ${b.id}}" method="post" style="margin:0">
+                  <button type="button" class="btn-action danger" th:data-id="${b.id}" onclick="showCancelModal(this.form, this.getAttribute('data-id'))">
                     <i class="fa-solid fa-xmark"></i> Hủy
                   </button>
                 </form>
@@ -994,7 +1350,84 @@
     </div>
   </div>
 
-  <script>
+  <!-- Notification Detail Modal -->
+  <div class="notif-modal-backdrop" id="notifDetailModal" onclick="handleNotifModalBackdrop(event)">
+    <div class="notif-modal-card">
+      <div class="notif-modal-header">
+        <div class="notif-modal-header-title">
+          <i class="fa-solid fa-bell text-success" id="notifModalIcon"></i>
+          <span id="notifModalHeaderTitle">Chi tiết thông báo</span>
+        </div>
+        <button type="button" class="btn-close-wizard" onclick="closeNotifModal()" title="Đóng" style="font-size: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: none; background: #f1f5f9; cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="notif-modal-body">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span id="notifModalBadge" style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: #e6f9ed; color: #059669;">Hệ thống</span>
+          <span id="notifModalTime" style="font-size: 12px; color: #94a3b8;"><i class="fa-regular fa-clock"></i> Vừa xong</span>
+        </div>
+        <h3 id="notifModalTitle" style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 12px; line-height: 1.4;">Tiêu đề thông báo</h3>
+        <div id="notifModalContent" style="font-size: 14px; color: #334155; line-height: 1.6; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; white-space: pre-line;">
+          Nội dung thông báo
+        </div>
+        <div id="notifModalExtraDetails" style="display: none; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;"></div>
+      </div>
+      <div class="notif-modal-footer">
+        <button type="button" id="btnNotifActionSecondary" class="btn-secondary" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; font-weight: 600; font-size: 13px;" onclick="closeNotifModal()">Đóng</button>
+        <button type="button" id="btnNotifActionPrimary" class="btn-primary" style="padding: 8px 18px; border-radius: 8px; border: none; background: #059669; color: #fff; cursor: pointer; font-weight: 700; font-size: 13px; display: none;" onclick="closeNotifModal()">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Logout Confirmation Modal (Màn hình xác nhận đăng xuất chuyên nghiệp) -->
+  <div class="logout-modal-backdrop" id="logoutConfirmModal" onclick="handleLogoutModalBackdrop(event)">
+    <div class="logout-modal-card">
+      <div class="logout-modal-icon">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </div>
+      <h3 class="logout-modal-title">Xác nhận đăng xuất</h3>
+      <p class="logout-modal-desc">
+        Bạn có chắc chắn muốn đăng xuất khỏi tài khoản SportHub không?<br>
+        Phiên làm việc hiện tại của bạn sẽ được kết thúc an toàn.
+      </p>
+      <div class="logout-modal-actions">
+        <button type="button" class="btn-logout-cancel" onclick="closeLogoutModal()">Hủy bỏ</button>
+        <button type="button" class="btn-logout-confirm" onclick="confirmLogoutAction()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất ngay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Booking Confirmation Modal (Màn hình xác nhận hủy đặt sân chuyên nghiệp) -->
+  <div class="logout-modal-backdrop" id="cancelConfirmModal" onclick="handleCancelModalBackdrop(event)">
+    <div class="logout-modal-card">
+      <div class="logout-modal-icon" style="background:#fee2e2;color:#dc2626;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="logout-modal-title">Xác nhận hủy đặt sân</h3>
+      <p class="logout-modal-desc" id="cancelConfirmDesc">
+        Bạn có chắc chắn muốn hủy phiếu đặt sân này không?<br>
+        Tiền cọc sẽ được hoàn lại theo quy định của chính sách hủy sân SportHub.
+      </p>
+      <div class="logout-modal-actions">
+        <button type="button" class="btn-logout-cancel" onclick="closeCancelModal()">Giữ lại lịch</button>
+        <button type="button" class="btn-logout-confirm" onclick="confirmCancelAction()">
+          <i class="fa-solid fa-xmark"></i> Xác nhận hủy
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <form id="globalLogoutForm" th:action="@{/logout}" method="post" style="display:none;"></form>
+
+  <script th:inline="javascript">
+    // Khóa định danh bất biến theo Khóa chính Database (Customer ID - Primary Key)
+    const CURRENT_USER_KEY = /*[[${currentUser != null and currentUser.customerId != null ? currentUser.customerId : (currentUser != null ? currentUser.username : 'guest')}]]*/ 'guest';
+    const AVATAR_KEY = 'sporthub_custom_avatar_' + CURRENT_USER_KEY;
+    const NOTIF_KEY = 'sporthub_notifications_' + CURRENT_USER_KEY;
     function showDetailModal(btn) {
       document.getElementById('modalId').textContent = btn.getAttribute('data-id');
       document.getElementById('modalCourt').textContent = btn.getAttribute('data-court');
@@ -1013,8 +1446,292 @@
       if (e.key === 'Escape') closeDetailModal();
     });
 
-    document.getElementById('detailModal').addEventListener('click', (e) => {
-      if (e.target.id === 'detailModal') closeDetailModal();
+    function redirectToSearch() {
+      const val = document.getElementById('courtSearchInput')?.value.trim();
+      if (val) {
+        window.location.href = '/customer/booking?q=' + encodeURIComponent(val);
+      } else {
+        window.location.href = '/customer/booking';
+      }
+    }
+
+    // =========================================================================
+    // NOTIFICATION SYSTEM (Shared via localStorage)
+    // =========================================================================
+    const DEFAULT_NOTIFICATIONS = [
+      {
+        id: 'notif_welcome',
+        type: 'system',
+        title: 'Chào mừng bạn đến với SportHub! 🎉',
+        time: 'Hôm nay',
+        dateStr: '17/10/2026',
+        desc: 'Hệ thống đặt sân thể thao trực tuyến SportHub chúc bạn có những trải nghiệm rèn luyện thể thao tuyệt vời.',
+        content: 'Chào mừng bạn đến với SportHub - Hệ thống đặt sân thể thao thông minh!\n\nTại SportHub, bạn có thể dễ dàng:\n• Tra cứu lịch sân trống trực quan theo thời gian thực\n• Đặt sân nhanh chóng với hình thức cọc 30% hoặc 100%\n• Quét mã VietQR chuyển khoản tức thì chuẩn xác\n• Lưu lại các sân yêu thích để đặt lại bất cứ lúc nào\n\nChúc bạn luôn tràn đầy năng lượng và có những giờ phút thể thao ý nghĩa!',
+        unread: false,
+        extraData: null
+      },
+      {
+        id: 'notif_promo',
+        type: 'promo',
+        title: 'Ưu đãi Giờ Vàng Thể Thao: Giảm 10%',
+        time: 'Hôm qua',
+        dateStr: '16/10/2026',
+        desc: 'Áp dụng cho khung giờ sáng từ 06:00 - 09:00 từ Thứ Hai đến Thứ Sáu tại tất cả các cụm sân.',
+        content: 'ƯU ĐÃI ĐẶC BIỆT: GIỜ VÀNG THỂ THAO 🏸\n\nNhằm khuyến khích tinh thần rèn luyện thể thao buổi sáng, SportHub áp dụng chương trình ưu đãi:\n• Giảm ngay 10% khi đặt sân khung giờ 06:00 - 09:00\n• Áp dụng từ Thứ Hai đến Thứ Sáu hàng tuần\n• Mã ưu đãi: GIOVANG10 (nhập tại bước thanh toán)\n\nSố lượng khung giờ ưu đãi có hạn, hãy nhanh tay giữ chỗ!',
+        unread: false,
+        extraData: null
+      }
+    ];
+
+    function getNotifications() {
+      try {
+        const stored = localStorage.getItem(NOTIF_KEY);
+        if (!stored) {
+          localStorage.setItem(NOTIF_KEY, JSON.stringify(DEFAULT_NOTIFICATIONS));
+          return DEFAULT_NOTIFICATIONS;
+        }
+        return JSON.parse(stored);
+      } catch (e) {
+        return DEFAULT_NOTIFICATIONS;
+      }
+    }
+
+    function saveNotifications(list) {
+      localStorage.setItem(NOTIF_KEY, JSON.stringify(list));
+      updateNotifBadge();
+      renderNotifications();
+    }
+
+    function updateNotifBadge() {
+      const list = getNotifications();
+      const unreadCount = list.filter(n => n.unread).length;
+      const dot = document.getElementById('notifBadgeDot');
+      if (dot) {
+        dot.style.display = (unreadCount > 0) ? 'block' : 'none';
+      }
+    }
+
+    function toggleNotifDropdown(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+          renderNotifications();
+        }
+      }
+    }
+
+    function closeNotifDropdown() {
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    }
+
+    function renderNotifications() {
+      const container = document.getElementById('notifListContainer');
+      if (!container) return;
+
+      const list = getNotifications();
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="notif-empty">
+            <i class="fa-regular fa-bell-slash"></i>
+            <div class="notif-empty-text">Hiện chưa có thông báo nào</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(item => {
+        let iconHtml = '<i class="fa-solid fa-bell"></i>';
+        let iconClass = 'system';
+        if (item.type === 'booking') {
+          iconHtml = '<i class="fa-solid fa-calendar-check"></i>';
+          iconClass = 'booking';
+        } else if (item.type === 'promo') {
+          iconHtml = '<i class="fa-solid fa-tag"></i>';
+          iconClass = 'promo';
+        }
+
+        return `
+          <div class="notif-item ${item.unread ? 'unread' : ''}" onclick="openNotifDetail('${item.id}')">
+            <div class="notif-item-icon ${iconClass}">
+              ${iconHtml}
+            </div>
+            <div class="notif-item-content">
+              <div class="notif-item-title">
+                <span>${item.title}</span>
+                ${item.unread ? '<span class="notif-unread-dot"></span>' : ''}
+              </div>
+              <div class="notif-item-desc">${item.desc || (item.content ? item.content.slice(0, 90) + '...' : '')}</div>
+              <div class="notif-item-time"><i class="fa-regular fa-clock"></i> ${item.time || item.dateStr || 'Gần đây'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openNotifDetail(notifId) {
+      closeNotifDropdown();
+
+      const list = getNotifications();
+      const notif = list.find(n => n.id === notifId);
+      if (!notif) return;
+
+      if (notif.unread) {
+        notif.unread = false;
+        saveNotifications(list);
+      }
+
+      const modal = document.getElementById('notifDetailModal');
+      const titleElem = document.getElementById('notifModalTitle');
+      const contentElem = document.getElementById('notifModalContent');
+      const badgeElem = document.getElementById('notifModalBadge');
+      const timeElem = document.getElementById('notifModalTime');
+      const extraElem = document.getElementById('notifModalExtraDetails');
+
+      if (titleElem) titleElem.textContent = notif.title;
+      if (contentElem) contentElem.textContent = notif.content;
+      if (timeElem) timeElem.innerHTML = `<i class="fa-regular fa-clock"></i> ${notif.dateStr || notif.time || 'Vừa xong'}`;
+
+      if (badgeElem) {
+        if (notif.type === 'booking') {
+          badgeElem.textContent = 'Đặt sân';
+          badgeElem.style.background = '#e6f9ed';
+          badgeElem.style.color = '#059669';
+        } else if (notif.type === 'promo') {
+          badgeElem.textContent = 'Khuyến mãi';
+          badgeElem.style.background = '#fef3c7';
+          badgeElem.style.color = '#d97706';
+        } else {
+          badgeElem.textContent = 'Hệ thống';
+          badgeElem.style.background = '#eff6ff';
+          badgeElem.style.color = '#3b82f6';
+        }
+      }
+
+      if (extraElem) {
+        if (notif.extraData) {
+          extraElem.style.display = 'block';
+          extraElem.innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;">
+              <div><span style="color:#64748b;">Mã đặt sân:</span> <strong style="color:#0f172a;">#${notif.extraData.bookingId || '--'}</strong></div>
+              <div><span style="color:#64748b;">Sân:</span> <strong style="color:#059669;">${notif.extraData.courtName || '--'}</strong></div>
+              <div><span style="color:#64748b;">Ngày thi đấu:</span> <strong style="color:#0f172a;">${notif.extraData.date || '--'}</strong></div>
+              <div><span style="color:#64748b;">Khung giờ:</span> <strong style="color:#0f172a;">${notif.extraData.time || '--'}</strong></div>
+            </div>
+          `;
+        } else {
+          extraElem.style.display = 'none';
+        }
+      }
+
+      if (modal) modal.classList.add('show');
+    }
+
+    function closeNotifModal() {
+      const modal = document.getElementById('notifDetailModal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function handleNotifModalBackdrop(event) {
+      if (event.target.id === 'notifDetailModal') {
+        closeNotifModal();
+      }
+    }
+
+    function markAllNotificationsAsRead() {
+      const list = getNotifications();
+      list.forEach(n => n.unread = false);
+      saveNotifications(list);
+    }
+
+    // Đóng dropdown thông báo khi click ra ngoài
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('notifWrapper');
+      if (wrap && !wrap.contains(e.target)) {
+        closeNotifDropdown();
+      }
+    });
+
+    
+    // =========================================================================
+    // LOGOUT CONFIRMATION MODAL LOGIC
+    // =========================================================================
+    function showLogoutModal() {
+      const modal = document.getElementById('logoutConfirmModal');
+      if (modal) modal.classList.add('show');
+    }
+
+    function closeLogoutModal() {
+      const modal = document.getElementById('logoutConfirmModal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function handleLogoutModalBackdrop(event) {
+      if (event.target.id === 'logoutConfirmModal') {
+        closeLogoutModal();
+      }
+    }
+
+    function confirmLogoutAction() {
+      const form = document.getElementById('globalLogoutForm');
+      if (form) {
+        form.submit();
+      }
+    }
+
+    // =========================================================================
+    // CANCEL BOOKING MODAL LOGIC
+    // =========================================================================
+    let currentCancelForm = null;
+
+    function showCancelModal(form, bookingId) {
+      currentCancelForm = form;
+      const desc = document.getElementById('cancelConfirmDesc');
+      if (desc) {
+        desc.innerHTML = `Bạn có chắc chắn muốn hủy phiếu đặt sân <strong>#${bookingId}</strong> không?<br>Tiền cọc sẽ được hoàn lại theo quy định của chính sách hủy sân SportHub.`;
+      }
+      const modal = document.getElementById('cancelConfirmModal');
+      if (modal) modal.classList.add('show');
+    }
+
+    function closeCancelModal() {
+      const modal = document.getElementById('cancelConfirmModal');
+      if (modal) modal.classList.remove('show');
+      currentCancelForm = null;
+    }
+
+    function handleCancelModalBackdrop(event) {
+      if (event.target.id === 'cancelConfirmModal') {
+        closeCancelModal();
+      }
+    }
+
+    function confirmCancelAction() {
+      if (currentCancelForm) {
+        currentCancelForm.submit();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNotifBadge();
+
+      const savedAvatar = sessionStorage.getItem(AVATAR_KEY) || localStorage.getItem(AVATAR_KEY);
+      if (savedAvatar) {
+        document.querySelectorAll('.user-avatar-img').forEach(img => {
+          if (!img.getAttribute('src') || img.src.includes('user_avatar')) {
+            img.src = savedAvatar;
+            img.style.display = 'block';
+          }
+        });
+        document.querySelectorAll('.user-avatar-badge').forEach(b => {
+          b.style.display = 'none';
+        });
+      }
     });
   </script>
 </body>

@@ -29,10 +29,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/admin/bookings/api/**")) 
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/admin/bookings/api/**", "/customer/booking/api/**", "/customer/api/**", "/admin/services/api/**", "/admin/permissions/**", "/v3/api-docs/**", "/swagger-ui/**")) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register/**", "/forgot-password/**", "/otp-action", "/auth/**", "/error", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/login", "/register/**", "/forgot-password/**", "/otp-action", "/auth/**", "/error", "/css/**", "/js/**", "/images/**", "/uploads/**", "/customer/api/avatar/**", "/v3/api-docs/**", "/v3/api-docs", "/swagger-ui/**", "/swagger-ui", "/swagger-ui.html").permitAll()
                 .requestMatchers("/customer/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_MANAGER")
+                .requestMatchers("/admin/services/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
                 .requestMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_RECEPTIONIST", "ROLE_OPERATOR", "ROLE_STAFF")
                 .anyRequest().authenticated()
             )

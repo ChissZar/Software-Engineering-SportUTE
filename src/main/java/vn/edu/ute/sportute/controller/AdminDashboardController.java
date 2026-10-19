@@ -23,9 +23,4 @@ public class AdminDashboardController {
         model.addAttribute("data", dashboardData);
         return "admin/dashboard";
     }
-
-    @GetMapping("/permissions")
-    public String permissions() {
-        return "admin/permissions";
-    }
 }

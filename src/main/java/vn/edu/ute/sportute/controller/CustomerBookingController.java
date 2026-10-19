@@ -17,6 +17,8 @@ import vn.edu.ute.sportute.service.CustomerBookingService;
 import vn.edu.ute.sportute.service.SportService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import org.springframework.http.MediaType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -36,6 +38,8 @@ public class CustomerBookingController {
     private final BookingDetailRepository bookingDetailRepository;
     private final MaintenanceRepository maintenanceRepository;
     private final PriceRepository priceRepository;
+    private final vn.edu.ute.sportute.service.InvoiceExportService invoiceExportService;
+    private final vn.edu.ute.sportute.service.CustomerUserDataService customerUserDataService;
 
     public CustomerBookingController(CustomerBookingService customerBookingService,
                                      SportService sportService,
@@ -45,7 +49,9 @@ public class CustomerBookingController {
                                      CourtRepository courtRepository,
                                      BookingDetailRepository bookingDetailRepository,
                                      MaintenanceRepository maintenanceRepository,
-                                     PriceRepository priceRepository) {
+                                     PriceRepository priceRepository,
+                                     vn.edu.ute.sportute.service.InvoiceExportService invoiceExportService,
+                                     vn.edu.ute.sportute.service.CustomerUserDataService customerUserDataService) {
         this.customerBookingService = customerBookingService;
         this.sportService = sportService;
         this.adminBookingService = adminBookingService;
@@ -55,11 +61,13 @@ public class CustomerBookingController {
         this.bookingDetailRepository = bookingDetailRepository;
         this.maintenanceRepository = maintenanceRepository;
         this.priceRepository = priceRepository;
+        this.invoiceExportService = invoiceExportService;
+        this.customerUserDataService = customerUserDataService;
     }
 
     private Customer findCustomerByUsernameOrEmail(String usernameOrEmail) {
         if (usernameOrEmail == null || usernameOrEmail.isBlank()) {
-            return customerRepository.findAll().stream().findFirst().orElse(null);
+            return null;
         }
         Optional<Account> accountOpt = accountRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
         if (accountOpt.isPresent()) {
@@ -74,7 +82,7 @@ public class CustomerBookingController {
         Optional<Customer> byPhone = customerRepository.findByPhone(usernameOrEmail);
         if (byPhone.isPresent()) return byPhone.get();
 
-        return customerRepository.findAll().stream().findFirst().orElse(null);
+        return null;
     }
 
     @GetMapping({"", "/", "/dashboard"})
@@ -100,6 +108,13 @@ public class CustomerBookingController {
         model.addAttribute("currentUserName", customerDisplayName);
         model.addAttribute("customer", customer);
 
+        // Thông tin hạng thành viên và tỷ lệ giảm giá theo điểm tích lũy
+        CustomerTierInfo tierInfo = getCustomerTierInfo(customer);
+        model.addAttribute("tierInfo", tierInfo);
+        model.addAttribute("membershipTier", tierInfo.getTierName());
+        model.addAttribute("tierDiscountPercent", tierInfo.getDiscountPercent());
+        model.addAttribute("rewardPoints", tierInfo.getPoints());
+
         // Danh sách môn thể thao cho các nút Pills
         model.addAttribute("sports", sportService.getAllSports());
 
@@ -110,6 +125,13 @@ public class CustomerBookingController {
         model.addAttribute("availableCourts", customerBookingService.searchAvailableCourts(filter));
         model.addAttribute("filter", filter);
         model.addAttribute("bookingRequest", new CustomerBookingRequestDTO());
+
+        // Danh sách sân yêu thích lấy trực tiếp từ Server theo mã khách hàng (Customer ID bất biến)
+        List<String> userFavorites = (customer != null && customer.getId() != null)
+                ? customerUserDataService.getFavorites(customer.getId())
+                : Collections.emptyList();
+        model.addAttribute("userFavorites", userFavorites);
+        model.addAttribute("customerId", customer != null ? customer.getId() : "");
 
         return "customer/booking";
     }
@@ -195,11 +217,51 @@ public class CustomerBookingController {
             String username = (authentication != null) ? authentication.getName() : "khachle";
             customerBookingService.bookCourtOnline(request, username);
             redirectAttributes.addFlashAttribute("successMessage", 
-                    "Đặt sân trực tuyến thành công! Phiếu của bạn đang ở trạng thái 'Chờ xác nhận'. Vui lòng kiểm tra mục 'Lịch sử đặt sân'.");
+                    "Đặt sân trực tuyến thành công! Phiếu của bạn đã được xác nhận giữ chỗ ('Đã xác nhận'). Vui lòng kiểm tra mục 'Lịch sử đặt sân'.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/customer/history";
+    }
+
+    @PostMapping(value = "/booking/api/confirm", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> confirmBookingApiJson(
+            @RequestBody CustomerBookingRequestDTO request,
+            Authentication authentication) {
+        return handleConfirmBooking(request, authentication);
+    }
+
+    @PostMapping(value = "/booking/api/confirm")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> confirmBookingApi(
+            @ModelAttribute CustomerBookingRequestDTO request,
+            Authentication authentication) {
+        return handleConfirmBooking(request, authentication);
+    }
+
+    private ResponseEntity<Map<String, Object>> handleConfirmBooking(
+            CustomerBookingRequestDTO request,
+            Authentication authentication) {
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            String username = (authentication != null) ? authentication.getName() : "khachle";
+            vn.edu.ute.sportute.entity.Booking booking = customerBookingService.bookCourtOnline(request, username);
+            resp.put("success", true);
+            resp.put("bookingId", booking.getId());
+            resp.put("courtId", request.getCourtId());
+            resp.put("bookingDate", request.getBookingDate() != null ? request.getBookingDate().toString() : "");
+            resp.put("startTime", request.getStartTime() != null ? request.getStartTime().toString() : "");
+            resp.put("durationMinutes", request.getDurationMinutes());
+            resp.put("totalAmount", request.getTotalAmount());
+            resp.put("depositChoice", request.getDepositChoice());
+            resp.put("message", "Đặt sân trực tuyến thành công!");
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            resp.put("success", false);
+            resp.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(resp);
+        }
     }
 
     @GetMapping("/history")
@@ -215,33 +277,62 @@ public class CustomerBookingController {
         model.addAttribute("currentUserName", customerDisplayName);
         model.addAttribute("customer", customer);
 
-        List<AdminBookingDTO> allBookings = adminBookingService.getBookings(keyword, status);
-        List<AdminBookingDTO> userBookings;
+        String searchStatus = status;
+        if ("Hoàn thành".equalsIgnoreCase(status) || "Hoàn tất".equalsIgnoreCase(status)) {
+            searchStatus = "Hoàn tất";
+        }
+
+        // 1. Lấy toàn bộ lịch sử đặt sân của khách hàng (không bị phụ thuộc vào tab đang lọc) để tính đúng số lượng từng trạng thái
+        List<AdminBookingDTO> rawAllBookings = adminBookingService.getBookings(null, "Tất cả");
+        List<AdminBookingDTO> allCustomerBookings;
         if (customer != null) {
-            userBookings = allBookings.stream()
+            allCustomerBookings = rawAllBookings.stream()
                     .filter(b -> customer.getId().equalsIgnoreCase(b.getCustomerId()) ||
                             (customer.getPhone() != null && customer.getPhone().equals(b.getCustomerPhone())) ||
                             (customer.getFullName() != null && customer.getFullName().equalsIgnoreCase(b.getCustomerName())))
                     .collect(Collectors.toList());
-            if (userBookings.isEmpty() && ("admin".equalsIgnoreCase(username) || allBookings.size() <= 2)) {
-                userBookings = allBookings;
+            if (allCustomerBookings.isEmpty() && ("admin".equalsIgnoreCase(username) || rawAllBookings.size() <= 2)) {
+                allCustomerBookings = rawAllBookings;
             }
         } else {
-            userBookings = allBookings;
+            allCustomerBookings = rawAllBookings;
         }
 
-        // Tính toán thống kê
-        long totalCount = userBookings.size();
-        long pendingCount = userBookings.stream().filter(b -> "Chờ xác nhận".equalsIgnoreCase(b.getStatus())).count();
-        long confirmedCount = userBookings.stream().filter(b -> "Đã xác nhận".equalsIgnoreCase(b.getStatus()) || "Đang sử dụng".equalsIgnoreCase(b.getStatus())).count();
-        long completedCount = userBookings.stream().filter(b -> "Hoàn thành".equalsIgnoreCase(b.getStatus())).count();
-        long cancelledCount = userBookings.stream().filter(b -> "Đã hủy".equalsIgnoreCase(b.getStatus())).count();
-        BigDecimal totalSpent = userBookings.stream()
+        // Tính toán thống kê trên toàn bộ lịch sử đặt sân của khách hàng
+        long totalCount = allCustomerBookings.size();
+        long pendingCount = allCustomerBookings.stream().filter(b -> "Chờ xác nhận".equalsIgnoreCase(b.getStatus())).count();
+        long confirmedCount = allCustomerBookings.stream().filter(b -> "Đã xác nhận".equalsIgnoreCase(b.getStatus()) || "Đang sử dụng".equalsIgnoreCase(b.getStatus())).count();
+        long completedCount = allCustomerBookings.stream().filter(b -> "Hoàn tất".equalsIgnoreCase(b.getStatus()) || "Hoàn thành".equalsIgnoreCase(b.getStatus())).count();
+        long cancelledCount = allCustomerBookings.stream().filter(b -> "Đã hủy".equalsIgnoreCase(b.getStatus())).count();
+        BigDecimal totalSpent = allCustomerBookings.stream()
                 .filter(b -> !"Đã hủy".equalsIgnoreCase(b.getStatus()))
                 .map(b -> b.getTotalAmount() != null ? b.getTotalAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        model.addAttribute("bookings", userBookings);
+        // 2. Lọc danh sách hiển thị theo trạng thái tab được chọn và từ khóa tìm kiếm
+        final String finalSearchStatus = searchStatus;
+        List<AdminBookingDTO> displayedBookings = allCustomerBookings.stream()
+                .filter(b -> {
+                    if (finalSearchStatus != null && !finalSearchStatus.isBlank() && !"Tất cả".equalsIgnoreCase(finalSearchStatus)) {
+                        if ("Hoàn tất".equalsIgnoreCase(finalSearchStatus)) {
+                            if (!"Hoàn tất".equalsIgnoreCase(b.getStatus()) && !"Hoàn thành".equalsIgnoreCase(b.getStatus())) return false;
+                        } else if ("Đã xác nhận".equalsIgnoreCase(finalSearchStatus)) {
+                            if (!"Đã xác nhận".equalsIgnoreCase(b.getStatus()) && !"Đang sử dụng".equalsIgnoreCase(b.getStatus())) return false;
+                        } else {
+                            if (!finalSearchStatus.equalsIgnoreCase(b.getStatus())) return false;
+                        }
+                    }
+                    if (keyword != null && !keyword.isBlank()) {
+                        String kw = keyword.trim().toLowerCase();
+                        boolean matchId = b.getId() != null && b.getId().toLowerCase().contains(kw);
+                        boolean matchCourt = b.getCourtName() != null && b.getCourtName().toLowerCase().contains(kw);
+                        return matchId || matchCourt;
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        model.addAttribute("bookings", displayedBookings);
         model.addAttribute("totalCount", totalCount);
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("confirmedCount", confirmedCount);
@@ -290,18 +381,113 @@ public class CustomerBookingController {
         model.addAttribute("currentUserName", customerDisplayName);
         model.addAttribute("customer", customer);
 
-        final String targetCustomerId = customer.getId();
-        List<AdminBookingDTO> bookings = adminBookingService.getBookings(null, null);
-        long userBookingCount = bookings.stream()
-                .filter(b -> targetCustomerId != null && targetCustomerId.equalsIgnoreCase(b.getCustomerId()))
-                .count();
-        if (userBookingCount == 0) userBookingCount = Math.max(3, bookings.size());
-
-        model.addAttribute("bookingCount", userBookingCount);
-        model.addAttribute("rewardPoints", userBookingCount * 50);
-        model.addAttribute("membershipTier", userBookingCount >= 10 ? "Thành viên Vàng" : (userBookingCount >= 3 ? "Thành viên Bạc" : "Thành viên Thân thiết"));
+        CustomerTierInfo tierInfo = getCustomerTierInfo(customer);
+        model.addAttribute("tierInfo", tierInfo);
+        model.addAttribute("bookingCount", tierInfo.getBookingCount());
+        model.addAttribute("totalSpent", tierInfo.getTotalSpent());
+        model.addAttribute("rewardPoints", tierInfo.getPoints());
+        model.addAttribute("membershipTier", tierInfo.getTierName());
+        model.addAttribute("tierDiscountPercent", tierInfo.getDiscountPercent());
 
         return "customer/profile";
+    }
+
+    public static class CustomerTierInfo {
+        private String tierKey;
+        private String tierName;
+        private int discountPercent;
+        private int points;
+        private long bookingCount;
+        private BigDecimal totalSpent = BigDecimal.ZERO;
+        private String nextTierGoal;
+        private int nextTierPoints;
+        private int progressPercent;
+        private int pointsNeeded;
+        private String cardGradient;
+        private String cardBadgeClass;
+
+        public String getTierKey() { return tierKey; }
+        public String getTierName() { return tierName; }
+        public int getDiscountPercent() { return discountPercent; }
+        public int getPoints() { return points; }
+        public long getBookingCount() { return bookingCount; }
+        public BigDecimal getTotalSpent() { return totalSpent; }
+        public String getNextTierGoal() { return nextTierGoal; }
+        public int getNextTierPoints() { return nextTierPoints; }
+        public int getProgressPercent() { return progressPercent; }
+        public int getPointsNeeded() { return pointsNeeded; }
+        public String getCardGradient() { return cardGradient; }
+        public String getCardBadgeClass() { return cardBadgeClass; }
+    }
+
+    private CustomerTierInfo getCustomerTierInfo(Customer customer) {
+        CustomerTierInfo info = new CustomerTierInfo();
+        long bookingCount = 0;
+        BigDecimal totalSpent = BigDecimal.ZERO;
+        if (customer != null && customer.getId() != null) {
+            String targetId = customer.getId();
+            List<AdminBookingDTO> bookings = adminBookingService.getBookings(null, null).stream()
+                    .filter(b -> targetId.equalsIgnoreCase(b.getCustomerId()) ||
+                            (customer.getPhone() != null && customer.getPhone().equals(b.getCustomerPhone())))
+                    .filter(b -> !"Đã hủy".equalsIgnoreCase(b.getStatus()))
+                    .collect(Collectors.toList());
+            bookingCount = bookings.size();
+            for (AdminBookingDTO b : bookings) {
+                if (b.getTotalAmount() != null) {
+                    totalSpent = totalSpent.add(b.getTotalAmount());
+                }
+            }
+        }
+
+        info.bookingCount = bookingCount;
+        info.totalSpent = totalSpent;
+
+        // Điểm tích lũy tính tự động từ CSDL thật: 10.000 VNĐ chi tiêu = 1 điểm thưởng
+        int points = totalSpent.divide(BigDecimal.valueOf(10000), 0, RoundingMode.HALF_UP).intValue();
+        info.points = points;
+
+        if (points < 200) {
+            info.tierKey = "BRONZE";
+            info.tierName = "Thành viên Đồng";
+            info.discountPercent = 0;
+            info.nextTierGoal = "Hạng Bạc";
+            info.nextTierPoints = 200;
+            info.progressPercent = Math.min(100, Math.max(8, (points * 100) / 200));
+            info.pointsNeeded = 200 - points;
+            info.cardGradient = "linear-gradient(135deg, #78350f 0%, #b45309 50%, #92400e 100%)";
+            info.cardBadgeClass = "bronze";
+        } else if (points < 500) {
+            info.tierKey = "SILVER";
+            info.tierName = "Thành viên Bạc";
+            info.discountPercent = 5;
+            info.nextTierGoal = "Hạng Vàng";
+            info.nextTierPoints = 500;
+            info.progressPercent = Math.min(100, Math.max(8, ((points - 200) * 100) / 300));
+            info.pointsNeeded = 500 - points;
+            info.cardGradient = "linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)";
+            info.cardBadgeClass = "silver";
+        } else if (points < 1000) {
+            info.tierKey = "GOLD";
+            info.tierName = "Thành viên Vàng";
+            info.discountPercent = 10;
+            info.nextTierGoal = "Hạng Kim Cương";
+            info.nextTierPoints = 1000;
+            info.progressPercent = Math.min(100, Math.max(8, ((points - 500) * 100) / 500));
+            info.pointsNeeded = 1000 - points;
+            info.cardGradient = "linear-gradient(135deg, #78350f 0%, #d97706 50%, #f59e0b 100%)";
+            info.cardBadgeClass = "gold";
+        } else {
+            info.tierKey = "DIAMOND";
+            info.tierName = "Thành viên Kim Cương";
+            info.discountPercent = 15;
+            info.nextTierGoal = "Đã đạt đỉnh cấp";
+            info.nextTierPoints = 1000;
+            info.progressPercent = 100;
+            info.pointsNeeded = 0;
+            info.cardGradient = "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%)";
+            info.cardBadgeClass = "diamond";
+        }
+        return info;
     }
 
     @PostMapping("/profile")
@@ -326,5 +512,87 @@ public class CustomerBookingController {
             redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi lưu thông tin: " + e.getMessage());
         }
         return "redirect:/customer/profile";
+    }
+
+    // Tải hóa đơn PDF cho khách hàng
+    @GetMapping("/booking/export-pdf/{id}")
+    public ResponseEntity<org.springframework.core.io.InputStreamResource> exportCustomerPdf(@PathVariable String id) {
+        var bis = invoiceExportService.generateBookingPdfInvoice(id);
+        var headers = new org.springframework.http.HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=HoaDon_SPORTHUB_" + id + ".pdf");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(new org.springframework.core.io.InputStreamResource(bis));
+    }
+
+    // =========================================================================
+    // SERVER-SIDE USER DATA APIs: FAVORITES & AVATAR PERSISTENCE
+    // =========================================================================
+
+    @GetMapping("/booking/api/favorites")
+    @ResponseBody
+    public ResponseEntity<List<String>> getCustomerFavorites(Authentication authentication) {
+        String username = (authentication != null) ? authentication.getName() : null;
+        Customer customer = findCustomerByUsernameOrEmail(username);
+        if (customer == null || customer.getId() == null) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        return ResponseEntity.ok(customerUserDataService.getFavorites(customer.getId()));
+    }
+
+    @PostMapping("/booking/api/favorites/toggle")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> toggleCustomerFavorite(
+            @RequestParam("courtId") String courtId,
+            Authentication authentication) {
+        String username = (authentication != null) ? authentication.getName() : null;
+        Customer customer = findCustomerByUsernameOrEmail(username);
+        if (customer == null || customer.getId() == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng đăng nhập để lưu sân yêu thích!"));
+        }
+        List<String> updatedFavorites = customerUserDataService.toggleFavorite(customer.getId(), courtId);
+        boolean isFav = updatedFavorites.contains(courtId);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "courtId", courtId,
+                "isFavorite", isFav,
+                "favorites", updatedFavorites
+        ));
+    }
+
+    @PostMapping("/api/avatar")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> uploadAvatar(
+            @RequestBody Map<String, String> payload,
+            Authentication authentication) {
+        String username = (authentication != null) ? authentication.getName() : null;
+        Customer customer = findCustomerByUsernameOrEmail(username);
+        if (customer == null || customer.getId() == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Chưa xác thực người dùng!"));
+        }
+        String dataUrl = payload.get("dataUrl");
+        if (dataUrl == null || dataUrl.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Dữ liệu ảnh không hợp lệ!"));
+        }
+        String effectiveUrl = customerUserDataService.saveAvatar(customer.getId(), dataUrl);
+        if (effectiveUrl != null) {
+            return ResponseEntity.ok(Map.of("success", true, "avatarUrl", effectiveUrl));
+        } else {
+            return ResponseEntity.internalServerError().body(Map.of("success", false, "message", "Không thể lưu ảnh!"));
+        }
+    }
+
+    @GetMapping(value = "/api/avatar/{customerId}")
+    @ResponseBody
+    public ResponseEntity<byte[]> getCustomerAvatar(@PathVariable("customerId") String customerId) {
+        byte[] bytes = customerUserDataService.getAvatarBytes(customerId);
+        if (bytes == null || bytes.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .cacheControl(org.springframework.http.CacheControl.noCache())
+                .contentType(MediaType.IMAGE_PNG)
+                .body(bytes);
     }
 }

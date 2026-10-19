@@ -39,10 +39,13 @@ public class DashboardServiceImpl implements DashboardService {
         // 1. Tổng lượt đặt sân
         long totalBookings = bookingRepository.count();
 
-        // 2. Doanh thu hôm nay (tính từ các giao dịch thành công)
+        // 2. Doanh thu hôm nay (tính từ các giao dịch thành công: Thu, Cọc, Thanh toán)
         BigDecimal revenueToday = paymentRepository.findAll().stream()
-                .filter(p -> "Thu".equalsIgnoreCase(p.getTransactionType()) || "Cọc".equalsIgnoreCase(p.getTransactionType()))
-                .map(Payment::getAmount)
+                .filter(p -> p.getTransactionType() != null &&
+                        ("Thu".equalsIgnoreCase(p.getTransactionType()) ||
+                         "Cọc".equalsIgnoreCase(p.getTransactionType()) ||
+                         "Thanh toán".equalsIgnoreCase(p.getTransactionType())))
+                .map(p -> p.getAmount() != null ? p.getAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // 3. Tỷ lệ lấp đầy sân (ước tính dựa trên số sân đang sử dụng / tổng số sân)

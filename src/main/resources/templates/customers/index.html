@@ -4,404 +4,425 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Quản lý khách hàng</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Font Awesome 6.5.1 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Unified Admin Design System -->
+<link rel="stylesheet" th:href="@{/css/admin.css}">
 <style>
-:root{
-  --nav:#082c2f;--nav2:#061f25;--green:#1aaa62;--green2:#087d48;
-  --mint:#dff7e8;--blue:#1684ef;--orange:#ef9a28;--purple:#7958e9;
-  --ink:#132337;--muted:#728096;--bg:#f2f6f8;--line:#e2e9ed;
-  --card:#fff;--shadow:0 6px 22px rgba(15,42,52,.07);--shadow-sm:0 2px 8px rgba(15,42,52,.04)
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
-button,input,select{font:inherit}
-.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
-
-/* Sidebar */
-aside{
-  height:100vh;position:sticky;top:0;background:linear-gradient(180deg,var(--nav2),var(--nav));
-  color:#fff;padding:20px 14px;display:flex;flex-direction:column;overflow-y:auto;z-index:10
-}
-.brand{min-height:64px;padding:6px 10px 12px;margin:0 0 10px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none}
-.brand-logo{max-height:48px;max-width:170px;object-fit:contain}
-.nav{display:flex;flex-direction:column;gap:2px}
-.nav a{
-  height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;color:#c7d8da;
-  text-decoration:none;border-radius:9px;font-size:12px;font-weight:600;transition:.18s
-}
-.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
-.nav a.active{
-  background:linear-gradient(90deg,#138e4f,#1ca35d);color:#fff;
-  box-shadow:inset 3px 0 #68f3a5,0 4px 14px rgba(26,170,98,.2)
-}
-.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
-.side-art{
-  margin-top:auto;height:120px;margin-left:-14px;margin-right:-14px;margin-bottom:-20px;
-  background:linear-gradient(180deg,transparent 0,#052a2d 88%),linear-gradient(135deg,#0c553caa,#061f25 65%);
-  position:relative;overflow:hidden
-}
-.side-copy{position:absolute;left:22px;bottom:24px;font-size:15px;line-height:1.2;font-weight:800;font-style:italic;color:#e8f8ef}
-.side-copy:after{content:"";display:block;width:32px;height:3px;background:#31d77c;margin-top:8px}
-
-/* Topbar */
-main{min-width:0}
-.topbar{
-  height:60px;background:#fff;border-bottom:1px solid var(--line);
-  display:grid;grid-template-columns:300px minmax(260px,560px) 1fr;
-  align-items:center;gap:20px;padding:0 24px;position:sticky;top:0;z-index:9
-}
-.centername{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:10px}
-.mini-logo{
-  width:28px;height:28px;border-radius:8px;background:var(--mint);color:var(--green2);
-  display:grid;place-items:center;font-weight:900;font-size:11px
-}
-.search{position:relative}
-.search input{
-  width:100%;height:38px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:9px;
-  padding:0 14px 0 38px;font-size:12px;outline:none;transition:.2s
-}
-.search input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
-.search svg{position:absolute;left:13px;top:11px;width:15px;height:15px;fill:none;stroke:#748297;stroke-width:1.8}
-.account{justify-self:end;display:flex;align-items:center;gap:11px}
-.avatar{
-  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0e4b36,#199c58);
-  color:#fff;display:grid;place-items:center;font-weight:800;font-size:11.5px;
-  box-shadow:0 3px 10px rgba(14,75,54,.2)
-}
-.account b{font-size:12px;color:var(--ink);display:block}
-.account small{display:block;color:var(--green2);font-size:9.5px;font-weight:700;margin-top:1px}
-.btn-logout{
-  height:32px;padding:0 12px;border:1px solid #fee2e2;background:#fff5f5;color:#dc2626;border-radius:8px;
-  font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.18s
-}
-.btn-logout:hover{background:#fee2e2;border-color:#fca5a5;color:#b91c1c}
-
-/* Content Area */
-.content{max-width:1600px;margin:auto;padding:16px 22px 30px}
-.pagehead{
-  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;
-  padding:18px 24px;border-radius:14px;background:linear-gradient(90deg,#fff 0%,#f8fffb 55%,#dff7e8 100%);
-  border:1px solid var(--line);box-shadow:var(--shadow-sm)
-}
-.crumb{font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:700;letter-spacing:.3px}
-.pagehead h1{margin:0 0 3px;font-size:22px;letter-spacing:-.6px;color:#0b3b28}
-.pagehead p{margin:0;color:#5a6e64;font-size:12px}
-
-.btn{
-  height:36px;padding:0 16px;border:1px solid #d8e3dc;background:#fff;border-radius:8px;
-  font-weight:800;font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;
-  justify-content:center;gap:6px;transition:.18s;text-decoration:none;color:var(--ink)
-}
-.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
-.btn.primary{
-  background:linear-gradient(90deg,var(--green2),var(--green));color:#fff;border:none;
-  box-shadow:0 4px 12px rgba(26,170,98,.25)
-}
-.btn.danger{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
-.btn.danger:hover{background:#fecaca;color:#991b1b}
-
-/* Alerts */
-.alert{padding:12px 16px;border-radius:10px;margin-bottom:14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
-.alert-success{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
-.alert-danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
-
-/* Summary Grid */
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-.metric{
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
-  display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm)
-}
-.metric-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex:none}
-.metric-icon.g{background:var(--mint);color:var(--green2)}
-.metric-icon.p{background:#f3e8ff;color:var(--purple)}
-.metric-icon.b{background:#e0f2fe;color:var(--blue)}
-.metric-icon.o{background:#fef3c7;color:var(--orange)}
-.metric label{font-size:11px;color:var(--muted);display:block;font-weight:700}
-.metric strong{font-size:18px;color:var(--ink);display:block;line-height:1.2;font-weight:800}
-
-/* Layout Split */
-.layout{display:grid;grid-template-columns:1.8fr 1fr;gap:14px;align-items:start}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-.card .head{
-  padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;
-  align-items:center;background:#fafbfc
-}
-.card .head h2{margin:0;font-size:13.5px;color:#0b3b28;font-weight:800}
-.tablewrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th{background:#f6f8fa;color:#5a6e64;font-size:11px;font-weight:800;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:middle}
-tr:hover td{background:#f8fbf9}
-tr.sel td{background:#eefbf3}
-
-/* Badges */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10.5px;font-weight:800}
-.badge.vip{background:#f3e8ff;color:#7e22ce}
-.badge.loyal{background:#e0f2fe;color:#0369a1}
-.badge.regular{background:#f1f5f9;color:#475569}
-.badge.active{background:#dcfce7;color:#15803d}
-.badge.inactive{background:#fee2e2;color:#b91c1c}
-
-/* Form Card */
-.formcard{padding:0}
-.fields{padding:16px 18px;display:flex;flex-direction:column;gap:11px}
-.field label{display:block;font-size:11px;font-weight:800;color:#4a5d54;margin-bottom:4px}
-.field input,.field select{
-  width:100%;height:36px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:8px;
-  padding:0 11px;font-size:12px;outline:none;transition:.2s
-}
-.field input:focus,.field select:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
-.actions{padding:12px 18px;background:#fafbfc;border-top:1px solid var(--line);display:flex;gap:8px}
+.tier-vip { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+.tier-loyal { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.tier-regular { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
 
 /* Modal */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(8,44,47,.45);z-index:99;
-  display:none;place-items:center;padding:20px;backdrop-filter:blur(3px)
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
 }
-.modal-overlay.active{display:grid}
-.modal-card{background:#fff;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.25);width:100%;max-width:680px;overflow:hidden}
-.modal-head{padding:14px 18px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.modal-head h3{margin:0;font-size:14px;font-weight:800;color:var(--ink)}
-.modal-close{border:none;background:transparent;font-size:18px;cursor:pointer;color:var(--muted)}
-.modal-body{padding:18px;max-height:65vh;overflow-y:auto}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 720px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes popIn {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-head {
+  padding: 16px 22px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--gray-400);
+  padding: 0;
+}
+.modal-body {
+  padding: 22px;
+  max-height: 68vh;
+  overflow-y: auto;
+}
 
-@media(max-width:1100px){.layout{grid-template-columns:1fr}}
-@media(max-width:880px){
-  .app{grid-template-columns:70px 1fr}
-  .brand-logo,.nav span,.side-art,.centername span{display:none}
-  .topbar{grid-template-columns:1fr 1.5fr auto}
-  .summary{grid-template-columns:1fr 1fr}
-}
 </style>
 </head>
 <body>
-
 <div class="app">
-<!-- Sidebar -->
-<aside>
-  <a href="/admin/dashboard" class="brand">
-    <img class="brand-logo" src="/images/sporthub-logo.png" alt="SportHub Logo">
-  </a>
-  <nav class="nav">
-    <a href="/admin/dashboard"><svg viewBox="0 0 24 24"><path d="M5 5h14v15H5zM8 2v5M16 2v5M8 11h8"/></svg><span>Tổng quan</span></a>
-    <a href="/admin/bookings"><svg viewBox="0 0 24 24"><path d="M5 16l3-8 4 4 4-7 3 11M4 19h16"/></svg><span>Đặt sân</span></a>
-    <a href="/admin/bookings?view=schedule"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 9h16M8 3v4M16 3v4"/></svg><span>Lịch sân</span></a>
-    <a href="/admin/courts"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4v16"/></svg><span>Sân thể thao</span></a>
-    <a class="active" href="/admin/customers"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg><span>Khách hàng</span></a>
-    <a href="/admin/employees"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 20c.8-3.6 3.2-5.5 5.5-5.5S13.7 16.4 14.5 20"/><path d="M13 19c.6-2.3 2.2-3.8 4.2-3.8 1.8 0 3.2 1 3.8 2.8"/></svg><span>Nhân viên</span></a>
-    <a href="/admin/payments"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5zM8 4h8v3M8 12h8"/></svg><span>Thanh toán</span></a>
-    <a href="/admin/promotions"><svg viewBox="0 0 24 24"><path d="M4 12l8-8 8 8-8 8zM8 8h.01M16 16h.01M8 16l8-8"/></svg><span>Khuyến mãi</span></a>
-    <a href="/admin/maintenance"><svg viewBox="0 0 24 24"><path d="M14.7 6.3l3 3m-9.4 8.1l-3.6.7.7-3.6 8.8-8.8 2.9 2.9-8.8 8.8z"/><path d="M12 20h8"/></svg><span>Bảo trì</span></a>
-    <a href="/admin/reports"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Báo cáo</span></a>
-    <a href="/admin/permissions"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg><span>Phân quyền</span></a>
-  </nav>
-  <div class="side-art"><div class="side-copy">Thể thao<br>kết nối<br>cuộc sống</div></div>
-</aside>
+  <!-- Shared Sidebar -->
+  <div th:replace="~{fragments/sidebar :: sidebar('customers')}"></div>
 
-<!-- Main Area -->
-<main>
-<header class="topbar">
-  <div class="centername">
-    <div class="mini-logo">SH</div>
-    <span>Trung tâm Thể thao SportHub</span>
-  </div>
-  <form action="/admin/customers" method="get" class="search">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
-    <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm khách hàng theo mã, họ tên, số điện thoại, địa chỉ...">
-  </form>
-  <div class="account">
-    <div class="avatar">QL</div>
-    <div><b>Quản lý trung tâm</b><small>Quản trị viên</small></div>
-    <form th:action="@{/logout}" method="post" style="margin:0">
-      <button type="submit" class="btn-logout" title="Đăng xuất"><i class="fa-solid fa-right-from-bracket"></i></button>
-    </form>
-  </div>
-</header>
-
-<div class="content">
-  <!-- Flash Messages -->
-  <div th:if="${successMessage}" class="alert alert-success">
-    <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
-  </div>
-  <div th:if="${errorMessage}" class="alert alert-danger">
-    <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span>
-  </div>
-
-  <div class="pagehead">
-    <div>
-      <div class="crumb">Trang chủ › Quan hệ khách hàng › Danh mục khách hàng (UC30 - UC34)</div>
-      <h1>Quản lý khách hàng</h1>
-      <p>Lưu trữ hồ sơ hội viên, phân loại khách hàng thường/thân thiết/VIP và theo dõi lịch sử thuê sân</p>
-    </div>
-    <a href="/admin/customers" class="btn primary">＋ Thêm khách hàng mới</a>
-  </div>
-
-  <!-- Summary Cards -->
-  <section class="summary">
-    <div class="metric">
-      <div class="metric-icon g">👥</div>
-      <div><label>Tổng khách hàng</label><strong th:text="${stats.totalCustomers}">0</strong></div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon p">★</div>
-      <div><label>Khách hàng VIP (≥30 lượt)</label><strong th:text="${stats.vipCustomers}">0</strong></div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon b">♥</div>
-      <div><label>Khách thân thiết (≥10 lượt)</label><strong th:text="${stats.loyalCustomers}">0</strong></div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon o">▦</div>
-      <div><label>Tổng lượt đặt sân</label><strong th:text="${stats.totalBookings}">0</strong></div>
-    </div>
-  </section>
-
-  <!-- Layout Main Split -->
-  <section class="layout">
-    <!-- CỘT TRÁI: DANH SÁCH KHÁCH HÀNG (UC31) -->
-    <div class="card">
-      <div class="head">
-        <h2>Danh sách khách hàng</h2>
-        <form action="/admin/customers" method="get" style="display:flex;gap:8px;align-items:center">
-          <input type="hidden" name="keyword" th:value="${currentKeyword}">
-          <select name="tier" onchange="this.form.submit()" style="height:30px;font-size:11px;border-radius:6px;border:1px solid #cbd5e1;padding:0 6px">
-            <option value="Tất cả" th:selected="${selectedTier == 'Tất cả'}">Tất cả phân loại</option>
-            <option value="VIP" th:selected="${selectedTier == 'VIP'}">Khách VIP</option>
-            <option value="Thân thiết" th:selected="${selectedTier == 'Thân thiết'}">Khách thân thiết</option>
-            <option value="Thường" th:selected="${selectedTier == 'Thường'}">Khách thường</option>
-          </select>
-          <select name="status" onchange="this.form.submit()" style="height:30px;font-size:11px;border-radius:6px;border:1px solid #cbd5e1;padding:0 6px">
-            <option value="Tất cả" th:selected="${selectedStatus == 'Tất cả'}">Tất cả trạng thái</option>
-            <option value="Hoạt động" th:selected="${selectedStatus == 'Hoạt động'}">Hoạt động</option>
-            <option value="Ngừng hoạt động" th:selected="${selectedStatus == 'Ngừng hoạt động'}">Ngừng hoạt động</option>
-          </select>
+  <main>
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="centername">
+          <div class="mini-logo"><i class="fa-solid fa-users"></i></div>
+          <span>Trung tâm Thể thao SportHub</span>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <form action="/admin/customers" method="get" class="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm khách hàng theo mã, họ tên, số điện thoại, địa chỉ...">
         </form>
       </div>
+      <div class="topbar-right">
+        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <div class="topbar-user">
+          <div class="avatar" th:text="${currentUser != null ? currentUser.avatarInitials : 'QL'}">QL</div>
+          <div class="topbar-user-info">
+            <span class="topbar-user-name" th:text="${currentUser != null ? currentUser.fullName : 'Quản lý trung tâm'}">Quản lý trung tâm</span>
+            <span class="topbar-user-role" th:text="${currentUser != null ? currentUser.roleName : 'Quản trị viên'}">Quản trị viên</span>
+          </div>
+        </div>
+      </div>
+    </header>
 
-      <div class="tablewrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Mã KH</th>
-              <th>Họ và tên</th>
-              <th>Số điện thoại</th>
-              <th>Địa chỉ</th>
-              <th>Lượt đặt</th>
-              <th>Hạng</th>
-              <th>Trạng thái</th>
-              <th style="text-align:right">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="c : ${customers}" th:classappend="${customerDTO.id == c.id ? 'sel' : ''}">
-              <td style="font-weight:800;color:var(--green2)" th:text="${c.id}">KH001</td>
-              <td><b th:text="${c.fullName}">Nguyễn Văn An</b><div th:if="${c.email != null}" style="font-size:10px;color:var(--muted)" th:text="${c.email}"></div></td>
-              <td th:text="${c.phone}">0901234567</td>
-              <td th:text="${c.address != null and !c.address.isEmpty() ? c.address : '---'}">TP. Thủ Đức</td>
-              <td><b th:text="${c.totalBookings}">12</b></td>
-              <td>
-                <span class="badge" th:classappend="${c.tier == 'VIP' ? 'vip' : (c.tier == 'Thân thiết' ? 'loyal' : 'regular')}" th:text="${c.tier}">Thường</span>
-              </td>
-              <td>
-                <span class="badge" th:classappend="${c.status == 'Hoạt động' ? 'active' : 'inactive'}" th:text="${c.status}">Hoạt động</span>
-              </td>
-              <td style="text-align:right;white-space:nowrap">
-                <a th:href="@{/admin/customers(editId=${c.id})}" class="btn" style="height:28px;padding:0 8px;font-size:11px" title="Sửa thông tin"><i class="fa-solid fa-pen"></i></a>
-                <button type="button" class="btn" style="height:28px;padding:0 8px;font-size:11px" th:data-id="${c.id}" th:data-name="${c.fullName}" onclick="openHistoryModal(this)" title="Lịch sử thuê (UC34)"><i class="fa-solid fa-clock-rotate-left"></i></button>
-                <form th:action="@{/admin/customers/toggle/{id}(id=${c.id})}" method="post" style="display:inline" onsubmit="return confirm('Xác nhận đổi trạng thái khách hàng #' + '[[${c.id}]]' + '?');">
-                  <button type="submit" class="btn" style="height:28px;padding:0 8px;font-size:11px" th:classappend="${c.status == 'Hoạt động' ? 'danger' : 'primary'}" th:title="${c.status == 'Hoạt động' ? 'Ngừng hoạt động (UC33)' : 'Kích hoạt lại'}">
-                    <i th:class="${c.status == 'Hoạt động' ? 'fa-solid fa-user-slash' : 'fa-solid fa-user-check'}"></i>
+    <div class="content">
+      <!-- Flash Messages -->
+      <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+      </div>
+
+      <!-- Pagehead Banner -->
+      <section class="pagehead">
+        <div class="pagehead-left">
+          <div class="pagehead-icon">
+            <i class="fa-solid fa-address-book"></i>
+          </div>
+          <div>
+            <h1>Quản lý khách hàng hội viên</h1>
+            <p>Lưu trữ hồ sơ hội viên, phân loại khách hàng thường / thân thiết / VIP và theo dõi lịch sử thuê sân</p>
+          </div>
+        </div>
+        <div class="pagehead-actions">
+          <button type="button" class="btn primary" onclick="openCreateModal()">
+            <i class="fa-solid fa-plus"></i> Thêm khách hàng mới
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI Summary Cards -->
+      <section class="summary">
+        <div class="metric">
+          <div class="metric-icon green"><i class="fa-solid fa-users"></i></div>
+          <div>
+            <label>Tổng khách hàng</label>
+            <strong th:text="${stats.totalCustomers}">0</strong>
+            <small>Đã đăng ký tài khoản</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon purple"><i class="fa-solid fa-crown"></i></div>
+          <div>
+            <label>Khách hàng VIP</label>
+            <strong th:text="${stats.vipCustomers}">0</strong>
+            <small>≥ 30 lượt đặt sân</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon blue"><i class="fa-solid fa-award"></i></div>
+          <div>
+            <label>Khách thân thiết</label>
+            <strong th:text="${stats.loyalCustomers}">0</strong>
+            <small>≥ 10 lượt đặt sân</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon amber"><i class="fa-regular fa-calendar-check"></i></div>
+          <div>
+            <label>Tổng lượt đặt</label>
+            <strong th:text="${stats.totalBookings}">0</strong>
+            <small>Lượt đặt từ khách hàng</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- BẢNG DANH SÁCH 100% CHIỀU RỘNG (MÔ HÌNH MODAL CRUD) -->
+      <section class="card" style="width:100%;">
+        <div class="card-head">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-list-check" style="color:var(--gray-500);"></i>
+            <h2>Danh sách khách hàng</h2>
+            <span class="badge" style="background:var(--gray-100); color:var(--gray-700); font-weight:700;" th:text="${customers.size() + ' bản ghi'}">10 bản ghi</span>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div style="position:relative; width: 240px;">
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--gray-400); font-size:12px;"></i>
+              <input type="text" id="customerQuickSearch" placeholder="Tìm kiếm nhanh tên, SĐT, mã..." oninput="filterCustomersClient(this.value)" style="height:34px; padding-left:30px; padding-right:10px; border-radius:8px; border:1px solid var(--line); font-size:12px; width:100%; background:#ffffff;">
+            </div>
+            <form action="/admin/customers" method="get" style="display:flex; gap:8px; align-items:center; margin:0;">
+              <input type="hidden" name="keyword" th:value="${currentKeyword}">
+              <select name="tier" onchange="this.form.submit()" style="height:34px; font-size:12px; border-radius:8px; border:1px solid var(--line); padding:0 8px; background:var(--gray-50);">
+                <option value="Tất cả" th:selected="${selectedTier == 'Tất cả'}">Tất cả phân loại</option>
+                <option value="VIP" th:selected="${selectedTier == 'VIP'}">Khách VIP</option>
+                <option value="Thân thiết" th:selected="${selectedTier == 'Thân thiết'}">Khách thân thiết</option>
+                <option value="Thường" th:selected="${selectedTier == 'Thường'}">Khách thường</option>
+              </select>
+              <select name="status" onchange="this.form.submit()" style="height:34px; font-size:12px; border-radius:8px; border:1px solid var(--line); padding:0 8px; background:var(--gray-50);">
+                <option value="Tất cả" th:selected="${selectedStatus == 'Tất cả'}">Tất cả trạng thái</option>
+                <option value="Hoạt động" th:selected="${selectedStatus == 'Hoạt động'}">Hoạt động</option>
+                <option value="Ngừng hoạt động" th:selected="${selectedStatus == 'Ngừng hoạt động'}">Ngừng hoạt động</option>
+              </select>
+            </form>
+          </div>
+        </div>
+
+        <div class="tablewrap tablewrap-scroll">
+          <table id="customersTable">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Mã KH</th>
+                <th>Họ và tên</th>
+                <th>Số điện thoại</th>
+                <th>Địa chỉ</th>
+                <th style="width: 90px; text-align:center;">Lượt đặt</th>
+                <th>Hạng</th>
+                <th>Trạng thái</th>
+                <th style="text-align:right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="c : ${customers}" 
+                  th:data-id="${c.id}"
+                  th:data-name="${c.fullName}"
+                  class="clickable-row"
+                  th:classappend="${customerDTO.id == c.id ? 'selected-row' : ''}"
+                  onclick="handleCustomerRowClick(this, event)"
+                  style="cursor:pointer;"
+                  title="Bấm vào dòng để xem chi tiết & lịch sử đặt sân của khách hàng này">
+                <td style="font-weight:800; color:var(--primary);" th:text="${c.id}">KH001</td>
+                <td>
+                  <b th:text="${c.fullName}">Nguyễn Văn An</b>
+                  <div th:if="${c.email != null}" style="font-size:11px; color:var(--gray-500);" th:text="${c.email}"></div>
+                </td>
+                <td th:text="${c.phone}">0901234567</td>
+                <td th:text="${c.address != null and !c.address.isEmpty() ? c.address : '---'}">TP. Thủ Đức</td>
+                <td style="text-align:center;"><b th:text="${c.totalBookings}">12</b></td>
+                <td>
+                  <span class="badge" th:classappend="${c.tier == 'VIP' ? 'tier-vip' : (c.tier == 'Thân thiết' ? 'tier-loyal' : 'tier-regular')}" th:text="${c.tier}">Thường</span>
+                </td>
+                <td>
+                  <span class="badge" th:classappend="${c.status == 'Hoạt động' ? 'status-active' : 'status-disabled'}" th:text="${c.status}">Hoạt động</span>
+                </td>
+                <td style="text-align:right; white-space:nowrap;">
+                  <button type="button" class="btn btn-sm"
+                          th:data-id="${c.id}"
+                          th:data-fullname="${c.fullName}"
+                          th:data-phone="${c.phone}"
+                          th:data-email="${c.email != null ? c.email : ''}"
+                          th:data-address="${c.address != null ? c.address : ''}"
+                          th:data-status="${c.status}"
+                          onclick="openEditModal(this)"
+                          title="Sửa thông tin">
+                    <i class="fa-solid fa-pen"></i> Sửa
                   </button>
-                </form>
-              </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(customers)}">
-              <td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Không tìm thấy khách hàng phù hợp điều kiện lọc.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                  <button type="button" class="btn btn-sm" th:data-id="${c.id}" th:data-name="${c.fullName}" onclick="openHistoryModal(this)" title="Lịch sử thuê"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử</button>
+                  <form th:action="@{/admin/customers/toggle/{id}(id=${c.id})}" method="post" style="display:inline" onsubmit="return confirm('Xác nhận đổi trạng thái khách hàng #' + '[[${c.id}]]' + '?');">
+                    <button type="submit" class="btn btn-sm" th:classappend="${c.status == 'Hoạt động' ? 'btn-danger' : 'btn-success'}" th:title="${c.status == 'Hoạt động' ? 'Ngừng hoạt động' : 'Kích hoạt lại'}">
+                      <i th:class="${c.status == 'Hoạt động' ? 'fa-solid fa-user-slash' : 'fa-solid fa-user-check'}"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(customers)}">
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="fa-solid fa-inbox fs-2 mb-2 d-block"></i>
+                  Không tìm thấy khách hàng phù hợp điều kiện lọc.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
+  </main>
+</div>
 
-    <!-- CỘT PHẢI: FORM THÊM / CẬP NHẬT KHÁCH HÀNG (UC30, UC32) -->
-    <div class="card formcard">
-      <div class="head">
-        <h2>Thông tin khách hàng</h2>
-        <span class="badge" th:text="${customerDTO.id != null ? 'Cập nhật: #' + customerDTO.id : 'Thêm mới (UC30)'}"></span>
-      </div>
-
-      <form th:action="@{/admin/customers/save}" th:object="${customerDTO}" method="post">
-        <input type="hidden" th:field="*{id}">
-        <div class="fields">
-          <div class="field" th:if="${customerDTO.id != null}">
-            <label>Mã khách hàng</label>
-            <input type="text" th:value="${customerDTO.id}" readonly style="background:#f1f5f9;font-weight:700;color:var(--green2)">
-          </div>
-          <div class="field">
+<!-- ==========================================================================
+     MODAL 1: THÊM / CẬP NHẬT HỒ SƠ KHÁCH HÀNG (MÔ HÌNH MODAL CRUD)
+     ========================================================================== -->
+<div class="modal-overlay" id="customerModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>
+        <i class="fa-solid fa-user-pen" style="color:var(--primary);"></i>
+        <span id="customerModalTitle">Thêm khách hàng mới</span>
+        <span id="customerModalBadge" class="badge status-active modal-badge">Tạo mới</span>
+      </h3>
+      <button type="button" class="modal-close" onclick="closeCustomerModal()">&times;</button>
+    </div>
+    <form id="customerForm" th:action="@{/admin/customers/save}" method="post">
+      <input type="hidden" id="custFieldId" name="id">
+      <div class="modal-body">
+        <div class="field" id="custCodeRow" style="display:none; margin-bottom:14px;">
+          <label>Mã khách hàng</label>
+          <input type="text" id="custFieldCode" readonly style="font-weight:700; color:var(--primary); background:var(--gray-50);">
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="field" style="margin:0;">
             <label>Họ và tên khách hàng (*)</label>
-            <input type="text" th:field="*{fullName}" placeholder="Ví dụ: Nguyễn Hoàng Nam" required>
+            <input type="text" id="custFieldFullName" name="fullName" placeholder="Ví dụ: Nguyễn Hoàng Nam" required>
           </div>
-          <div class="field">
+          <div class="field" style="margin:0;">
             <label>Số điện thoại (*)</label>
-            <input type="text" th:field="*{phone}" placeholder="Ví dụ: 0908111222" required>
+            <input type="text" id="custFieldPhone" name="phone" placeholder="Ví dụ: 0908111222" required>
           </div>
-          <div class="field">
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="field" style="margin:0;">
             <label>Email liên hệ</label>
-            <input type="email" th:field="*{email}" placeholder="Ví dụ: nam.nh@gmail.com">
+            <input type="email" id="custFieldEmail" name="email" placeholder="Ví dụ: nam.nh@gmail.com">
           </div>
-          <div class="field">
-            <label>Địa chỉ</label>
-            <input type="text" th:field="*{address}" placeholder="Ví dụ: Số 1 Võ Văn Ngân, Thủ Đức">
-          </div>
-          <div class="field">
+          <div class="field" style="margin:0;">
             <label>Trạng thái hồ sơ</label>
-            <select th:field="*{status}">
+            <select id="custFieldStatus" name="status">
               <option value="Hoạt động">Hoạt động</option>
               <option value="Ngừng hoạt động">Ngừng hoạt động</option>
             </select>
           </div>
         </div>
-
-        <div class="actions">
-          <button type="submit" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu khách hàng</button>
-          <a href="/admin/customers" class="btn"><i class="fa-solid fa-rotate-right"></i> Làm mới</a>
+        <div class="field" style="margin:0;">
+          <label>Địa chỉ</label>
+          <input type="text" id="custFieldAddress" name="address" placeholder="Ví dụ: Số 1 Võ Văn Ngân, Thủ Đức, TP.HCM">
         </div>
-      </form>
-    </div>
-  </section>
-</div>
-</main>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeCustomerModal()">Hủy bỏ</button>
+        <button type="submit" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu khách hàng</button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- MODAL: LỊCH SỬ THUÊ SÂN CỦA KHÁCH HÀNG (UC34) -->
+<!-- ==========================================================================
+     MODAL 2: LỊCH SỬ THUÊ SÂN CỦA KHÁCH HÀNG
+     ========================================================================== -->
 <div class="modal-overlay" id="historyModal">
   <div class="modal-card">
     <div class="modal-head">
-      <h3><i class="fa-solid fa-clock-rotate-left text-success me-1"></i> Lịch Sử Thuê Sân: <span id="histCustomerName" style="color:var(--green2)"></span></h3>
+      <h3><i class="fa-solid fa-clock-rotate-left text-success me-1"></i> Lịch Sử Thuê Sân: <span id="histCustomerName" style="color:var(--primary);"></span></h3>
       <button type="button" class="modal-close" onclick="closeHistoryModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <div id="histLoading" style="text-align:center;padding:20px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải lịch sử thuê...</div>
+      <div id="histLoading" style="text-align:center; padding:30px; color:var(--gray-500);"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tải lịch sử thuê...</div>
       <div id="histContent" style="display:none">
-        <table style="width:100%;font-size:12px">
-          <thead>
-            <tr style="background:#f1f5f9">
-              <th>Mã phiếu</th>
-              <th>Sân & Môn</th>
-              <th>Ngày thuê</th>
-              <th>Khung giờ</th>
-              <th>Tổng tiền</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody id="histTableBody"></tbody>
-        </table>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã phiếu</th>
+                <th>Sân & Môn</th>
+                <th>Ngày thuê</th>
+                <th>Khung giờ</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody id="histTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+// --- Customer Modal CRUD Helpers ---
+function openCreateModal() {
+  document.getElementById('customerForm').reset();
+  document.getElementById('custFieldId').value = '';
+  document.getElementById('custCodeRow').style.display = 'none';
+  document.getElementById('customerModalTitle').innerText = 'Thêm khách hàng mới';
+  const badge = document.getElementById('customerModalBadge');
+  badge.innerText = 'Tạo mới';
+  badge.className = 'badge status-active modal-badge';
+  document.getElementById('customerModal').classList.add('active');
+}
+
+function openEditModal(btn) {
+  const id = btn.getAttribute('data-id');
+  const fullName = btn.getAttribute('data-fullname') || '';
+  const phone = btn.getAttribute('data-phone') || '';
+  const email = btn.getAttribute('data-email') || '';
+  const address = btn.getAttribute('data-address') || '';
+  const status = btn.getAttribute('data-status') || 'Hoạt động';
+
+  document.getElementById('custFieldId').value = id;
+  document.getElementById('custFieldCode').value = id;
+  document.getElementById('custCodeRow').style.display = 'block';
+  document.getElementById('custFieldFullName').value = fullName;
+  document.getElementById('custFieldPhone').value = phone;
+  document.getElementById('custFieldEmail').value = email;
+  document.getElementById('custFieldAddress').value = address;
+  document.getElementById('custFieldStatus').value = status;
+
+  document.getElementById('customerModalTitle').innerText = 'Cập nhật khách hàng: #' + id;
+  const badge = document.getElementById('customerModalBadge');
+  badge.innerText = 'Chế độ chỉnh sửa';
+  badge.className = 'badge status-inuse modal-badge';
+  document.getElementById('customerModal').classList.add('active');
+}
+
+function closeCustomerModal() {
+  document.getElementById('customerModal').classList.remove('active');
+}
+
+// Close modals when clicking overlay backdrop
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+});
+
+// Auto open edit modal if editId param exists in URL
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get('editId');
+  if (editId) {
+    const editBtn = document.querySelector(`button[data-id="${editId}"]`);
+    if (editBtn) openEditModal(editBtn);
+  }
+});
+
+// --- History Modal Helper ---
 function openHistoryModal(btn) {
   const id = btn.getAttribute('data-id');
   const name = btn.getAttribute('data-name');
@@ -419,16 +440,16 @@ function openHistoryModal(btn) {
       if (data && data.length > 0) {
         tb.innerHTML = data.map(item => `
           <tr>
-            <td><b style="color:#087d48">#${item.bookingId}</b></td>
-            <td><b>${item.courtName}</b> <small style="color:#64748b">(${item.sportName})</small></td>
+            <td><b style="color:var(--primary)">#${item.bookingId}</b></td>
+            <td><b>${item.courtName}</b> <small style="color:var(--gray-500)">(${item.sportName})</small></td>
             <td>${item.bookingDate}</td>
             <td><b>${item.timeSlot}</b></td>
-            <td><b>${Number(item.totalAmount).toLocaleString('vi-VN')} đ</b></td>
-            <td><span class="badge ${item.status === 'Hoàn thành' ? 'active' : (item.status === 'Đã hủy' ? 'inactive' : 'loyal')}">${item.status}</span></td>
+            <td><b style="color:var(--primary)">${Number(item.totalAmount).toLocaleString('vi-VN')} đ</b></td>
+            <td><span class="badge ${item.status === 'Hoàn thành' ? 'status-active' : (item.status === 'Đã hủy' ? 'status-disabled' : 'status-inuse')}">${item.status}</span></td>
           </tr>
         `).join('');
       } else {
-        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#94a3b8">Khách hàng chưa có lượt đặt sân nào.</td></tr>';
+        tb.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Khách hàng chưa có lượt đặt sân nào.</td></tr>';
       }
     })
     .catch(err => {
@@ -437,6 +458,19 @@ function openHistoryModal(btn) {
 }
 function closeHistoryModal() {
   document.getElementById('historyModal').classList.remove('active');
+}
+
+function handleCustomerRowClick(row, event) {
+  if (event.target.closest('button, a, input, select, form')) return;
+  openHistoryModal(row);
+}
+
+function filterCustomersClient(query) {
+  const q = (query || '').toLowerCase().trim();
+  document.querySelectorAll('#customersTable tbody tr').forEach(tr => {
+    const text = tr.innerText.toLowerCase();
+    tr.style.display = text.includes(q) ? '' : 'none';
+  });
 }
 </script>
 </body>

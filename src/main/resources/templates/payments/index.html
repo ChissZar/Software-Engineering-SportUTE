@@ -4,344 +4,225 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Quản lý thanh toán</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<style>
-:root{
-  --nav:#082c2f;--nav2:#061f25;--green:#1aaa62;--green2:#087d48;
-  --mint:#dff7e8;--blue:#1684ef;--orange:#ef9a28;--purple:#7958e9;
-  --ink:#132337;--muted:#728096;--bg:#f2f6f8;--line:#e2e9ed;
-  --card:#fff;--shadow:0 6px 22px rgba(15,42,52,.07);--shadow-sm:0 2px 8px rgba(15,42,52,.04)
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
-button,input,select{font:inherit}
-.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Font Awesome 6.5.1 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Unified Admin Design System -->
+<link rel="stylesheet" th:href="@{/css/admin.css}">
 
-/* Aside Sidebar */
-aside{
-  height:100vh;position:sticky;top:0;background:linear-gradient(180deg,var(--nav2),var(--nav));
-  color:#fff;padding:20px 13px;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;z-index:10;box-sizing:border-box
-}
-.brand{
-  min-height:68px;padding:8px 8px 10px;margin:0 2px 9px;display:flex;align-items:center;justify-content:center;
-  border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none
-}
-.brand-logo{
-  display:block;width:100%;max-width:176px;height:auto;object-fit:contain;box-sizing:border-box;
-  padding:7px 10px;border:1px solid rgba(96,243,165,.18);border-radius:11px;
-  background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(238,251,245,.92));
-  box-shadow:0 5px 14px rgba(0,0,0,.16)
-}
-.nav{display:flex;flex-direction:column;gap:2px}
-.nav a{
-  height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;margin:2px 0;color:#c7d8da;
-  text-decoration:none;border-radius:9px;font-size:11.5px;font-weight:600;transition:.18s;box-sizing:border-box
-}
-.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
-.nav a.active{
-  background:linear-gradient(90deg,#138e4f,#1ca35d);color:#fff;
-  box-shadow:inset 3px 0 #68f3a5,0 4px 14px rgba(26,170,98,.2)
-}
-.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
-.side-art{
-  margin-top:auto;height:150px;margin-left:-13px;margin-right:-13px;margin-bottom:-20px;
-  background:linear-gradient(180deg,transparent 0,#052a2d 88%),linear-gradient(135deg,#0c553caa,#061f25 65%);
-  position:relative;overflow:hidden;flex-shrink:0
-}
-.side-art:before{
-  content:"";position:absolute;inset:20px -30px -15px;
-  background:radial-gradient(circle at 60% 50%,#2ac77733,transparent 40%);transform:skewY(-12deg)
-}
-.side-copy{position:absolute;left:25px;bottom:26px;font-size:17px;line-height:1.12;font-weight:800;font-style:italic}
-.side-copy:after{content:"";display:block;width:35px;height:3px;background:#31d77c;margin-top:12px}
-
-/* Topbar */
-main{min-width:0}
-.topbar{
-  height:58px;background:#fff;border-bottom:1px solid var(--line);
-  display:grid;grid-template-columns:280px minmax(260px,540px) 1fr;
-  align-items:center;gap:20px;padding:0 22px;position:sticky;top:0;z-index:8;box-sizing:border-box
-}
-.centername{font-size:11px;font-weight:800;display:flex;align-items:center;gap:8px}
-.mini-logo{
-  width:28px;height:28px;border-radius:7px;background:#dff7e8;color:#0d8b4f;
-  display:grid;place-items:center;font-weight:900;font-size:11px;flex:none
-}
-.search{position:relative}
-.search input{
-  width:100%;height:34px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:8px;
-  padding:0 13px 0 35px;font-size:11px;outline:none;box-sizing:border-box;transition:.2s
-}
-.search input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
-.search svg{position:absolute;left:12px;top:10px;width:14px;height:14px;fill:none;stroke:#748297}
-.account{justify-self:end;display:flex;align-items:center;gap:10px}
-.avatar{
-  width:34px;height:34px;border-radius:50%;background:#173d2c;color:#fff;
-  display:grid;place-items:center;font-weight:800;font-size:10px;flex:none
-}
-.account b{font-size:10px;color:var(--ink);display:block}
-.account small{display:block;color:#7f8b9d;font-size:8px;margin-top:2px}
-
-/* Page content */
-.content{max-width:1540px;margin:auto;padding:16px 22px 30px}
-.pagehead{
-  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;
-  padding:18px 24px;border-radius:14px;background:linear-gradient(90deg,#fff 0%,#f8fffb 55%,#dff7e8 100%);
-  border:1px solid var(--line);box-shadow:var(--shadow-sm)
-}
-.crumb{font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:700;letter-spacing:.3px}
-.pagehead h1{margin:0 0 3px;font-size:22px;letter-spacing:-.6px;color:#0b3b28}
-.pagehead p{margin:0;color:#5a6e64;font-size:12px}
-
-.btn{
-  height:34px;padding:0 14px;border:1px solid #d8e3dc;background:#fff;border-radius:8px;
-  font-weight:800;font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;
-  justify-content:center;gap:6px;transition:.18s;text-decoration:none;color:var(--ink)
-}
-.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
-.btn.primary{background:linear-gradient(90deg,#087a42,#17a45b);color:#fff;border:0;box-shadow:0 4px 12px rgba(26,170,98,.25)}
-
-/* Metrics */
-.summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:12px 0}
-.metric{
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;
-  display:flex;gap:12px;align-items:center;box-shadow:var(--shadow-sm);transition:.2s
-}
-.metric:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.metric-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:16px;flex:none}
-.g{background:var(--mint);color:#0d8a4e}
-.b{background:#bfe0ff;color:#096bc4}
-.o{background:#ffe1a8;color:#bb6e00}
-.r{background:#fee2e2;color:#dc2626}
-.p{background:#ddcfff;color:#6642c6}
-.metric label{font-size:9.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.metric strong{display:block;font-size:18px;margin-top:2px;color:var(--ink);letter-spacing:-.5px}
-
-/* Layout */
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start}
-.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow-sm)}
-.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.head h2{font-size:13.5px;margin:0;font-weight:800;color:var(--ink)}
-
-/* Table */
-.tablewrap{overflow:auto;border:1px solid #edf1f3;border-radius:10px}
-table{width:100%;border-collapse:collapse;min-width:680px}
-th{
-  text-align:left;background:#f5f8fa;color:#617084;font-size:10.5px;font-weight:800;
-  padding:10px 12px;white-space:nowrap;border-bottom:1px solid #e5ebef;text-transform:uppercase;letter-spacing:.5px
-}
-td{font-size:12px;padding:10px 12px;border-bottom:1px solid #edf1f3;white-space:nowrap}
-tbody tr:hover{background:#f7fbf9}
-.empty{text-align:center;color:var(--muted);padding:28px;font-size:12px}
-
-/* Badges */
-.badge{padding:4px 9px;border-radius:7px;font-size:10px;font-weight:800;display:inline-block}
-.badge-thu{background:#dcfce7;color:#15803d}
-.badge-coc{background:#fef3c7;color:#b45309}
-.badge-hoan{background:#fee2e2;color:#b91c1c}
-
-/* Form */
-.formcard{position:sticky;top:74px}
-.fields{display:grid;gap:10px}
-.field label{display:block;font-size:10.5px;font-weight:800;color:#4b5a6e;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
-.field input,.field select{
-  width:100%;height:36px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:8px;
-  padding:0 11px;font-size:12px;outline:none;transition:.18s
-}
-.field input:focus,.field select:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
-
-.alert{padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px}
-.alert-success{background:#e8f8ef;color:#087a42;border:1px solid #b9eecd}
-.alert-danger{background:#feecec;color:#c0392b;border:1px solid #fecaca}
-
-@media(max-width:1050px){.summary{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:980px){.layout{grid-template-columns:1fr}.formcard{position:static}}
-</style>
 </head>
 <body>
 <div class="app">
-<!-- ASIDE SIDEBAR -->
-<aside>
-  <a href="/admin/dashboard" class="brand">
-    <img class="brand-logo" src="/images/sporthub-logo.png" alt="SportHub Logo">
-  </a>
-  <nav class="nav">
-    <a href="/admin/dashboard"><svg viewBox="0 0 24 24"><path d="M5 5h14v15H5zM8 2v5M16 2v5M8 11h8"/></svg><span>Tổng quan</span></a>
-    <a href="/admin/bookings"><svg viewBox="0 0 24 24"><path d="M5 16l3-8 4 4 4-7 3 11M4 19h16"/></svg><span>Đặt sân</span></a>
-    <a href="/admin/bookings?view=schedule"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 9h16M8 3v4M16 3v4"/></svg><span>Lịch sân</span></a>
-    <a href="/admin/courts"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4v16"/></svg><span>Sân thể thao</span></a>
-    <a href="/admin/customers"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg><span>Khách hàng</span></a>
-    <a href="/admin/employees"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 20c.8-3.6 3.2-5.5 5.5-5.5S13.7 16.4 14.5 20"/><path d="M13 19c.6-2.3 2.2-3.8 4.2-3.8 1.8 0 3.2 1 3.8 2.8"/></svg><span>Nhân viên</span></a>
-    <a class="active" href="/admin/payments"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5zM8 4h8v3M8 12h8"/></svg><span>Thanh toán</span></a>
-    <a href="/admin/promotions"><svg viewBox="0 0 24 24"><path d="M4 12l8-8 8 8-8 8zM8 8h.01M16 16h.01M8 16l8-8"/></svg><span>Khuyến mãi</span></a>
-    <a href="/admin/maintenance"><svg viewBox="0 0 24 24"><path d="M14.7 6.3l3 3m-9.4 8.1l-3.6.7.7-3.6 8.8-8.8 2.9 2.9-8.8 8.8z"/><path d="M12 20h8"/></svg><span>Bảo trì</span></a>
-    <a href="/admin/reports"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Báo cáo</span></a>
-    <a href="/admin/permissions"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg><span>Phân quyền</span></a>
-  </nav>
-  <div class="side-art"><div class="side-copy">Thể thao<br>kết nối<br>cuộc sống</div></div>
-</aside>
+  <!-- Shared Sidebar -->
+  <div th:replace="~{fragments/sidebar :: sidebar('payments')}"></div>
 
-<main>
-<header class="topbar">
-  <div class="centername">
-    <div class="mini-logo">SH</div>
-    <span>Trung tâm Thể thao SportHub UTE</span>
-  </div>
-  <form class="search" action="/admin/payments" method="get">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
-    <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm theo mã giao dịch, mã phiếu, khách hàng...">
-  </form>
-  <div class="account">
-    <div class="avatar">QL</div>
-    <div>
-      <b>Quản lý trung tâm</b>
-      <small>Quản trị viên</small>
-    </div>
-  </div>
-</header>
-
-<div class="content">
-  <!-- Flash Messages -->
-  <div th:if="${successMessage}" class="alert alert-success">
-    <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
-  </div>
-  <div th:if="${errorMessage}" class="alert alert-danger">
-    <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
-  </div>
-
-  <div class="pagehead">
-    <div>
-      <div class="crumb">Trang chủ › Kế toán & Tài chính › Quản lý thanh toán</div>
-      <h1>Quản lý Giao dịch & Thu tiền đặt sân</h1>
-      <p>Theo dõi các khoản thu tiền, ghi nhận cọc, đối soát hoàn tiền và tính thu ròng (RB4: Thu ròng = Thu + Cọc - Hoàn)</p>
-    </div>
-  </div>
-
-  <!-- Thống kê tài chính -->
-  <section class="summary">
-    <div class="metric">
-      <div class="metric-icon g"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-      <div>
-        <label>Tổng giao dịch</label>
-        <strong th:text="${stats != null and stats['totalTransactions'] != null ? stats['totalTransactions'] : 0}">0</strong>
+  <main>
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="centername">
+          <div class="mini-logo"><i class="fa-solid fa-receipt"></i></div>
+          <span>Trung tâm Thể thao SportHub</span>
+        </div>
       </div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon b"><i class="fa-solid fa-arrow-down"></i></div>
-      <div>
-        <label>Đã thu tiền</label>
-        <strong th:text="${stats != null and stats['totalThu'] != null ? #numbers.formatDecimal(stats['totalThu'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
-      </div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon o"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-      <div>
-        <label>Tiền đặt cọc</label>
-        <strong th:text="${stats != null and stats['totalDeposit'] != null ? #numbers.formatDecimal(stats['totalDeposit'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
-      </div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon r"><i class="fa-solid fa-arrow-rotate-left"></i></div>
-      <div>
-        <label>Tổng hoàn tiền</label>
-        <strong th:text="${stats != null and stats['totalRefund'] != null ? #numbers.formatDecimal(stats['totalRefund'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
-      </div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon p"><i class="fa-solid fa-sack-dollar"></i></div>
-      <div>
-        <label>Thu ròng thực tế</label>
-        <strong th:text="${stats != null and stats['netRevenue'] != null ? #numbers.formatDecimal(stats['netRevenue'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
-      </div>
-    </div>
-  </section>
-
-  <section class="layout">
-    <!-- CỘT TRÁI: DANH SÁCH GIAO DỊCH -->
-    <div class="card">
-      <div class="head">
-        <h2>Lịch sử giao dịch thanh toán</h2>
-        <form action="/admin/payments" method="get" style="display:flex;gap:8px">
-          <input type="hidden" name="keyword" th:value="${currentKeyword}">
-          <select name="type" onchange="this.form.submit()" style="border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:11.5px">
-            <option value="Tất cả" th:selected="${currentType == 'Tất cả'}">Tất cả loại GD</option>
-            <option value="Thu" th:selected="${currentType == 'Thu'}">Khoản thu</option>
-            <option value="Cọc" th:selected="${currentType == 'Cọc'}">Tiền cọc</option>
-            <option value="Hoàn tiền" th:selected="${currentType == 'Hoàn tiền'}">Hoàn tiền</option>
-          </select>
-          <select name="method" onchange="this.form.submit()" style="border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:11.5px">
-            <option value="Tất cả" th:selected="${currentMethod == 'Tất cả'}">Tất cả hình thức</option>
-            <option value="Tiền mặt" th:selected="${currentMethod == 'Tiền mặt'}">Tiền mặt</option>
-            <option value="Chuyển khoản" th:selected="${currentMethod == 'Chuyển khoản'}">Chuyển khoản</option>
-          </select>
+      <div class="topbar-center">
+        <form class="search" action="/admin/payments" method="get">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm theo mã giao dịch, mã phiếu, khách hàng...">
         </form>
       </div>
-
-      <div class="tablewrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Mã GD</th>
-              <th>Mã phiếu đặt</th>
-              <th>Khách hàng</th>
-              <th>Sân thể thao</th>
-              <th>Số tiền</th>
-              <th>Loại giao dịch</th>
-              <th>Hình thức</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="p : ${payments}">
-              <td style="font-weight:800;color:#087a42" th:text="${p.id}"></td>
-              <td><a th:href="@{/admin/bookings(editId=${p.bookingId})}" style="font-weight:700;color:var(--blue);text-decoration:none" th:text="'#' + ${p.bookingId}"></a></td>
-              <td>
-                <b th:text="${p.customerName}"></b>
-                <div style="font-size:10px;color:var(--muted)" th:text="${p.customerPhone}"></div>
-              </td>
-              <td th:text="${p.courtName}"></td>
-              <td style="font-weight:800">
-                <span th:if="${p.transactionType == 'Hoàn tiền'}" style="color:#dc2626" th:text="'-' + ${#numbers.formatDecimal(p.amount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
-                <span th:if="${p.transactionType != 'Hoàn tiền'}" style="color:#0f766e" th:text="${#numbers.formatDecimal(p.amount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
-              </td>
-              <td>
-                <span class="badge" th:classappend="${p.transactionType == 'Thu' ? 'badge-thu' : (p.transactionType == 'Cọc' ? 'badge-coc' : 'badge-hoan')}" th:text="${p.transactionType}"></span>
-              </td>
-              <td th:text="${p.paymentMethod}"></td>
-              <td>
-                <span class="badge" style="background:#e0f2fe;color:#0369a1" th:text="${p.status}"></span>
-              </td>
-            </tr>
-            <tr th:if="${payments == null or #lists.isEmpty(payments)}">
-              <td colspan="8" class="empty">Không có giao dịch nào phù hợp.</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="topbar-right">
+        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <div class="topbar-user">
+          <div class="avatar" th:text="${currentUser != null ? currentUser.avatarInitials : 'QL'}">QL</div>
+          <div class="topbar-user-info">
+            <span class="topbar-user-name" th:text="${currentUser != null ? currentUser.fullName : 'Quản lý trung tâm'}">Quản lý trung tâm</span>
+            <span class="topbar-user-role" th:text="${currentUser != null ? currentUser.roleName : 'Quản trị viên'}">Quản trị viên</span>
+          </div>
+        </div>
       </div>
+    </header>
+
+    <div class="content">
+      <!-- Flash Messages -->
+      <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+      </div>
+
+      <!-- Pagehead Banner -->
+      <section class="pagehead">
+        <div class="pagehead-left">
+          <div class="pagehead-icon">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <div>
+            <h1>Quản lý Giao dịch & Thu tiền đặt sân</h1>
+            <p>Theo dõi các khoản thu tiền, ghi nhận cọc, đối soát hoàn tiền và tự động tính thu ròng (Thu ròng = Thu + Cọc - Hoàn)</p>
+          </div>
+        </div>
+        <div class="pagehead-actions">
+          <button type="button" class="btn primary" onclick="openPaymentModal()">
+            <i class="fa-solid fa-plus"></i> Ghi nhận giao dịch
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI Metrics -->
+      <section class="summary" style="grid-template-columns: repeat(5, minmax(0, 1fr));">
+        <div class="metric">
+          <div class="metric-icon green"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          <div>
+            <label>Tổng giao dịch</label>
+            <strong th:text="${stats != null and stats['totalTransactions'] != null ? stats['totalTransactions'] : 0}">0</strong>
+            <small>Lượt giao dịch</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon blue"><i class="fa-solid fa-arrow-down"></i></div>
+          <div>
+            <label>Đã thu tiền</label>
+            <strong style="font-size: 19px;" th:text="${stats != null and stats['totalThu'] != null ? #numbers.formatDecimal(stats['totalThu'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
+            <small>Thanh toán hóa đơn</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon amber"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+          <div>
+            <label>Tiền đặt cọc</label>
+            <strong style="font-size: 19px;" th:text="${stats != null and stats['totalDeposit'] != null ? #numbers.formatDecimal(stats['totalDeposit'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
+            <small>Tiền cọc giữ sân</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon purple" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-arrow-rotate-left"></i></div>
+          <div>
+            <label>Tổng hoàn tiền</label>
+            <strong style="font-size: 19px;" th:text="${stats != null and stats['totalRefund'] != null ? #numbers.formatDecimal(stats['totalRefund'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
+            <small>Hoàn do hủy phiếu</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon green"><i class="fa-solid fa-sack-dollar"></i></div>
+          <div>
+            <label>Thu ròng thực tế</label>
+            <strong style="font-size: 19px;" th:text="${stats != null and stats['netRevenue'] != null ? #numbers.formatDecimal(stats['netRevenue'], 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0 đ</strong>
+            <small>Lợi nhuận ròng</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- 100% Full-Width Card (Option 1) -->
+      <section class="card" style="width: 100%;">
+        <div class="card-head">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <h2>Lịch sử giao dịch thanh toán</h2>
+            <span class="badge status-inuse" th:text="${payments != null ? #lists.size(payments) + ' giao dịch' : '0 giao dịch'}">0 giao dịch</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <form action="/admin/payments" method="get" style="display:flex; gap:8px; margin:0;">
+              <input type="hidden" name="keyword" th:value="${currentKeyword}">
+              <select name="type" onchange="this.form.submit()" style="height:34px; font-size:12px; border-radius:8px; border:1px solid var(--line); padding:0 8px; background:var(--gray-50);">
+                <option value="Tất cả" th:selected="${currentType == 'Tất cả'}">Tất cả loại GD</option>
+                <option value="Thu" th:selected="${currentType == 'Thu'}">Khoản thu</option>
+                <option value="Cọc" th:selected="${currentType == 'Cọc'}">Tiền cọc</option>
+                <option value="Hoàn tiền" th:selected="${currentType == 'Hoàn tiền'}">Hoàn tiền</option>
+              </select>
+              <select name="method" onchange="this.form.submit()" style="height:34px; font-size:12px; border-radius:8px; border:1px solid var(--line); padding:0 8px; background:var(--gray-50);">
+                <option value="Tất cả" th:selected="${currentMethod == 'Tất cả'}">Tất cả hình thức</option>
+                <option value="Tiền mặt" th:selected="${currentMethod == 'Tiền mặt'}">Tiền mặt</option>
+                <option value="Chuyển khoản" th:selected="${currentMethod == 'Chuyển khoản'}">Chuyển khoản</option>
+              </select>
+            </form>
+          </div>
+        </div>
+
+        <div class="tablewrap tablewrap-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 80px;">Mã GD</th>
+                <th style="width: 90px;">Mã phiếu</th>
+                <th>Khách hàng</th>
+                <th>Sân thể thao</th>
+                <th>Số tiền</th>
+                <th>Loại giao dịch</th>
+                <th>Hình thức</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="p : ${payments}">
+                <td style="font-weight:800; color:var(--primary);" th:text="${p.id}"></td>
+                <td>
+                  <a th:href="@{/admin/bookings(editId=${p.bookingId})}" style="font-weight:700; color:var(--blue);" th:text="'#' + ${p.bookingId}"></a>
+                </td>
+                <td>
+                  <b th:text="${p.customerName}"></b>
+                  <div style="font-size:11px; color:var(--gray-500);" th:text="${p.customerPhone}"></div>
+                </td>
+                <td th:text="${p.courtName}"></td>
+                <td>
+                  <strong th:if="${p.transactionType == 'Hoàn tiền'}" style="color:var(--red);" th:text="'-' + ${#numbers.formatDecimal(p.amount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                  <strong th:if="${p.transactionType != 'Hoàn tiền'}" style="color:var(--primary);" th:text="${#numbers.formatDecimal(p.amount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></strong>
+                </td>
+                <td>
+                  <span class="badge" th:classappend="${p.transactionType == 'Thu' ? 'status-active' : (p.transactionType == 'Cọc' ? 'status-maint' : 'status-danger')}" th:text="${p.transactionType}"></span>
+                </td>
+                <td>
+                  <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--line);">
+                    <i th:class="${p.paymentMethod == 'Tiền mặt' ? 'fa-solid fa-money-bill me-1' : 'fa-solid fa-building-columns me-1'}"></i>
+                    <span th:text="${p.paymentMethod}"></span>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge status-inuse" th:text="${p.status}"></span>
+                </td>
+              </tr>
+              <tr th:if="${payments == null or #lists.isEmpty(payments)}">
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="fa-solid fa-inbox fs-2 mb-2 d-block"></i>
+                  Không có giao dịch nào phù hợp.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
+  </main>
+</div>
 
-    <!-- CỘT PHẢI: FORM GHI NHẬN THU TIỀN TẠI QUẦY -->
-    <div class="card formcard">
-      <div class="head">
-        <h2>Ghi Nhận Giao Dịch</h2>
-        <span class="badge badge-thu">Thu tiền tại quầy</span>
-      </div>
+<!-- Modal Ghi Nhận Giao Dịch (Option 1) -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-receipt" style="color:var(--primary);"></i> Ghi Nhận Giao Dịch Tại Quầy</h3>
+      <button type="button" class="modal-close" onclick="closePaymentModal()">&times;</button>
+    </div>
+    <form th:action="@{/admin/payments/record}" method="post">
+      <div class="modal-body">
+        <div class="field">
+          <label>Phiếu đặt sân (*)</label>
+          <select name="bookingId" required>
+            <option value="" disabled selected>-- Chọn phiếu đặt sân --</option>
+            <option th:each="b : ${bookings}" th:value="${b.id}" th:text="'#' + ${b.id} + ' - ' + (${b.customer != null ? b.customer.fullName : 'Khách'}) + ' (' + ${b.status} + ')'"></option>
+          </select>
+        </div>
 
-      <form th:action="@{/admin/payments/record}" method="post">
-        <div class="fields">
-          <div class="field">
-            <label>Phiếu đặt sân (*)</label>
-            <select name="bookingId" required>
-              <option value="" disabled selected>-- Chọn phiếu đặt sân --</option>
-              <option th:each="b : ${bookings}" th:value="${b.id}" th:text="'#' + ${b.id} + ' - ' + (${b.customer != null ? b.customer.fullName : 'Khách'}) + ' (' + ${b.status} + ')'"></option>
-            </select>
-          </div>
+        <div class="field">
+          <label>Số tiền giao dịch (đ) (*)</label>
+          <input type="number" name="amount" min="1000" step="1000" placeholder="Ví dụ: 150000" required>
+        </div>
 
-          <div class="field">
-            <label>Số tiền giao dịch (đ) (*)</label>
-            <input type="number" name="amount" min="1000" step="1000" placeholder="Ví dụ: 150000" required>
-          </div>
-
+        <div class="form-grid-2">
           <div class="field">
             <label>Loại giao dịch (*)</label>
             <select name="transactionType" required>
@@ -358,16 +239,28 @@ tbody tr:hover{background:#f7fbf9}
               <option value="Chuyển khoản">Chuyển khoản ngân hàng</option>
             </select>
           </div>
-
-          <button type="submit" class="btn primary" style="width:100%;margin-top:10px">
-            <i class="fa-solid fa-floppy-disk"></i> Ghi nhận giao dịch
-          </button>
         </div>
-      </form>
-    </div>
-  </section>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closePaymentModal()">Hủy bỏ</button>
+        <button type="submit" class="btn primary">
+          <i class="fa-solid fa-floppy-disk"></i> Ghi nhận giao dịch
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
-</main>
-</div>
+
+<script>
+  function openPaymentModal() {
+    document.getElementById('paymentModal').classList.add('active');
+  }
+  function closePaymentModal() {
+    document.getElementById('paymentModal').classList.remove('active');
+  }
+  document.getElementById('paymentModal').addEventListener('click', function(e) {
+    if (e.target === this) closePaymentModal();
+  });
+</script>
 </body>
 </html>

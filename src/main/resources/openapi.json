@@ -1,0 +1,305 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SportHub UTE - Hệ Thống Quản Lý Trung Tâm Thể Thao API",
+    "description": "Tài liệu đặc tả toàn diện chuẩn OpenAPI 3.0 / Swagger UI cho hệ thống SportHub UTE (HCMUTE). Bao gồm quản lý đặt sân, F&B POS, xuất hóa đơn PDF/Excel, lưu trữ đám mây Cloudinary và Dynamic VietQR Napas 247.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Nhóm Kỹ thuật Phần mềm HCMUTE (Triết, Thọ, Đạt)",
+      "email": "contact@sporthub.ute.edu.vn",
+      "url": "https://sporthub.ute.edu.vn"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8081",
+      "description": "Local Development Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Dịch vụ & F&B POS",
+      "description": "Quản lý đồ ăn thức uống, phụ kiện thể thao, kiểm kê tồn kho và gọi dịch vụ vào phiếu đặt sân"
+    },
+    {
+      "name": "Phiếu Đặt Sân & Check-in",
+      "description": "Quản lý phiếu đặt sân, timeline, QR Check-in nhanh và Dynamic VietQR Napas 247"
+    },
+    {
+      "name": "Xuất Hóa Đơn (PDF & Excel)",
+      "description": "Xuất hóa đơn thanh toán PDF chuẩn in ấn và báo cáo thống kê Excel đa tầng"
+    },
+    {
+      "name": "Lưu Trữ Đám Mây (Cloudinary)",
+      "description": "Upload và tối ưu hóa hình ảnh sản phẩm F&B, sân bãi và tài liệu hóa đơn số"
+    },
+    {
+      "name": "Xác Thực & Tài Khoản",
+      "description": "Đăng ký, đăng nhập, bảo mật phiên làm việc và phân quyền RBAC (ADMIN, STAFF, CUSTOMER)"
+    }
+  ],
+  "paths": {
+    "/admin/services": {
+      "get": {
+        "tags": ["Dịch vụ & F&B POS"],
+        "summary": "Lấy danh sách dịch vụ F&B & Phụ kiện thể thao",
+        "description": "Trả về giao diện bảng quản lý danh mục đồ ăn thức uống và phụ kiện kèm bộ lọc theo loại hàng và trạng thái tồn kho.",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["FOOD", "DRINK", "GEAR", "RENTAL"] },
+            "description": "Lọc theo phân loại mặt hàng"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Giao diện HTML danh sách dịch vụ chuẩn Option 1" },
+          "401": { "description": "Chưa xác thực quyền ADMIN" }
+        }
+      }
+    },
+    "/admin/services/save": {
+      "post": {
+        "tags": ["Dịch vụ & F&B POS"],
+        "summary": "Thêm mới hoặc cập nhật thông tin mặt hàng F&B / Phụ kiện",
+        "description": "Lưu mặt hàng dịch vụ kèm upload hình ảnh trực tiếp lên Cloudinary hoặc lưu trữ cục bộ.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string", "example": "DV01" },
+                  "name": { "type": "string", "example": "Nước tăng lực Revive Chanh Muối" },
+                  "category": { "type": "string", "example": "DRINK" },
+                  "unit": { "type": "string", "example": "Chai" },
+                  "price": { "type": "number", "example": 15000 },
+                  "stockQuantity": { "type": "integer", "example": 50 },
+                  "imageFile": { "type": "string", "format": "binary", "description": "Tập tin ảnh đại diện mặt hàng" },
+                  "description": { "type": "string", "example": "Nước bù điện giải thể thao 500ml" },
+                  "active": { "type": "boolean", "example": true }
+                },
+                "required": ["name", "category", "price", "stockQuantity"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "302": { "description": "Lưu thành công, chuyển hướng về /admin/services" },
+          "400": { "description": "Dữ liệu nhập vào không hợp lệ" }
+        }
+      }
+    },
+    "/admin/services/toggle/{id}": {
+      "post": {
+        "tags": ["Dịch vụ & F&B POS"],
+        "summary": "Đổi trạng thái kinh doanh của mặt hàng",
+        "description": "Chuyển đổi trạng thái Đang kinh doanh <-> Tạm ngừng",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "DV01" }
+        ],
+        "responses": {
+          "302": { "description": "Cập nhật thành công, chuyển hướng về danh sách" }
+        }
+      }
+    },
+    "/admin/services/delete/{id}": {
+      "post": {
+        "tags": ["Dịch vụ & F&B POS"],
+        "summary": "Xóa mặt hàng F&B / Phụ kiện",
+        "description": "Xóa vĩnh viễn mặt hàng khỏi danh mục nếu chưa phát sinh dữ liệu hóa đơn ràng buộc",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "DV05" }
+        ],
+        "responses": {
+          "302": { "description": "Xóa thành công, chuyển hướng về danh sách" }
+        }
+      }
+    },
+    "/admin/bookings/add-service": {
+      "post": {
+        "tags": ["Dịch vụ & F&B POS"],
+        "summary": "Gọi đồ ăn / thức uống / phụ kiện cho phiếu đặt sân (POS)",
+        "description": "Thêm món vào phiếu đặt sân khi khách đang chơi hoặc nhận sân tại quầy. Hệ thống tự động trừ kho tồn và cập nhật tổng tiền thanh toán.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bookingId": { "type": "string", "example": "DS0101" },
+                  "serviceId": { "type": "string", "example": "DV01" },
+                  "quantity": { "type": "integer", "example": 2 },
+                  "note": { "type": "string", "example": "Ướp lạnh, mang ra sân số 1" }
+                },
+                "required": ["bookingId", "serviceId", "quantity"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "302": { "description": "Thêm dịch vụ thành công, chuyển hướng về /admin/bookings" },
+          "400": { "description": "Hết hàng tồn kho hoặc số lượng không hợp lệ" }
+        }
+      }
+    },
+    "/admin/bookings/delete-service/{id}": {
+      "post": {
+        "tags": ["Dịch vụ & F&B POS"],
+        "summary": "Hủy/Xóa món dịch vụ đã gọi",
+        "description": "Hủy một món dịch vụ trong phiếu đặt sân. Hệ thống tự động hoàn lại số lượng tồn kho.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "example": 1 }
+        ],
+        "responses": {
+          "302": { "description": "Hủy món và hoàn kho thành công" }
+        }
+      }
+    },
+    "/admin/bookings/api/services/{id}": {
+      "get": {
+        "tags": ["Dịch vụ & F&B POS"],
+        "summary": "Lấy chi tiết danh sách F&B đã gọi của phiếu đặt sân (API JSON)",
+        "description": "Trả về danh sách các món đồ ăn, thức uống, phụ kiện kèm số lượng, đơn giá, thành tiền và ghi chú dưới dạng JSON.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "DS0101" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách chi tiết dịch vụ F&B",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BookingServiceDetailDTO" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/bookings/export-pdf/{id}": {
+      "get": {
+        "tags": ["Xuất Hóa Đơn (PDF & Excel)"],
+        "summary": "Xuất hóa đơn thanh toán PDF (Quản trị viên)",
+        "description": "Tạo và tải về tập tin PDF hóa đơn thể thao SportHub UTE chuẩn mực, hỗ trợ tiếng Việt có dấu Unicode, chi tiết tiền sân, tiền F&B, tiền cọc và thanh toán.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "DS0101" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tập tin PDF hóa đơn",
+            "content": { "application/pdf": { "schema": { "type": "string", "format": "binary" } } }
+          }
+        }
+      }
+    },
+    "/customer/booking/export-pdf/{id}": {
+      "get": {
+        "tags": ["Xuất Hóa Đơn (PDF & Excel)"],
+        "summary": "Xuất hóa đơn PDF cho khách hàng",
+        "description": "Cho phép khách hàng đã đăng nhập tải hóa đơn điện tử PDF của chính mình trong trang Lịch sử đặt sân.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "DS0101" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tập tin PDF hóa đơn điện tử",
+            "content": { "application/pdf": { "schema": { "type": "string", "format": "binary" } } }
+          }
+        }
+      }
+    },
+    "/admin/bookings/export-excel/{id}": {
+      "get": {
+        "tags": ["Xuất Hóa Đơn (PDF & Excel)"],
+        "summary": "Xuất hóa đơn chi tiết ra bảng tính Excel (XLSX)",
+        "description": "Tạo tập tin Excel định dạng tài chính chuyên nghiệp với công thức, định dạng tiền tệ VNĐ và bảng kê F&B.",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "DS0101" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tập tin bảng tính Excel hóa đơn đơn lẻ",
+            "content": { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { "schema": { "type": "string", "format": "binary" } } }
+          }
+        }
+      }
+    },
+    "/admin/bookings/export-excel/all": {
+      "get": {
+        "tags": ["Xuất Hóa Đơn (PDF & Excel)"],
+        "summary": "Xuất báo cáo tổng hợp toàn bộ danh sách đặt sân ra Excel",
+        "description": "Báo cáo doanh thu và tình trạng đặt sân phục vụ kế toán, thống kê doanh thu sân và F&B đi kèm.",
+        "responses": {
+          "200": {
+            "description": "Tập tin Excel tổng hợp toàn bộ danh sách phiếu đặt",
+            "content": { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": { "schema": { "type": "string", "format": "binary" } } }
+          }
+        }
+      }
+    },
+    "/admin/bookings/checkin-qr": {
+      "get": {
+        "tags": ["Phiếu Đặt Sân & Check-in"],
+        "summary": "Lấy URL mã Fast QR Check-in",
+        "description": "Tạo URL mã QR định dạng chuẩn để nhân viên tại quầy quét và xác thực nhận sân trong 1 giây.",
+        "parameters": [
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" }, "example": "DS0101" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đường dẫn hình ảnh mã QR",
+            "content": { "text/plain": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BookingServiceDetailDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "serviceId": { "type": "string", "example": "DV01" },
+          "serviceName": { "type": "string", "example": "Nước tăng lực Revive" },
+          "unit": { "type": "string", "example": "Chai" },
+          "unitPrice": { "type": "number", "example": 15000 },
+          "quantity": { "type": "integer", "example": 2 },
+          "totalPrice": { "type": "number", "example": 30000 },
+          "note": { "type": "string", "example": "Ướp lạnh" }
+        }
+      },
+      "ServiceItemDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "DV01" },
+          "name": { "type": "string", "example": "Nước tăng lực Revive" },
+          "category": { "type": "string", "example": "DRINK" },
+          "unit": { "type": "string", "example": "Chai" },
+          "price": { "type": "number", "example": 15000 },
+          "stockQuantity": { "type": "integer", "example": 50 },
+          "imageUrl": { "type": "string", "example": "https://res.cloudinary.com/sportute/image/upload/v1/revive.png" },
+          "description": { "type": "string", "example": "Nước uống thể thao bổ sung điện giải" },
+          "active": { "type": "boolean", "example": true }
+        }
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "JSESSIONID"
+      }
+    }
+  }
+}

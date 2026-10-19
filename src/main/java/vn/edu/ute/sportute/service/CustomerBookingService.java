@@ -4,6 +4,7 @@ import vn.edu.ute.sportute.dto.request.AdminBookingDTO;
 import vn.edu.ute.sportute.dto.request.CustomerBookingRequestDTO;
 import vn.edu.ute.sportute.dto.request.CustomerCourtFilterDTO;
 import vn.edu.ute.sportute.dto.response.CustomerCourtCardDTO;
+import vn.edu.ute.sportute.entity.Booking;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface CustomerBookingService {
     List<CustomerCourtCardDTO> searchAvailableCourts(CustomerCourtFilterDTO filter);
 
     // 2. Đặt sân trực tuyến (UC41)
-    void bookCourtOnline(CustomerBookingRequestDTO request, String accountUsernameOrEmail);
+    Booking bookCourtOnline(CustomerBookingRequestDTO request, String accountUsernameOrEmail);
 
     // 3. Xem lịch sử đặt sân của mình (UC42)
     List<AdminBookingDTO> getCustomerBookings(String accountUsernameOrEmail, String status, String keyword);

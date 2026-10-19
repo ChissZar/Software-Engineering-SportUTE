@@ -48,7 +48,7 @@
 
     body {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background-color: #f6f9f8;
+      background-color: #eaf5ef;
       color: var(--gray-900);
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
@@ -91,6 +91,8 @@
       display: flex;
       align-items: center;
       gap: 20px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .brand-logo {
@@ -114,6 +116,7 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
+      white-space: nowrap;
     }
 
     .greeting-date {
@@ -136,6 +139,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
     }
 
     .nav-item {
@@ -148,6 +152,8 @@
       font-weight: 600;
       color: var(--gray-600);
       transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .nav-item:hover {
@@ -165,6 +171,8 @@
       display: flex;
       align-items: center;
       gap: 16px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .btn-icon-circle {
@@ -190,13 +198,269 @@
 
     .badge-dot {
       position: absolute;
-      top: 9px;
-      right: 9px;
-      width: 8px;
-      height: 8px;
+      top: 8px;
+      right: 8px;
+      width: 9px;
+      height: 9px;
       background: #ef4444;
       border-radius: 50%;
       border: 2px solid var(--white);
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+      display: none;
+    }
+
+    /* Topbar Search Input */
+    .topbar-search-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-100);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9999px;
+      padding: 0 14px;
+      height: 38px;
+      width: 220px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .topbar-search-wrap:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+    }
+    .topbar-search-wrap:focus-within {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+    }
+    .topbar-search-wrap .search-icon {
+      color: var(--gray-400);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .topbar-search-wrap:focus-within .search-icon {
+      color: var(--primary);
+    }
+    .topbar-search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13px;
+      color: var(--gray-900);
+      width: 100%;
+    }
+    .topbar-search-input::placeholder {
+      color: var(--gray-400);
+      font-size: 12.5px;
+    }
+
+    .btn-clear-search {
+      background: transparent;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s ease;
+    }
+    .btn-clear-search:hover {
+      color: var(--gray-700);
+    }
+
+    /* Notification Wrap & Dropdown */
+    .notif-wrapper {
+      position: relative;
+    }
+    .notif-dropdown {
+      position: absolute;
+      top: 48px;
+      right: -10px;
+      width: 360px;
+      max-width: 90vw;
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--gray-200);
+      z-index: 150;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: notifSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .notif-dropdown.show {
+      display: flex;
+    }
+    @keyframes notifSlideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .notif-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbfc;
+    }
+    .notif-header-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-mark-all-read {
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+    .btn-mark-all-read:hover {
+      text-decoration: underline;
+    }
+    .notif-list {
+      max-height: 380px;
+      overflow-y: auto;
+      padding: 6px 0;
+    }
+    .notif-item {
+      padding: 12px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: background 0.18s;
+      border-bottom: 1px solid #f8fafc;
+      position: relative;
+    }
+    .notif-item:hover {
+      background: #f8fafc;
+    }
+    .notif-item.unread {
+      background: #f0fdf4;
+    }
+    .notif-item.unread:hover {
+      background: #e6f9ed;
+    }
+    .notif-item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .notif-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .notif-item-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 2px;
+      line-height: 1.35;
+    }
+    .notif-item.unread .notif-item-title {
+      color: #064e3b;
+      font-weight: 800;
+    }
+    .notif-item-desc {
+      font-size: 12px;
+      color: var(--gray-600);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .notif-item-time {
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 4px;
+      display: block;
+    }
+    .notif-unread-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+    .notif-empty {
+      padding: 36px 20px;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 13px;
+    }
+    .notif-empty i {
+      font-size: 32px;
+      color: var(--gray-300);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* Notification Detail Modal */
+    .notif-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 250;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .notif-modal-backdrop.show {
+      display: flex;
+    }
+    .notif-modal-card {
+      background: var(--white);
+      border-radius: 20px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease;
+    }
+    .notif-modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fafbfc;
+    }
+    .notif-modal-header-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notif-modal-body {
+      padding: 22px;
+    }
+    .notif-modal-footer {
+      padding: 14px 22px;
+      border-top: 1px solid var(--gray-100);
+      background: #fafbfc;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
     }
 
     .user-profile-menu {
@@ -531,6 +795,81 @@
       box-shadow: 0 4px 12px rgba(4, 120, 87, 0.25);
     }
 
+    /* Style riêng cho nút Lọc Yêu Thích */
+    .pill-btn.pill-favorite:hover {
+      background: #fff1f2;
+      border-color: #fca5a5;
+    }
+
+    .pill-btn.pill-favorite.active {
+      background: #ef4444 !important;
+      color: var(--white) !important;
+      border-color: #ef4444 !important;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
+    }
+
+    .pill-btn.pill-favorite.active i {
+      color: #ffffff !important;
+    }
+
+    .pill-fav-badge {
+      font-weight: 700;
+      font-size: 12px;
+      margin-left: 2px;
+    }
+
+    /* Section Controls Wrap: Pills + Quick Search */
+    .section-controls-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Courts Quick Search (đặt ở dưới, tinh tế & hiện đại) */
+    .courts-quick-search-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9999px;
+      padding: 0 14px;
+      height: 38px;
+      width: 220px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .courts-quick-search-wrap:hover {
+      border-color: #cbd5e1;
+    }
+
+    .courts-quick-search-wrap:focus-within {
+      width: 260px;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+    }
+
+    .courts-quick-search-wrap .search-icon {
+      color: var(--gray-400);
+      font-size: 13px;
+    }
+
+    .courts-quick-search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13px;
+      color: var(--gray-900);
+      width: 100%;
+    }
+
+    .courts-quick-search-input::placeholder {
+      color: var(--gray-400);
+      font-size: 12.5px;
+    }
+
     .pill-btn i {
       font-size: 14px;
     }
@@ -751,70 +1090,96 @@
     /* ==========================================================================
        6. MODERN MULTI-STEP BOOKING WIZARD MODAL
        ========================================================================== */
+    /* ==========================================================================
+       6. FULL-SCREEN DEDICATED BOOKING WIZARD (SPORTHUB EMERALD THEME)
+       ========================================================================== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(8px);
-      z-index: 999;
+      width: 100vw;
+      height: 100vh;
+      background: #F8FAFC;
+      z-index: 99999;
       display: none;
-      place-items: center;
-      padding: 20px;
+      overflow-y: auto;
       opacity: 0;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.2s ease;
     }
 
     .modal-backdrop.show {
-      display: grid;
+      display: block;
       opacity: 1;
     }
 
     .booking-wizard-card {
-      background: #FAF9F9;
-      border-radius: 24px;
-      max-width: 1240px;
       width: 100%;
-      max-height: 94vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.35);
-      transform: scale(0.96);
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      min-height: 100vh;
+      background: #F8FAFC;
       display: flex;
       flex-direction: column;
       position: relative;
     }
 
-    .modal-backdrop.show .booking-wizard-card {
-      transform: scale(1);
-    }
-
-    /* Top Step Indicator Bar */
+    /* Full-width Sticky Top Navigation Bar */
     .wizard-topbar {
       background: #FFFFFF;
-      padding: 20px 32px 16px;
-      border-bottom: 1px solid #F1F5F9;
+      height: 72px;
+      padding: 0 36px;
+      border-bottom: 1px solid #E2E8F0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
-      z-index: 30;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     }
 
+    .wizard-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .wizard-topbar-left img {
+      height: 40px;
+      object-fit: contain;
+    }
+    .wizard-brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .wizard-brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0F172A;
+      line-height: 1.2;
+    }
+    .wizard-brand-sub {
+      font-size: 12px;
+      color: #64748B;
+      font-weight: 500;
+    }
+
+    /* Stepper Track in Center */
     .wizard-stepper-track {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto;
-      gap: 12px;
+      gap: 14px;
     }
 
     .wizard-step-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
       user-select: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      transition: all 0.2s;
+    }
+    .wizard-step-item:hover {
+      background: #F1F5F9;
     }
 
     .wizard-step-circle {
@@ -831,24 +1196,25 @@
 
     /* Step states */
     .wizard-step-item.step-completed .wizard-step-circle {
-      border: 1.5px solid #8B1D24;
-      color: #8B1D24;
-      background: #FFFFFF;
+      border: 2px solid #059669;
+      color: #059669;
+      background: #ECFDF5;
     }
     .wizard-step-item.step-completed .wizard-step-label {
-      color: #8B1D24;
-      font-weight: 600;
+      color: #059669;
+      font-weight: 700;
       font-size: 14px;
     }
 
     .wizard-step-item.step-active .wizard-step-circle {
-      background: #8B1D24;
+      background: #059669;
       color: #FFFFFF;
-      border: 1.5px solid #8B1D24;
+      border: 2px solid #059669;
+      box-shadow: 0 0 0 4px #D1FAE5;
     }
     .wizard-step-item.step-active .wizard-step-label {
-      color: #1E293B;
-      font-weight: 700;
+      color: #047857;
+      font-weight: 800;
       font-size: 14px;
     }
 
@@ -864,141 +1230,162 @@
     }
 
     .wizard-step-line {
-      width: 44px;
+      width: 48px;
       height: 2px;
-      background: #CBD5E1;
+      background: #E2E8F0;
       transition: background 0.3s;
     }
-    .wizard-step-line.active-red {
-      background: #8B1D24;
+    .wizard-step-line.active-green {
+      background: #059669;
     }
 
-    .wizard-close-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #F1F5F9;
-      border: none;
-      color: #64748B;
-      cursor: pointer;
-      display: flex;
+    .wizard-exit-btn {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-size: 16px;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 12px;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      color: #475569;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
       transition: all 0.2s;
     }
-    .wizard-close-btn:hover {
+    .wizard-exit-btn:hover {
       background: #E2E8F0;
       color: #0F172A;
     }
 
-    /* 2-Column Booking Layout */
-    .wizard-2col-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 24px;
-      padding: 26px 32px 34px;
+    /* Full-screen Body Container */
+    .wizard-body-wrapper {
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 32px 36px 80px;
     }
 
-    /* Left Panel: Chọn sân và khung giờ */
+    /* 2-Column Responsive Layout */
+    .wizard-2col-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Left Panel */
     .wizard-left-panel {
       background: #FFFFFF;
-      border-radius: 20px;
-      padding: 28px 26px;
-      border: 1px solid #F1F5F9;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+      border-radius: 24px;
+      padding: 32px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
     }
 
     .wizard-panel-title {
       font-size: 22px;
       font-weight: 800;
-      color: #1E293B;
+      color: #0F172A;
       letter-spacing: -0.3px;
     }
     .wizard-panel-subtitle {
       font-size: 13.5px;
       color: #64748B;
       margin-top: 4px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
-    /* Sub-court Pills */
-    .subcourt-select-box {
-      margin-bottom: 20px;
-    }
-    .subcourt-title {
-      font-size: 14.5px;
-      font-weight: 700;
-      color: #1E293B;
-      margin-bottom: 10px;
-    }
-    .subcourt-pills {
+    /* Active Court Banner (Replaces subcourt pills) */
+    .active-court-banner {
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+      border: 1.5px solid #A7F3D0;
+      border-radius: 16px;
+      padding: 16px 22px;
+      margin-bottom: 24px;
+      gap: 16px;
     }
-    .subcourt-pill-btn {
-      display: inline-flex;
+    .court-banner-left {
+      display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 20px;
-      border-radius: 999px;
-      border: 1.5px solid #E2E8F0;
-      background: #FFFFFF;
-      color: #334155;
-      font-size: 13.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      gap: 16px;
     }
-    .subcourt-pill-btn:hover {
-      border-color: #8B1D24;
-      background: #FFF5F5;
-    }
-    .pill-radio-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 1.5px solid #CBD5E1;
+    .court-banner-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #059669;
+      color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+      flex-shrink: 0;
     }
-    .subcourt-pill-btn.active {
-      border-color: #8B1D24;
-      background: #FFF5F5;
-      color: #8B1D24;
+    .court-banner-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #047857;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .court-banner-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #064E3B;
+      line-height: 1.2;
+    }
+    .court-banner-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #047857;
+      margin-top: 4px;
+    }
+    .btn-change-court {
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: 1.5px solid #059669;
+      background: #FFFFFF;
+      color: #059669;
+      font-size: 13px;
       font-weight: 700;
-      box-shadow: 0 2px 8px rgba(139, 29, 36, 0.12);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      white-space: nowrap;
     }
-    .subcourt-pill-btn.active .pill-radio-dot {
-      border-color: #8B1D24;
-    }
-    .subcourt-pill-btn.active .pill-radio-dot::after {
-      content: '';
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #8B1D24;
+    .btn-change-court:hover {
+      background: #059669;
+      color: #FFFFFF;
     }
 
-    /* Horizontal Date Carousel Strip */
+    /* Horizontal Date Carousel */
     .date-carousel-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 22px;
+      gap: 10px;
+      margin-bottom: 24px;
     }
     .carousel-nav-btn {
-      width: 40px;
-      height: 62px;
-      border-radius: 10px;
+      width: 42px;
+      height: 64px;
+      border-radius: 12px;
       border: 1px solid #E2E8F0;
       background: #FFFFFF;
       color: #475569;
-      font-size: 13px;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1018,14 +1405,14 @@
     .carousel-days-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
+      gap: 10px;
       flex: 1;
     }
     .date-card-item {
-      padding: 8px 2px;
-      height: 62px;
-      border-radius: 10px;
-      border: 1px solid #E2E8F0;
+      padding: 10px 4px;
+      height: 64px;
+      border-radius: 12px;
+      border: 1.5px solid #E2E8F0;
       background: #FFFFFF;
       display: flex;
       flex-direction: column;
@@ -1033,12 +1420,12 @@
       justify-content: center;
       gap: 3px;
       cursor: pointer;
-      transition: all 0.18s ease;
+      transition: all 0.2s ease;
       user-select: none;
     }
     .date-card-item:hover:not(.active) {
-      border-color: #CBD5E1;
-      background: #F8FAFC;
+      border-color: #A7F3D0;
+      background: #ECFDF5;
     }
     .date-card-day {
       font-size: 12px;
@@ -1046,62 +1433,68 @@
       color: #64748B;
     }
     .date-card-num {
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: 800;
       color: #1E293B;
     }
     .date-card-item.active {
-      background: #8B1D24;
-      border-color: #8B1D24;
-      box-shadow: 0 4px 12px rgba(139, 29, 36, 0.25);
+      background: #059669;
+      border-color: #059669;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
     }
     .date-card-item.active .date-card-day,
     .date-card-item.active .date-card-num {
       color: #FFFFFF;
     }
 
-    /* Selected Date Header and Range Info */
+    /* Selected Date Header */
     .selected-date-info-box {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #F1F5F9;
     }
     .date-header-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 16px;
+      gap: 10px;
+      font-size: 17px;
       font-weight: 800;
-      color: #1E293B;
+      color: #0F172A;
     }
     .date-header-row i {
-      color: #8B1D24;
-      font-size: 17px;
+      color: #059669;
+      font-size: 18px;
     }
     .time-selected-text {
-      font-size: 13.5px;
+      font-size: 14px;
       color: #64748B;
       margin-top: 4px;
     }
     .time-selected-text .time-range-badge {
-      color: #8B1D24;
+      color: #047857;
       font-weight: 800;
+      background: #ECFDF5;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid #A7F3D0;
     }
     .time-selected-text .time-duration-badge {
-      color: #64748B;
-      font-weight: 500;
+      color: #059669;
+      font-weight: 600;
     }
 
-    /* Time Slots Grid (4 columns, strictly 05:00 - 23:00) */
+    /* 4-Column Time Slot Grid */
     .slots-grid-4col {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 24px;
     }
     .slot-cell-btn {
       height: 48px;
-      border-radius: 10px;
-      border: 1px solid #FDE2E2;
-      background: #FFF3F3;
+      border-radius: 12px;
+      border: 1.5px solid #E2E8F0;
+      background: #FFFFFF;
       color: #1E293B;
       font-size: 14px;
       font-weight: 700;
@@ -1115,8 +1508,9 @@
       position: relative;
     }
     .slot-cell-btn:hover:not(.slot-booked):not(.slot-start):not(.slot-end) {
-      background: #FFE8E8;
-      border-color: #FCA5A5;
+      background: #ECFDF5;
+      border-color: #059669;
+      color: #047857;
       transform: translateY(-1px);
     }
     .slot-state-label {
@@ -1128,53 +1522,61 @@
       text-transform: uppercase;
     }
 
-    /* Start Slot (Red badge BẮT ĐẦU) */
+    /* Start Slot (SportHub Emerald BẮT ĐẦU) */
     .slot-cell-btn.slot-start {
-      background: #8B1D24 !important;
-      border-color: #8B1D24 !important;
+      background: #059669 !important;
+      border-color: #047857 !important;
       color: #FFFFFF !important;
-      box-shadow: 0 4px 12px rgba(139, 29, 36, 0.35);
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.45);
     }
     .slot-cell-btn.slot-start .slot-state-label {
-      color: #FFFFFF;
+      color: #A7F3D0;
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
 
-    /* End Slot (Green badge KẾT THÚC) */
+    /* End Slot (Vibrant Red KẾT THÚC - High Contrast with Start) */
     .slot-cell-btn.slot-end {
-      background: #087D48 !important;
-      border-color: #087D48 !important;
+      background: #DC2626 !important;
+      border-color: #B91C1C !important;
       color: #FFFFFF !important;
-      box-shadow: 0 4px 12px rgba(8, 125, 72, 0.35);
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
     }
     .slot-cell-btn.slot-end .slot-state-label {
-      color: #FFFFFF;
+      color: #FEE2E2;
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
 
-    /* Range in-between (Giữa đã chọn) */
+    /* Middle Range Slots */
     .slot-cell-btn.slot-middle {
-      background: #FFEAEA !important;
-      border: 1.5px solid #E11D48 !important;
-      color: #8B1D24 !important;
+      background: #ECFDF5 !important;
+      border: 1.5px solid #10B981 !important;
+      color: #047857 !important;
+      font-weight: 800;
     }
 
-    /* Booked Slot (Đã có người đặt) */
+    /* Booked Slot */
     .slot-cell-btn.slot-booked {
       background: #F1F5F9 !important;
       border-color: #E2E8F0 !important;
       color: #94A3B8 !important;
       cursor: not-allowed !important;
       pointer-events: none;
+      text-decoration: line-through;
     }
 
     /* Legend Row */
     .wizard-legend-row {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 20px;
       flex-wrap: wrap;
       font-size: 13px;
       color: #475569;
-      padding-top: 14px;
+      padding-top: 18px;
       border-top: 1px solid #F1F5F9;
     }
     .legend-box-item {
@@ -1188,48 +1590,47 @@
       border-radius: 4px;
     }
     .legend-chip.chip-available {
-      background: #FFF3F3;
-      border: 1px solid #FDE2E2;
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
     }
     .legend-chip.chip-booked {
       background: #F1F5F9;
-      border: 1px solid #E2E8F0;
+      border: 1.5px solid #E2E8F0;
     }
     .legend-chip.chip-middle {
-      background: #FFEAEA;
-      border: 1.5px solid #E11D48;
+      background: #ECFDF5;
+      border: 1.5px solid #10B981;
     }
     .legend-chip.chip-start {
-      background: #8B1D24;
+      background: #059669;
     }
     .legend-chip.chip-end {
-      background: #087D48;
+      background: #DC2626;
     }
 
-    /* Right Panel: Thông tin đặt sân */
+    /* Right Panel: Order Summary */
     .wizard-right-panel {
       background: #FFFFFF;
-      border-radius: 20px;
-      padding: 28px 24px;
-      border: 1px solid #F1F5F9;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
-      display: flex;
-      flex-direction: column;
-      height: fit-content;
+      border-radius: 24px;
+      padding: 30px 26px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      position: sticky;
+      top: 96px;
     }
     .summary-card-header {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-size: 18px;
       font-weight: 800;
-      color: #1E293B;
+      color: #0F172A;
       padding-bottom: 18px;
       border-bottom: 1px solid #F1F5F9;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .summary-card-header i {
-      color: #8B1D24;
+      color: #059669;
       font-size: 20px;
     }
     .summary-list {
@@ -1249,29 +1650,28 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 13.5px;
     }
     .summary-label i {
-      color: #8B1D24;
+      color: #059669;
       width: 16px;
       text-align: center;
     }
     .summary-val {
-      color: #1E293B;
+      color: #0F172A;
       font-weight: 700;
       text-align: right;
       max-width: 60%;
     }
     .summary-row.price-highlight-row {
-      margin-top: 6px;
+      margin-top: 8px;
       padding-top: 16px;
       border-top: 1px dashed #CBD5E1;
       border-bottom: none;
     }
     .summary-row.price-highlight-row .price-num {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 800;
-      color: #8B1D24;
+      color: #059669;
     }
     .summary-action-btns {
       display: flex;
@@ -1280,41 +1680,42 @@
     }
     .btn-wizard-back {
       padding: 13px 18px;
-      border: 1px solid #E2E8F0;
+      border: 1px solid #CBD5E1;
       background: #FFFFFF;
       color: #475569;
       border-radius: 12px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.2s;
     }
     .btn-wizard-back:hover {
       background: #F8FAFC;
       color: #0F172A;
+      border-color: #94A3B8;
     }
     .btn-wizard-next {
       flex: 1;
-      padding: 13px 20px;
+      padding: 13px 22px;
       border: none;
-      background: #1D4ED8;
+      background: #059669;
       color: #FFFFFF;
       border-radius: 12px;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
       transition: all 0.2s;
     }
     .btn-wizard-next:hover:not(:disabled) {
-      background: #1E40AF;
+      background: #047857;
       transform: translateY(-1px);
     }
     .btn-wizard-next:disabled {
@@ -1326,23 +1727,343 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       font-size: 12px;
       color: #64748B;
       margin-top: 16px;
       text-align: center;
     }
     .summary-security-note i {
-      color: #8B1D24;
+      color: #059669;
     }
 
-    /* Step 3 Form Styles */
+    /* ==========================================================================
+       STEP 3 CHECKOUT & PAYMENT ENHANCED STYLES
+       ========================================================================== */
+    .checkout-section-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .checkout-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+    .checkout-section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .checkout-section-title i {
+      color: #059669;
+      font-size: 18px;
+    }
+
+    /* Step 3 Form Styles - Polished & Modern */
     .step3-form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 18px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .form-group label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .form-group label i {
+      color: #059669;
+      font-size: 14px;
+    }
+    .form-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .form-input-wrap .input-icon {
+      position: absolute;
+      left: 14px;
+      color: #94A3B8;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .form-input-wrap .form-control {
+      width: 100%;
+      height: 48px;
+      padding: 10px 14px 10px 42px;
+      border-radius: 12px;
+      border: 1.5px solid #E2E8F0;
+      background: #F8FAFC;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0F172A;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .form-input-wrap .form-control:focus {
+      border-color: #059669;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+    .form-input-wrap .form-control[readonly] {
+      background: #F1F5F9;
+      color: #1E293B;
+      cursor: default;
+      border-color: #CBD5E1;
+    }
+    .input-verified-tag {
+      position: absolute;
+      right: 12px;
+      padding: 4px 8px;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #059669;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      pointer-events: none;
+    }
+
+    /* Deposit Choice Option Cards (30% vs 100%) */
+    .deposit-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .deposit-card-item {
+      border: 2px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .deposit-card-item:hover {
+      border-color: #A7F3D0;
+      background: #F0FDF4;
+    }
+    .deposit-card-item.selected {
+      border-color: #059669;
+      background: #ECFDF5;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.12);
+    }
+    .deposit-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .deposit-card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .deposit-card-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #D1FAE5;
+      color: #065F46;
+    }
+    .deposit-card-desc {
+      font-size: 12.5px;
+      color: #64748B;
+      line-height: 1.4;
+    }
+
+    /* Payment Method Selector Grid (3 columns: VietQR, MoMo, VNPAY) */
+    .payment-methods-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
       margin-bottom: 20px;
     }
+    .pay-method-pill {
+      border: 1.5px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: #FFFFFF;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .pay-method-pill:hover {
+      border-color: #CBD5E1;
+      background: #F8FAFC;
+    }
+    .pay-method-pill.active {
+      border-color: #059669;
+      background: #ECFDF5;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.12);
+    }
+    .pay-method-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .pay-method-pill.active .pay-method-icon {
+      background: #059669;
+      color: #FFFFFF;
+    }
+    .pay-method-pill:not(.active) .pay-method-icon {
+      background: #F1F5F9;
+      color: #475569;
+    }
+    .pay-method-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .pay-method-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0F172A;
+    }
+    .pay-method-hint {
+      font-size: 11.5px;
+      color: #64748B;
+    }
+
+    /* VietQR Showcase Box */
+    .vietqr-box {
+      background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+      border: 1.5px solid #A7F3D0;
+      border-radius: 16px;
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+    .vietqr-code-img {
+      width: 190px;
+      height: 190px;
+      border-radius: 12px;
+      background: #FFFFFF;
+      padding: 8px;
+      border: 1px solid #CBD5E1;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      display: block;
+      object-fit: contain;
+    }
+    .vietqr-details-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .vietqr-detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FFFFFF;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid #E2E8F0;
+    }
+    .vietqr-label {
+      font-size: 12.5px;
+      color: #64748B;
+    }
+    .vietqr-val-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .vietqr-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: #064E3B;
+    }
+    .btn-copy-chip {
+      padding: 4px 10px;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #059669;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .btn-copy-chip:hover {
+      background: #059669;
+      color: #FFFFFF;
+    }
+
+    /* Voucher Input Box */
+    .voucher-box {
+      display: flex;
+      gap: 10px;
+    }
+    .voucher-input {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1.5px solid #CBD5E1;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .voucher-input:focus {
+      outline: none;
+      border-color: #059669;
+      box-shadow: 0 0 0 3px #D1FAE5;
+    }
+    .btn-apply-voucher {
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      background: #059669;
+      color: #FFFFFF;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-apply-voucher:hover {
+      background: #047857;
+    }
+
     .policy-box {
       background: #F8FAFC;
       border: 1px solid #E2E8F0;
@@ -1358,20 +2079,187 @@
       margin-right: 6px;
     }
 
-    @media (max-width: 992px) {
+    /* Success View Styles */
+    .wizard-success-card {
+      max-width: 660px;
+      margin: 40px auto;
+      background: #FFFFFF;
+      border-radius: 24px;
+      padding: 44px 38px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      animation: popInSuccess 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popInSuccess {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-celebrate-circle {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
+      margin-bottom: 20px;
+    }
+    .success-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 8px;
+    }
+    .success-subtitle {
+      font-size: 14px;
+      color: #64748B;
+      margin-bottom: 26px;
+      line-height: 1.5;
+    }
+    .success-ticket-box {
+      background: #F8FAFC;
+      border: 1.5px dashed #CBD5E1;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 22px;
+      text-align: left;
+    }
+    .success-ticket-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #E2E8F0;
+      margin-bottom: 12px;
+    }
+    .success-code-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: #059669;
+      background: #ECFDF5;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid #A7F3D0;
+      letter-spacing: 0.5px;
+    }
+    .success-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 13.5px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+    .success-row:last-child {
+      border-bottom: none;
+    }
+    .success-row-label {
+      color: #64748B;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .success-row-label i {
+      color: #059669;
+      width: 16px;
+    }
+    .success-row-val {
+      font-weight: 700;
+      color: #1E293B;
+      text-align: right;
+    }
+    .success-email-notice {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1E40AF;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+    .success-actions {
+      display: flex;
+      gap: 14px;
+    }
+    .btn-success-home {
+      flex: 1;
+      padding: 14px 22px;
+      background: #059669;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-success-home:hover {
+      background: #047857;
+      transform: translateY(-1px);
+    }
+    .btn-success-history {
+      flex: 1;
+      padding: 14px 22px;
+      background: #FFFFFF;
+      color: #334155;
+      font-size: 15px;
+      font-weight: 700;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .btn-success-history:hover {
+      background: #F8FAFC;
+      border-color: #94A3B8;
+      color: #0F172A;
+    }
+
+    @media (max-width: 1024px) {
       .wizard-2col-layout {
         grid-template-columns: 1fr;
       }
       .slots-grid-4col {
         grid-template-columns: repeat(3, 1fr);
       }
+      .vietqr-box {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
     }
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
+      .wizard-topbar {
+        padding: 0 16px;
+      }
+      .wizard-body-wrapper {
+        padding: 16px;
+      }
       .slots-grid-4col {
         grid-template-columns: repeat(2, 1fr);
       }
       .carousel-days-grid {
         grid-template-columns: repeat(4, 1fr);
+      }
+      .deposit-cards-grid,
+      .payment-methods-grid {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -1444,7 +2332,105 @@
         font-size: 28px;
       }
     }
-  </style>
+  
+    /* Logout Confirmation Modal */
+    .logout-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .logout-modal-backdrop.show {
+      display: flex;
+    }
+    .logout-modal-card {
+      background: #ffffff;
+      border-radius: 24px;
+      max-width: 440px;
+      width: 100%;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+      animation: logoutScaleUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes logoutScaleUp {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .logout-modal-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 18px;
+      box-shadow: 0 8px 16px -4px rgba(239, 68, 68, 0.2);
+    }
+    .logout-modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .logout-modal-desc {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .logout-modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn-logout-cancel {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout-cancel:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .btn-logout-confirm {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: none;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    .btn-logout-confirm:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+
+</style>
 </head>
 <body>
 
@@ -1467,29 +2453,32 @@
             <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd/MM/yyyy')}">Thứ năm, 15/10/2026</span>
           </div>
           <div class="greeting-name">
-            Xin chào, <span th:text="${currentUserName != null ? currentUserName : 'Minh Triet'}">Minh Triet</span> 👋
+            Xin chào, <span th:text="${currentUserName != null ? currentUserName : (currentUser != null ? currentUser.fullName : 'Minh Triet')}">Minh Triet</span> 👋
           </div>
         </div>
       </div>
 
-      <!-- Center: Navigation Links -->
+      <!-- Center: Navigation Links & Topbar Quick Search -->
       <nav class="topbar-nav">
-        <a href="/customer/booking" class="nav-item active">
+        <a href="/customer/booking" class="nav-item active" id="navItemHome">
           <i class="fa-solid fa-house"></i>
           <span>Trang chủ</span>
         </a>
-        <a href="#searchBarSection" class="nav-item">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <span>Tìm sân</span>
-        </a>
+
+        <!-- Ô Tìm Sân Nhanh trên topbar -->
+        <div class="topbar-search-wrap" title="Tìm nhanh sân theo tên, môn hoặc địa điểm">
+          <i class="fa-solid fa-magnifying-glass search-icon" style="cursor:pointer;" onclick="document.getElementById('courtCardGrid')?.scrollIntoView({behavior:'smooth'})"></i>
+          <input type="text" id="courtSearchInput" class="topbar-search-input" placeholder="Tìm sân nhanh..." oninput="handleCourtSearch(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('courtCardGrid')?.scrollIntoView({behavior:'smooth'});}">
+          <button type="button" class="btn-clear-search" id="btnClearCourtSearch" onclick="clearCourtSearch()" style="display:none;" title="Xóa tìm kiếm">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
         <a href="/customer/history" class="nav-item">
           <i class="fa-regular fa-calendar-check"></i>
           <span>Lịch đặt của tôi</span>
         </a>
-        <a href="#courtsSection" class="nav-item" onclick="filterFavoriteOnly()">
-          <i class="fa-regular fa-heart"></i>
-          <span>Yêu thích</span>
-        </a>
+
         <a href="/customer/profile" class="nav-item">
           <i class="fa-regular fa-user"></i>
           <span>Tài khoản</span>
@@ -1498,21 +2487,30 @@
 
       <!-- Right: Tools, Notifications & User Avatar -->
       <div class="topbar-right">
-        <button type="button" class="btn-icon-circle" title="Thông báo hệ thống" onclick="alert('Không có thông báo mới')">
-          <i class="fa-regular fa-bell"></i>
-          <span class="badge-dot"></span>
-        </button>
+        <!-- Notification Dropdown Wrap -->
+        <div class="notif-wrapper" id="notifWrapper">
+          <button type="button" class="btn-icon-circle" id="btnNotifBell" title="Thông báo hệ thống" onclick="toggleNotifDropdown(event)">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge-dot" id="notifBadgeDot" style="display:none;"></span>
+          </button>
+
+          <!-- Notification Dropdown Popover -->
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <span class="notif-header-title"><i class="fa-solid fa-bell text-success"></i> Thông báo</span>
+              <button type="button" class="btn-mark-all-read" onclick="markAllNotificationsAsRead()">Đánh dấu đã đọc</button>
+            </div>
+            <div class="notif-list" id="notifListContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
 
         <div class="user-profile-menu">
-          <a href="/customer/profile" title="Xem hồ sơ cá nhân">
-            <img src="/images/user_avatar.jpg" alt="Avatar" class="user-avatar-img">
+          <a href="/customer/profile" title="Xem hồ sơ cá nhân" style="display:inline-flex; align-items:center; text-decoration:none;">
+            <div class="user-avatar-badge" th:if="${currentUser == null or currentUser.customAvatarUrl == null}" th:text="${currentUser != null ? currentUser.avatarInitials : 'KH'}" style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg, #059669 0%, #10b981 100%); color:#ffffff; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(16,185,129,0.3);">KH</div>
+            <img class="user-avatar-img user-custom-avatar" th:if="${currentUser != null and currentUser.customAvatarUrl != null}" th:src="${currentUser.customAvatarUrl}" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(16,185,129,0.3);" alt="Avatar">
           </a>
-
-          <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống SportHub?');">
-            <button type="submit" class="btn-logout" title="Đăng xuất">
-              <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-          </form>
         </div>
       </div>
     </div>
@@ -1656,40 +2654,44 @@
         </div>
       </div>
 
-      <!-- Category Filter Pills -->
-      <div class="sport-pills">
-        <a th:href="@{/customer/booking(sportId='ALL', bookingDate=${filter.bookingDate}, startTime=${filter.startTime}, durationMinutes=${filter.durationMinutes})}"
-           class="pill-btn"
-           th:classappend="${filter == null or filter.sportId == null or filter.sportId == 'ALL' or filter.sportId == ''} ? 'active' : ''">
+      <!-- Category Filter Pills (bao gồm Yêu thích ở giữa Tất cả và Bóng đá) -->
+      <div class="sport-pills" id="sportPillsContainer">
+        <!-- 1. Tất cả -->
+        <button type="button" class="pill-btn active" id="pillAll" onclick="selectSportFilter('ALL')">
           <i class="fa-solid fa-table-cells-large"></i> Tất cả
-        </a>
-        <a th:href="@{/customer/booking(sportId='M_BD', bookingDate=${filter.bookingDate}, startTime=${filter.startTime}, durationMinutes=${filter.durationMinutes})}"
-           class="pill-btn"
-           th:classappend="${filter != null and filter.sportId == 'M_BD'} ? 'active' : ''">
+        </button>
+
+        <!-- 2. Yêu thích (ở giữa Tất cả và Bóng đá theo đúng yêu cầu) -->
+        <button type="button" class="pill-btn pill-favorite" id="pillFavorite" onclick="selectSportFilter('FAVORITE')">
+          <i class="fa-solid fa-heart" style="color:#ef4444;"></i> Yêu thích <span class="pill-fav-badge" id="pillFavBadge">(0)</span>
+        </button>
+
+        <!-- 3. Bóng đá -->
+        <button type="button" class="pill-btn" id="pill-M_BD" onclick="selectSportFilter('M_BD')">
           <i class="fa-solid fa-futbol"></i> Bóng đá
-        </a>
-        <a th:href="@{/customer/booking(sportId='M_BR', bookingDate=${filter.bookingDate}, startTime=${filter.startTime}, durationMinutes=${filter.durationMinutes})}"
-           class="pill-btn"
-           th:classappend="${filter != null and filter.sportId == 'M_BR'} ? 'active' : ''">
+        </button>
+
+        <!-- 4. Bóng rổ -->
+        <button type="button" class="pill-btn" id="pill-M_BR" onclick="selectSportFilter('M_BR')">
           <i class="fa-solid fa-basketball"></i> Bóng rổ
-        </a>
-        <a th:href="@{/customer/booking(sportId='M_CL', bookingDate=${filter.bookingDate}, startTime=${filter.startTime}, durationMinutes=${filter.durationMinutes})}"
-           class="pill-btn"
-           th:classappend="${filter != null and filter.sportId == 'M_CL'} ? 'active' : ''">
+        </button>
+
+        <!-- 5. Cầu lông -->
+        <button type="button" class="pill-btn" id="pill-M_CL" onclick="selectSportFilter('M_CL')">
           <i class="fa-solid fa-feather"></i> Cầu lông
-        </a>
-        <a th:href="@{/customer/booking(sportId='M_PB', bookingDate=${filter.bookingDate}, startTime=${filter.startTime}, durationMinutes=${filter.durationMinutes})}"
-           class="pill-btn"
-           th:classappend="${filter != null and filter.sportId == 'M_PB'} ? 'active' : ''">
+        </button>
+
+        <!-- 6. Pickleball -->
+        <button type="button" class="pill-btn" id="pill-M_PB" onclick="selectSportFilter('M_PB')">
           <i class="fa-solid fa-table-tennis-paddle-ball"></i> Pickleball
-        </a>
+        </button>
       </div>
     </div>
 
     <!-- 3-Column Grid of Court Cards -->
     <div class="courts-grid" id="courtCardGrid">
       
-      <div class="court-card" th:each="court : ${availableCourts}" th:id="'court-card-' + ${court.id}" th:data-court-id="${court.id}">
+      <div class="court-card" th:each="court : ${availableCourts}" th:id="'court-card-' + ${court.id}" th:data-court-id="${court.id}" th:data-sport-id="${court.sportId}">
         
         <!-- Card Thumbnail -->
         <div class="card-thumb-wrap">
@@ -1702,7 +2704,7 @@
           </span>
 
           <!-- Heart / Favorite Button Top-Right -->
-          <button type="button" class="btn-favorite" onclick="toggleFavorite(this, '[[${court.id}]]')" title="Thêm vào yêu thích">
+          <button type="button" class="btn-favorite" onclick="toggleFavorite(this, event)" title="Thêm vào yêu thích">
             <i class="fa-regular fa-heart"></i>
           </button>
         </div>
@@ -1773,289 +2775,756 @@
   </main>
 
   <!-- ========================================================================
-       MODERN MULTI-STEP BOOKING WIZARD MODAL
+       FULL-SCREEN DEDICATED BOOKING WIZARD
        ======================================================================== -->
   <div class="modal-backdrop" id="bookingWizardModal">
     <div class="booking-wizard-card">
       
-      <!-- Top Stepper Bar (1. Chọn sân -> 2. Chọn giờ -> 3. Thông tin -> 4. Xác nhận) -->
+      <!-- Top Sticky Navigation & Stepper Bar -->
       <div class="wizard-topbar">
-        <div class="wizard-stepper-track">
-          <!-- Step 1: Chọn sân (checked) -->
-          <div class="wizard-step-item step-completed" onclick="closeBookingModal()" title="Quay lại danh sách chọn sân">
-            <div class="wizard-step-circle"><i class="fa-solid fa-check"></i></div>
-            <span class="wizard-step-label">Chọn sân</span>
-          </div>
-          <div class="wizard-step-line active-red"></div>
-
-          <!-- Step 2: Chọn giờ (active) -->
-          <div class="wizard-step-item step-active" id="stepperStep2" onclick="goToStep2()">
-            <div class="wizard-step-circle">2</div>
-            <span class="wizard-step-label">Chọn giờ</span>
-          </div>
-          <div class="wizard-step-line" id="stepperLine23"></div>
-
-          <!-- Step 3: Thông tin -->
-          <div class="wizard-step-item step-upcoming" id="stepperStep3" onclick="goToStep3()">
-            <div class="wizard-step-circle">3</div>
-            <span class="wizard-step-label">Thông tin</span>
-          </div>
-          <div class="wizard-step-line" id="stepperLine34"></div>
-
-          <!-- Step 4: Xác nhận -->
-          <div class="wizard-step-item step-upcoming" id="stepperStep4">
-            <div class="wizard-step-circle">4</div>
-            <span class="wizard-step-label">Xác nhận</span>
+        <div class="wizard-topbar-left">
+          <a href="/customer/booking" onclick="closeBookingModal(); return false;" class="brand-logo" title="Quay lại danh sách sân">
+            <img src="/images/sporthub-logo.png" alt="SportHub Logo" style="height:44px;object-fit:contain;">
+          </a>
+          <div class="divider-v"></div>
+          <div class="wizard-brand-text">
+            <span class="wizard-brand-title">SportHub Online Booking</span>
+            <span class="wizard-brand-sub">Đặt sân & Thanh toán trực tuyến</span>
           </div>
         </div>
 
-        <button type="button" class="wizard-close-btn" onclick="closeBookingModal()" title="Đóng">
+        <!-- 4-Step Stepper Track -->
+        <div class="wizard-stepper-track">
+          <!-- Step 1: Chọn sân (completed) -->
+          <div class="wizard-step-item step-completed" onclick="closeBookingModal()" title="Bấm để quay lại danh sách chọn sân">
+            <div class="wizard-step-circle"><i class="fa-solid fa-check"></i></div>
+            <span class="wizard-step-label">1. Chọn sân</span>
+          </div>
+          <div class="wizard-step-line active-green" id="stepperLine12"></div>
+
+          <!-- Step 2: Chọn giờ -->
+          <div class="wizard-step-item step-active" id="stepperStep2" onclick="goToStep2()">
+            <div class="wizard-step-circle">2</div>
+            <span class="wizard-step-label">2. Chọn ngày & giờ</span>
+          </div>
+          <div class="wizard-step-line" id="stepperLine23"></div>
+
+          <!-- Step 3: Thông tin người đặt -->
+          <div class="wizard-step-item step-upcoming" id="stepperStep3" onclick="goToStep3()">
+            <div class="wizard-step-circle">3</div>
+            <span class="wizard-step-label">3. Thông tin người đặt</span>
+          </div>
+          <div class="wizard-step-line" id="stepperLine34"></div>
+
+          <!-- Step 4: Thanh toán -->
+          <div class="wizard-step-item step-upcoming" id="stepperStep4" onclick="goToStep4()">
+            <div class="wizard-step-circle">4</div>
+            <span class="wizard-step-label">4. Thanh toán</span>
+          </div>
+        </div>
+
+        <!-- Close / Exit Button -->
+        <button type="button" class="wizard-exit-btn" onclick="closeBookingModal()" title="Thoát màn hình đặt sân">
           <i class="fa-solid fa-xmark"></i>
+          <span>Thoát</span>
         </button>
       </div>
 
       <!-- ==================================================================
-           STEP 2 VIEW: CHỌN SÂN CON VÀ KHUNG GIỜ (MOCKUP EXACT MATCH)
+           STEP 2 VIEW: CHỌN NGÀY VÀ KHUNG GIỜ (05:00 - 23:00)
            ================================================================== -->
       <div id="viewStep2" class="wizard-step-container">
-        <div class="wizard-2col-layout">
-          
-          <!-- LEFT PANEL: Chọn sân và khung giờ -->
-          <div class="wizard-left-panel">
-            <h2 class="wizard-panel-title">Chọn sân và khung giờ</h2>
-            <p class="wizard-panel-subtitle">Chọn sân con trước, sau đó chọn ngày và khung giờ</p>
-
-            <!-- Sub-court Radio Pills Group -->
-            <div class="subcourt-select-box">
-              <div class="subcourt-title" id="subcourtTitleLabel">Chọn sân Bóng đá</div>
-              <div class="subcourt-pills" id="subcourtPillsGroup">
-                <!-- Dynamically populated subcourts pills -->
-              </div>
-            </div>
-
-            <!-- Horizontal Date Picker Carousel -->
-            <div class="date-carousel-wrap">
-              <button type="button" class="carousel-nav-btn" id="btnPrevDates" onclick="shiftDateCarousel(-7)" title="7 ngày trước">
-                <i class="fa-solid fa-chevron-left"></i>
-              </button>
-              <div class="carousel-days-grid" id="carouselDaysContainer">
-                <!-- 7 date pills (T2 12/10, ..., T7 17/10, CN 18/10) -->
-              </div>
-              <button type="button" class="carousel-nav-btn" id="btnNextDates" onclick="shiftDateCarousel(7)" title="7 ngày tiếp theo">
-                <i class="fa-solid fa-chevron-right"></i>
-              </button>
-            </div>
-
-            <!-- Selected Date Heading & Time Range Summary -->
-            <div class="selected-date-info-box">
-              <div class="date-header-row">
-                <i class="fa-solid fa-calendar-days"></i>
-                <span id="selectedDateTitle">Thứ 7, ngày 17 Tháng 10 2026</span>
-              </div>
-              <div class="time-selected-text" id="selectedTimeSummaryText">
-                Đã chọn: <span class="time-range-badge" id="lblRangeBadge">07:00 - 07:30</span> <span class="time-duration-badge" id="lblDurationBadge">(0.5 giờ)</span>
-              </div>
-            </div>
-
-            <!-- 4-Column Time Slot Grid (05:00 to 23:00) -->
-            <div class="slots-grid-4col" id="timeSlotsGridContainer">
-              <!-- Dynamically populated 30-min buttons -->
-            </div>
-
-            <!-- Legend Bar -->
-            <div class="wizard-legend-row">
-              <div class="legend-box-item">
-                <span class="legend-chip chip-available"></span>
-                <span>Còn trống</span>
-              </div>
-              <div class="legend-box-item">
-                <span class="legend-chip chip-booked"></span>
-                <span>Đã có người đặt</span>
-              </div>
-              <div class="legend-box-item">
-                <span class="legend-chip chip-middle"></span>
-                <span>Giữa (đã chọn)</span>
-              </div>
-              <div class="legend-box-item">
-                <span class="legend-chip chip-start"></span>
-                <span>Bắt đầu</span>
-              </div>
-              <div class="legend-box-item">
-                <span class="legend-chip chip-end"></span>
-                <span>Kết thúc</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- RIGHT PANEL: Thông tin đặt sân -->
-          <div class="wizard-right-panel">
-            <div class="summary-card-header">
-              <i class="fa-regular fa-newspaper"></i>
-              <h3>Thông tin đặt sân</h3>
-            </div>
-
-            <div class="summary-list">
-              <div class="summary-row">
-                <span class="summary-label"><i class="fa-solid fa-location-dot"></i> Sân</span>
-                <span class="summary-val" id="summaryCourtLocation">SportUTE - Cơ sở Võ Văn Ngân</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label"><i class="fa-solid fa-trophy"></i> Môn</span>
-                <span class="summary-val" id="summarySportName">Bóng đá</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label"><i class="fa-regular fa-futbol" id="summarySubcourtIcon"></i> Sân con</span>
-                <span class="summary-val" id="summarySubcourtName">Sân bóng đá 1</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label"><i class="fa-regular fa-calendar"></i> Ngày</span>
-                <span class="summary-val" id="summaryDate">17/10/2026</span>
-              </div>
-              <div class="summary-row">
-                <span class="summary-label"><i class="fa-regular fa-clock"></i> Giờ</span>
-                <span class="summary-val" id="summaryTime">07:00 - 07:30</span>
-              </div>
-              <div class="summary-row price-highlight-row">
-                <span class="summary-label"><i class="fa-solid fa-tag"></i> Giá</span>
-                <span class="summary-val price-num" id="summaryPrice">100.000đ</span>
-              </div>
-            </div>
-
-            <div class="summary-action-btns">
-              <button type="button" class="btn-wizard-back" onclick="closeBookingModal()">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>Quay lại</span>
-              </button>
-              <button type="button" class="btn-wizard-next" id="btnContinueToStep3" onclick="goToStep3()" disabled>
-                <span>Tiếp tục</span>
-                <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </div>
-
-            <div class="summary-security-note">
-              <i class="fa-solid fa-shield-halved"></i>
-              <span>Thông tin của bạn được bảo mật tuyệt đối</span>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- ==================================================================
-           STEP 3 VIEW: THÔNG TIN KHÁCH HÀNG & XÁC NHẬN ĐẶT SÂN
-           ================================================================== -->
-      <div id="viewStep3" class="wizard-step-container" style="display: none;">
-        <form th:action="@{/customer/booking/confirm}" method="post" id="wizardFinalForm">
-          <input type="hidden" name="courtId" id="finalCourtId">
-          <input type="hidden" name="bookingDate" id="finalBookingDate">
-          <input type="hidden" name="startTime" id="finalStartTime">
-          <input type="hidden" name="durationMinutes" id="finalDurationMinutes">
-          <input type="hidden" name="totalAmount" id="finalTotalAmount">
-
+        <div class="wizard-body-wrapper">
           <div class="wizard-2col-layout">
             
-            <!-- Left: Thông tin liên hệ & ghi chú -->
+            <!-- LEFT PANEL: Chọn ngày & giờ -->
             <div class="wizard-left-panel">
-              <h2 class="wizard-panel-title">Thông tin người đặt sân</h2>
-              <p class="wizard-panel-subtitle">Vui lòng kiểm tra thông tin để trung tâm gửi thông báo và hỗ trợ khi đến sân</p>
+              <h2 class="wizard-panel-title">Chọn thời gian thuê sân</h2>
+              <p class="wizard-panel-subtitle">Vui lòng chọn ngày và click 2 khung giờ bất kỳ để xác định giờ bắt đầu & giờ kết thúc</p>
 
-              <div class="step3-form-grid">
-                <div class="form-group">
-                  <label><i class="fa-regular fa-user"></i> Họ và tên người đặt</label>
-                  <input type="text" class="form-control" th:value="${customer != null ? customer.fullName : currentUserName}" readonly>
+              <!-- Active Court Banner (Xác nhận sân đã chọn, không còn sân 1 hay 2) -->
+              <div class="active-court-banner">
+                <div class="court-banner-left">
+                  <div class="court-banner-icon" id="bannerSportIcon">
+                    <i class="fa-regular fa-futbol"></i>
+                  </div>
+                  <div>
+                    <div class="court-banner-tag"><i class="fa-solid fa-circle-check"></i> Sân đang được chọn</div>
+                    <h2 class="court-banner-title" id="bannerCourtName">Sân bóng đá 1</h2>
+                    <div class="court-banner-meta">
+                      <span><i class="fa-solid fa-trophy"></i> <span id="bannerSportName">Bóng đá</span></span>
+                      <span>•</span>
+                      <span><i class="fa-solid fa-location-dot"></i> <span id="bannerLocation">SportUTE - Khu A</span></span>
+                      <span>•</span>
+                      <span><i class="fa-solid fa-tag"></i> <span id="bannerHourlyRate">100.000đ/giờ</span></span>
+                    </div>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label><i class="fa-solid fa-phone"></i> Số điện thoại liên hệ</label>
-                  <input type="text" class="form-control" th:value="${customer != null ? customer.phone : '0912345678'}" readonly>
+                <button type="button" class="btn-change-court" onclick="closeBookingModal()">
+                  <i class="fa-solid fa-rotate-left"></i> Đổi sân khác
+                </button>
+              </div>
+
+              <!-- Horizontal Date Carousel (7 Days Strip) -->
+              <div class="date-carousel-wrap">
+                <button type="button" class="carousel-nav-btn" id="btnPrevDates" onclick="shiftDateCarousel(-7)" title="7 ngày trước">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="carousel-days-grid" id="carouselDaysContainer">
+                  <!-- 7 date pills (CN, T2, T3, T4, T5, T6, T7) -->
                 </div>
-                <div class="form-group" style="grid-column: span 2;">
-                  <label><i class="fa-regular fa-envelope"></i> Email nhận phiếu đặt</label>
-                  <input type="email" class="form-control" th:value="${customer != null ? customer.email : 'customer@sporthub.vn'}" readonly>
+                <button type="button" class="carousel-nav-btn" id="btnNextDates" onclick="shiftDateCarousel(7)" title="7 ngày tiếp theo">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+
+              <!-- Selected Date Heading & Range Info -->
+              <div class="selected-date-info-box">
+                <div class="date-header-row">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  <span id="selectedDateTitle">Thứ 7, ngày 17 Tháng 10 2026</span>
                 </div>
-                <div class="form-group" style="grid-column: span 2;">
-                  <label><i class="fa-regular fa-pen-to-square"></i> Ghi chú cho ban quản lý sân (tùy chọn)</label>
-                  <input type="text" name="note" class="form-control" placeholder="Ví dụ: Mượn thêm vợt, bật đèn sân sớm 5 phút, chuẩn bị nước...">
+                <div class="time-selected-text" id="selectedTimeSummaryText">
+                  Vui lòng click 2 khung giờ bất kỳ để chọn giờ bắt đầu và kết thúc
                 </div>
               </div>
 
-              <div class="policy-box">
-                <div>
-                  <i class="fa-solid fa-circle-check text-success"></i>
-                  <span><strong>Chính sách cọc:</strong> Khách hàng chỉ cần thanh toán 30% cọc giữ chỗ, 70% còn lại thanh toán tại quầy khi nhận sân.</span>
+              <!-- 4-Column Time Slot Grid (05:00 to 23:00) -->
+              <div class="slots-grid-4col" id="timeSlotsGridContainer">
+                <!-- Dynamically populated 30-min buttons -->
+              </div>
+
+              <!-- Legend Row -->
+              <div class="wizard-legend-row">
+                <div class="legend-box-item">
+                  <span class="legend-chip chip-available"></span>
+                  <span>Còn trống</span>
                 </div>
-                <div>
-                  <i class="fa-solid fa-clock-rotate-left text-primary"></i>
-                  <span><strong>Chính sách hoàn hủy:</strong> Khách hàng được quyền tự hủy lịch và hoàn cọc miễn phí trước giờ chơi tối thiểu 24 giờ.</span>
+                <div class="legend-box-item">
+                  <span class="legend-chip chip-start"></span>
+                  <span>Giờ bắt đầu</span>
+                </div>
+                <div class="legend-box-item">
+                  <span class="legend-chip chip-middle"></span>
+                  <span>Khung giờ đã chọn</span>
+                </div>
+                <div class="legend-box-item">
+                  <span class="legend-chip chip-end"></span>
+                  <span>Giờ kết thúc</span>
+                </div>
+                <div class="legend-box-item">
+                  <span class="legend-chip chip-booked"></span>
+                  <span>Đã có lịch (Đã xác nhận)</span>
                 </div>
               </div>
             </div>
 
-            <!-- Right: Tóm tắt chi phí & Xác nhận hoàn tất -->
+            <!-- RIGHT PANEL: Tóm tắt thông tin đặt sân -->
             <div class="wizard-right-panel">
               <div class="summary-card-header">
-                <i class="fa-solid fa-receipt"></i>
-                <h3>Tóm tắt đơn đặt</h3>
+                <i class="fa-regular fa-newspaper"></i>
+                <h3>Thông tin đặt sân</h3>
               </div>
 
               <div class="summary-list">
                 <div class="summary-row">
                   <span class="summary-label"><i class="fa-solid fa-location-dot"></i> Sân</span>
-                  <span class="summary-val" id="step3CourtLocation">SportUTE</span>
+                  <span class="summary-val" id="summarySubcourtName">Sân bóng đá 1</span>
                 </div>
                 <div class="summary-row">
-                  <span class="summary-label"><i class="fa-solid fa-trophy"></i> Sân con</span>
-                  <span class="summary-val" id="step3CourtDetail">Sân bóng đá 1</span>
+                  <span class="summary-label"><i class="fa-solid fa-trophy"></i> Môn</span>
+                  <span class="summary-val" id="summarySportName">Bóng đá</span>
                 </div>
                 <div class="summary-row">
-                  <span class="summary-label"><i class="fa-regular fa-calendar"></i> Thời gian</span>
-                  <span class="summary-val" id="step3DateTime">17/10/2026 (07:00 - 07:30)</span>
+                  <span class="summary-label"><i class="fa-solid fa-map-pin"></i> Địa điểm</span>
+                  <span class="summary-val" id="summaryCourtLocation">SportUTE</span>
                 </div>
                 <div class="summary-row">
-                  <span class="summary-label"><i class="fa-regular fa-clock"></i> Thời lượng</span>
-                  <span class="summary-val" id="step3Duration">30 phút (0.5 giờ)</span>
+                  <span class="summary-label"><i class="fa-regular fa-calendar"></i> Ngày</span>
+                  <span class="summary-val" id="summaryDate">17/10/2026</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label"><i class="fa-regular fa-clock"></i> Khung giờ</span>
+                  <span class="summary-val" id="summaryTime">--:-- - --:--</span>
                 </div>
                 <div class="summary-row price-highlight-row">
-                  <span class="summary-label"><i class="fa-solid fa-tag"></i> Tổng tiền</span>
-                  <span class="summary-val price-num" id="step3Total">100.000đ</span>
-                </div>
-                <div class="summary-row" style="background:#ECFDF5;padding:10px 14px;border-radius:10px;margin-top:10px;">
-                  <span class="summary-label" style="color:#047857;font-weight:700;"><i class="fa-solid fa-shield-halved" style="color:#059669;"></i> Tiền cọc (30%):</span>
-                  <span class="summary-val" id="step3Deposit" style="color:#059669;font-size:16px;font-weight:800;">30.000đ</span>
-                </div>
-                <div class="summary-row" style="font-size:12px;color:#64748B;">
-                  <span>Thanh toán tại sân (70%):</span>
-                  <span id="step3Remaining">70.000đ</span>
+                  <span class="summary-label"><i class="fa-solid fa-tag"></i> Tạm tính</span>
+                  <span class="summary-val price-num" id="summaryPrice">0đ</span>
                 </div>
               </div>
 
               <div class="summary-action-btns">
-                <button type="button" class="btn-wizard-back" onclick="goToStep2()">
+                <button type="button" class="btn-wizard-back" onclick="closeBookingModal()">
                   <i class="fa-solid fa-arrow-left"></i>
-                  <span>Chọn lại giờ</span>
+                  <span>Quay lại</span>
                 </button>
-                <button type="submit" class="btn-wizard-next" style="background:#059669;">
-                  <i class="fa-solid fa-check"></i>
-                  <span>Xác nhận đặt</span>
+                <button type="button" class="btn-wizard-next" id="btnContinueToStep3" onclick="goToStep3()" disabled>
+                  <span>Tiếp tục</span>
+                  <i class="fa-solid fa-arrow-right"></i>
                 </button>
               </div>
 
               <div class="summary-security-note">
                 <i class="fa-solid fa-shield-halved"></i>
-                <span>Giao dịch an toàn được bảo vệ bởi SportHub</span>
+                <span>Thông tin của bạn được bảo mật tuyệt đối</span>
               </div>
             </div>
 
           </div>
-        </form>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           STEP 3 VIEW: XÁC NHẬN THÔNG TIN & MỨC CỌC
+           ================================================================== -->
+      <div id="viewStep3" class="wizard-step-container" style="display: none;">
+        <div class="wizard-body-wrapper">
+          <form id="wizardFinalForm">
+            <input type="hidden" name="courtId" id="finalCourtId">
+            <input type="hidden" name="bookingDate" id="finalBookingDate">
+            <input type="hidden" name="startTime" id="finalStartTime">
+            <input type="hidden" name="durationMinutes" id="finalDurationMinutes">
+            <input type="hidden" name="totalAmount" id="finalTotalAmount">
+            <input type="hidden" name="paymentMethod" id="finalPaymentMethod" value="Chuyển khoản VietQR">
+            <input type="hidden" name="depositChoice" id="finalDepositChoice" value="DEPOSIT_30">
+            <input type="hidden" name="voucherCode" id="finalVoucherCode" value="">
+            <input type="hidden" name="discountAmount" id="finalDiscountAmount" value="0">
+
+            <div class="wizard-2col-layout">
+              
+              <!-- LEFT PANEL: Thông tin & Mức cọc -->
+              <div class="wizard-left-panel" style="padding: 28px;">
+                
+                <!-- 1. Thông tin người đặt sân -->
+                <div class="checkout-section-card">
+                  <div class="checkout-section-header">
+                    <div class="checkout-section-title">
+                      <i class="fa-solid fa-user-check"></i>
+                      <span>1. Thông tin khách hàng đặt sân</span>
+                    </div>
+                    <span class="badge" style="background:#ECFDF5;color:#047857;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid #A7F3D0;">
+                      <i class="fa-solid fa-shield-check"></i> Tài khoản chính chủ đã xác thực
+                    </span>
+                  </div>
+                  <div class="step3-form-grid">
+                    <div class="form-group">
+                      <label><i class="fa-regular fa-user"></i> Họ và tên người đặt</label>
+                      <div class="form-input-wrap">
+                        <i class="fa-regular fa-user input-icon"></i>
+                        <input type="text" class="form-control" id="custFullNameDisplay" th:value="${customer != null ? customer.fullName : currentUserName}" readonly>
+                        <span class="input-verified-tag"><i class="fa-solid fa-lock"></i> Đã đồng bộ</span>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label><i class="fa-solid fa-phone"></i> Số điện thoại liên hệ</label>
+                      <div class="form-input-wrap">
+                        <i class="fa-solid fa-phone input-icon"></i>
+                        <input type="text" class="form-control" id="custPhoneDisplay" th:value="${customer != null ? customer.phone : '0912345678'}" readonly>
+                        <span class="input-verified-tag"><i class="fa-solid fa-circle-check"></i> Đã xác thực</span>
+                      </div>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                      <label><i class="fa-regular fa-envelope"></i> Email nhận vé xác nhận & hóa đơn</label>
+                      <div class="form-input-wrap">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input type="email" class="form-control" id="custEmailDisplay" th:value="${customer != null ? customer.email : 'customer@sporthub.vn'}" readonly>
+                      </div>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                      <label><i class="fa-regular fa-pen-to-square"></i> Ghi chú cho ban quản lý sân (tùy chọn)</label>
+                      <div class="form-input-wrap">
+                        <i class="fa-regular fa-comment-dots input-icon"></i>
+                        <input type="text" name="note" id="inputBookingNote" class="form-control" placeholder="Ví dụ: Mượn thêm bóng thi đấu, bật đèn sân sớm 5 phút, hỗ trợ chuẩn bị nước uống...">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Chọn mức thanh toán (Cọc 30% vs Toàn bộ 100%) -->
+                <div class="checkout-section-card">
+                  <div class="checkout-section-header">
+                    <div class="checkout-section-title">
+                      <i class="fa-solid fa-sliders"></i>
+                      <span>2. Lựa chọn mức thanh toán giữ chỗ</span>
+                    </div>
+                  </div>
+                  <div class="deposit-cards-grid">
+                    <div class="deposit-card-item selected" id="optDeposit30" onclick="selectDepositChoice('DEPOSIT_30')">
+                      <div class="deposit-card-top">
+                        <span class="deposit-card-title">
+                          <i class="fa-solid fa-circle-dot" id="radioDot30" style="color:#059669;"></i>
+                          Đặt cọc 30%
+                        </span>
+                        <span class="deposit-card-badge">Khuyên dùng</span>
+                      </div>
+                      <p class="deposit-card-desc">Chỉ cần thanh toán trước 30% để xác nhận giữ sân an tâm. 70% còn lại thanh toán tại quầy lễ tân khi đến nhận sân.</p>
+                    </div>
+
+                    <div class="deposit-card-item" id="optDeposit100" onclick="selectDepositChoice('FULL_100')">
+                      <div class="deposit-card-top">
+                        <span class="deposit-card-title">
+                          <i class="fa-regular fa-circle" id="radioDot100" style="color:#CBD5E1;"></i>
+                          Thanh toán 100%
+                        </span>
+                        <span class="deposit-card-badge" style="background:#F1F5F9;color:#475569;">Trọn gói</span>
+                      </div>
+                      <p class="deposit-card-desc">Thanh toán trọn gói 100% tiền sân. Khi đến giờ thi đấu quý khách chỉ cần vào nhận sân ngay, không cần chờ thủ tục.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Mã giảm giá / Voucher -->
+                <div class="checkout-section-card">
+                  <div class="checkout-section-header">
+                    <div class="checkout-section-title">
+                      <i class="fa-solid fa-ticket"></i>
+                      <span>3. Mã ưu đãi / Voucher giảm giá</span>
+                    </div>
+                  </div>
+                  <div class="voucher-box">
+                    <input type="text" class="voucher-input" id="inputVoucherCode" placeholder="Nhập mã voucher (Thử: SPORTUTE10, SVUTE)">
+                    <button type="button" class="btn-apply-voucher" onclick="applyVoucherCode()">
+                      <i class="fa-solid fa-tag"></i> Áp dụng
+                    </button>
+                  </div>
+                  <div id="voucherFeedbackMsg" style="margin-top:10px;font-size:13px;font-weight:600;display:none;"></div>
+                </div>
+
+                <!-- 4. Cam kết bảo đảm giữ sân -->
+                <div class="policy-box">
+                  <div>
+                    <i class="fa-solid fa-circle-check text-success"></i>
+                    <span><strong>Cam kết 100% giữ sân:</strong> Phiếu đặt giữ chỗ của bạn được hệ thống khóa lịch tự động ngay khi thanh toán.</span>
+                  </div>
+                  <div>
+                    <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+                    <span><strong>Chính sách hoàn hủy linh hoạt:</strong> Khách hàng được tự do hủy lịch và hoàn cọc 100% trước giờ chơi tối thiểu 24 giờ.</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- RIGHT PANEL: Tóm tắt đơn đặt & Nút Chuyển sang Thanh toán -->
+              <div class="wizard-right-panel">
+                <div class="summary-card-header">
+                  <i class="fa-solid fa-receipt"></i>
+                  <h3>Chi tiết đơn đặt sân</h3>
+                </div>
+
+                <div class="summary-list">
+                  <div class="summary-row">
+                    <span class="summary-label"><i class="fa-solid fa-location-dot"></i> Sân</span>
+                    <span class="summary-val" id="step3CourtDetail">Sân bóng đá 1</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="summary-label"><i class="fa-solid fa-map-pin"></i> Địa điểm</span>
+                    <span class="summary-val" id="step3CourtLocation">SportUTE</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="summary-label"><i class="fa-regular fa-calendar"></i> Thời gian</span>
+                    <span class="summary-val" id="step3DateTime">17/10/2026 (07:00 - 07:30)</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="summary-label"><i class="fa-regular fa-clock"></i> Thời lượng</span>
+                    <span class="summary-val" id="step3Duration">30 phút (0.5 giờ)</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="summary-label"><i class="fa-solid fa-money-bill"></i> Tiền sân gốc</span>
+                    <span class="summary-val" id="step3BasePrice">100.000đ</span>
+                  </div>
+                  <div class="summary-row" id="rowTierDiscount" style="display:none;color:#059669;">
+                    <span class="summary-label" style="color:#059669;"><i class="fa-solid fa-crown"></i> Ưu đãi hội viên (<span id="step3TierName">Hạng Bạc</span>)</span>
+                    <span class="summary-val" id="step3TierDiscountVal" style="color:#059669;font-weight:800;">-0đ</span>
+                  </div>
+                  <div class="summary-row" id="rowVoucherDiscount" style="display:none;color:#059669;">
+                    <span class="summary-label" style="color:#059669;"><i class="fa-solid fa-gift"></i> Voucher giảm giá</span>
+                    <span class="summary-val" id="step3DiscountVal" style="color:#059669;font-weight:800;">-0đ</span>
+                  </div>
+                  <div class="summary-row price-highlight-row">
+                    <span class="summary-label"><i class="fa-solid fa-tags"></i> Tổng tiền</span>
+                    <span class="summary-val price-num" id="step3Total">100.000đ</span>
+                  </div>
+
+                  <!-- Live Amount To Pay Right Now -->
+                  <div style="background:#ECFDF5;border:1.5px solid #A7F3D0;border-radius:12px;padding:14px;margin-top:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <span style="font-size:13px;font-weight:700;color:#065F46;" id="lblPayNowTitle">
+                        <i class="fa-solid fa-shield-halved" style="color:#059669;"></i> Tiền thanh toán ngay (30% cọc):
+                      </span>
+                      <span id="step3AmountToPayNow" style="font-size:18px;font-weight:800;color:#047857;">30.000đ</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12px;color:#047857;" id="rowRemainingAtCounter">
+                      <span>Còn lại thanh toán tại sân:</span>
+                      <strong id="step3Remaining">70.000đ</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="summary-action-btns">
+                  <button type="button" class="btn-wizard-back" onclick="goToStep2()">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Chọn lại giờ</span>
+                  </button>
+                  <button type="button" class="btn-wizard-next" onclick="goToStep4()">
+                    <span>Tiếp tục thanh toán</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </div>
+
+                <div class="summary-security-note">
+                  <i class="fa-solid fa-lock"></i>
+                  <span>Bảo mật giao dịch bởi SportHub Smart Pay</span>
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           STEP 4 VIEW: MÀN HÌNH QUÉT MÃ THANH TOÁN (VIETQR / MOMO / VNPAY)
+           ================================================================== -->
+      <div id="viewStep4" class="wizard-step-container" style="display: none;">
+        <div class="wizard-body-wrapper">
+          <div class="wizard-2col-layout">
+            
+            <!-- LEFT PANEL: Phương thức & Quét mã VietQR -->
+            <div class="wizard-left-panel" style="padding: 28px;">
+              <div class="checkout-section-card">
+                <div class="checkout-section-header">
+                  <div class="checkout-section-title">
+                    <i class="fa-solid fa-qrcode"></i>
+                    <span>Phương thức & Quét mã thanh toán</span>
+                  </div>
+                  <span class="badge" style="background:#EFF6FF;color:#1D4ED8;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid #BFDBFE;">
+                    <i class="fa-solid fa-bolt"></i> Xử lý tức thì 24/7
+                  </span>
+                </div>
+                <p style="font-size:13.5px;color:#64748B;margin-bottom:18px;">
+                  Khách hàng đặt trực tuyến vui lòng thanh toán tiền cọc giữ sân. Hệ thống sẽ tự động khóa lịch và gửi mã vé xác nhận ngay khi bạn thanh toán.
+                </p>
+
+                <!-- Payment Methods Grid (VietQR, MoMo, VNPAY) -->
+                <div class="payment-methods-grid">
+                  <!-- VietQR -->
+                  <div class="pay-method-pill active" id="payMethodVietQR" onclick="selectPayMethod('Chuyển khoản VietQR')">
+                    <div class="pay-method-icon"><i class="fa-solid fa-qrcode"></i></div>
+                    <div class="pay-method-text">
+                      <span class="pay-method-name">Chuyển khoản VietQR</span>
+                      <span class="pay-method-hint">Quét mã 24/7 mọi ngân hàng</span>
+                    </div>
+                  </div>
+
+                  <!-- MoMo -->
+                  <div class="pay-method-pill" id="payMethodMoMo" onclick="selectPayMethod('Ví MoMo')">
+                    <div class="pay-method-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="pay-method-text">
+                      <span class="pay-method-name">Ví điện tử MoMo</span>
+                      <span class="pay-method-hint">Quét mã qua App MoMo</span>
+                    </div>
+                  </div>
+
+                  <!-- VNPAY -->
+                  <div class="pay-method-pill" id="payMethodVNPAY" onclick="selectPayMethod('Cổng VNPAY')">
+                    <div class="pay-method-icon"><i class="fa-regular fa-credit-card"></i></div>
+                    <div class="pay-method-text">
+                      <span class="pay-method-name">VNPAY / Thẻ ATM</span>
+                      <span class="pay-method-hint">Thẻ nội địa & Quốc tế</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dynamic VietQR Showcase Box -->
+                <div class="vietqr-box" id="vietqrShowcaseBox">
+                  <div style="text-align:center;">
+                    <img src="" id="vietqrImage" alt="VietQR Code" class="vietqr-code-img">
+                    <span style="font-size:11.5px;color:#059669;font-weight:700;margin-top:8px;display:block;">
+                      <i class="fa-solid fa-camera"></i> Mở App ngân hàng quét mã
+                    </span>
+                  </div>
+                  <div class="vietqr-details-list">
+                    <div class="vietqr-detail-row">
+                      <span class="vietqr-label">Ngân hàng thụ hưởng:</span>
+                      <span class="vietqr-val">MB Bank (Ngân hàng Quân Đội)</span>
+                    </div>
+                    <div class="vietqr-detail-row">
+                      <span class="vietqr-label">Số tài khoản:</span>
+                      <div class="vietqr-val-group">
+                        <span class="vietqr-val" id="vietqrAccNum">0908111222</span>
+                        <button type="button" class="btn-copy-chip" onclick="copyToClipboard('0908111222', 'Số tài khoản')">
+                          <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                      </div>
+                    </div>
+                    <div class="vietqr-detail-row">
+                      <span class="vietqr-label">Chủ tài khoản:</span>
+                      <span class="vietqr-val">NGUYEN MINH TRIET (SPORTHUB)</span>
+                    </div>
+                    <div class="vietqr-detail-row">
+                      <span class="vietqr-label">Số tiền cần chuyển:</span>
+                      <div class="vietqr-val-group">
+                        <span class="vietqr-val" id="vietqrPayAmount" style="color:#059669;font-size:16px;">30.000đ</span>
+                        <button type="button" class="btn-copy-chip" onclick="copyPayAmount()">
+                          <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                      </div>
+                    </div>
+                    <div class="vietqr-detail-row">
+                      <span class="vietqr-label">Nội dung chuyển khoản:</span>
+                      <div class="vietqr-val-group">
+                        <span class="vietqr-val" id="vietqrTransferNote">SPORT DS999</span>
+                        <button type="button" class="btn-copy-chip" onclick="copyTransferNote()">
+                          <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MoMo Notice Box -->
+                <div id="momoNoticeBox" style="display:none;background:#FDF2F8;border:1.5px solid #FBCFE8;border-radius:14px;padding:20px;text-align:center;">
+                  <i class="fa-solid fa-wallet" style="font-size:36px;color:#DB2777;margin-bottom:10px;"></i>
+                  <h4 style="font-size:15px;font-weight:800;color:#831843;margin-bottom:6px;">Chuyển tiền nhanh qua Ví MoMo</h4>
+                  <p style="font-size:13px;color:#9D174D;margin-bottom:12px;">Số điện thoại MoMo: <strong>0908111222</strong> (NGUYEN MINH TRIET). Vui lòng ghi mã đặt sân vào lời nhắn.</p>
+                  <button type="button" class="btn-copy-chip" style="background:#FCE7F3;border-color:#F472B6;color:#BE185D;" onclick="copyToClipboard('0908111222', 'Số MoMo')">
+                    <i class="fa-regular fa-copy"></i> Sao chép số MoMo
+                  </button>
+                </div>
+
+                <!-- VNPAY Notice Box -->
+                <div id="vnpayNoticeBox" style="display:none;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:14px;padding:20px;text-align:center;">
+                  <i class="fa-regular fa-credit-card" style="font-size:36px;color:#2563EB;margin-bottom:10px;"></i>
+                  <h4 style="font-size:15px;font-weight:800;color:#1E3A8A;margin-bottom:6px;">Cổng thanh toán liên ngân hàng VNPAY-QR</h4>
+                  <p style="font-size:13px;color:#1D4ED8;">Sau khi bấm xác nhận, hệ thống sẽ tự động tạo giao dịch cọc an toàn được mã hóa 256-bit SSL.</p>
+                </div>
+
+                <!-- Quick Transfer Info Reminder -->
+                <div style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:12px;padding:12px 16px;font-size:12.5px;color:#065F46;margin-top:16px;display:flex;align-items:center;gap:10px;">
+                  <i class="fa-solid fa-circle-check" style="font-size:16px;color:#059669;flex-shrink:0;"></i>
+                  <span>Sau khi chuyển khoản trên ứng dụng ngân hàng, vui lòng bấm nút <strong>"Xác nhận đã thanh toán"</strong> bên phải để hệ thống hoàn tất đặt sân.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT PANEL: Tóm tắt thanh toán & Nút Xác nhận -->
+            <div class="wizard-right-panel">
+              <div class="summary-card-header">
+                <i class="fa-solid fa-shield-halved"></i>
+                <h3>Xác nhận thanh toán</h3>
+              </div>
+
+              <div class="summary-list">
+                <div class="summary-row">
+                  <span class="summary-label"><i class="fa-solid fa-location-dot"></i> Sân</span>
+                  <span class="summary-val" id="step4CourtDetail">Sân bóng đá 1</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label"><i class="fa-regular fa-calendar"></i> Thời gian</span>
+                  <span class="summary-val" id="step4DateTime">17/10/2026 (07:00 - 07:30)</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label"><i class="fa-regular fa-clock"></i> Thời lượng</span>
+                  <span class="summary-val" id="step4Duration">30 phút</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label"><i class="fa-solid fa-tags"></i> Tổng tiền sân</span>
+                  <span class="summary-val" id="step4Total">100.000đ</span>
+                </div>
+
+                <!-- Live Amount To Pay Right Now -->
+                <div style="background:#ECFDF5;border:1.5px solid #A7F3D0;border-radius:12px;padding:14px;margin-top:14px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:13px;font-weight:700;color:#065F46;" id="lblStep4PayNowTitle">
+                      <i class="fa-solid fa-credit-card" style="color:#059669;"></i> Tiền cần thanh toán ngay:
+                    </span>
+                    <span id="step4AmountToPayNow" style="font-size:20px;font-weight:800;color:#047857;">30.000đ</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12px;color:#047857;" id="rowStep4Remaining">
+                    <span>Còn lại thanh toán tại sân:</span>
+                    <strong id="step4Remaining">70.000đ</strong>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:12px;color:#64748B;">
+                    <span>Phương thức:</span>
+                    <strong id="step4PaymentMethodDisplay" style="color:#0F172A;">Chuyển khoản VietQR</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="summary-action-btns">
+                <button type="button" class="btn-wizard-back" onclick="goToStep3()">
+                  <i class="fa-solid fa-arrow-left"></i>
+                  <span>Quay lại</span>
+                </button>
+                <button type="button" class="btn-wizard-next btn-pay-confirm" id="btnSubmitPayment" onclick="submitBookingPayment()">
+                  <i class="fa-solid fa-circle-check"></i>
+                  <span>Xác nhận đã thanh toán</span>
+                </button>
+              </div>
+
+              <div class="summary-security-note">
+                <i class="fa-solid fa-lock"></i>
+                <span>Bảo mật giao dịch bởi SportHub Smart Pay</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           SUCCESS VIEW: ĐẶT SÂN & THANH TOÁN THÀNH CÔNG
+           ================================================================== -->
+      <div id="viewSuccess" class="wizard-step-container" style="display: none;">
+        <div class="wizard-body-wrapper">
+          <div class="wizard-success-card">
+            
+            <div class="success-celebrate-circle">
+              <i class="fa-solid fa-check"></i>
+            </div>
+
+            <h2 class="success-title">Đặt Sân Thành Công!</h2>
+            <p class="success-subtitle">
+              Yêu cầu đặt sân của bạn đã được hệ thống ghi nhận và khóa lịch bảo đảm 100%.
+            </p>
+
+            <div class="success-ticket-box">
+              <div class="success-ticket-header">
+                <div>
+                  <span style="font-size:12px;color:#64748B;font-weight:600;display:block;">MÃ PHIẾU ĐẶT SÂN</span>
+                  <span class="success-code-val" id="successBookingCode">DS2026101701</span>
+                </div>
+                <button type="button" class="btn-copy-chip" onclick="copyBookingCode()">
+                  <i class="fa-regular fa-copy"></i> Sao chép mã
+                </button>
+              </div>
+
+              <div class="success-row">
+                <span class="success-row-label"><i class="fa-solid fa-location-dot"></i> Sân thi đấu:</span>
+                <span class="success-row-val" id="successCourtName">Sân bóng đá 1</span>
+              </div>
+              <div class="success-row">
+                <span class="success-row-label"><i class="fa-solid fa-map-pin"></i> Địa điểm:</span>
+                <span class="success-row-val" id="successLocation">SportUTE</span>
+              </div>
+              <div class="success-row">
+                <span class="success-row-label"><i class="fa-regular fa-calendar"></i> Thời gian:</span>
+                <span class="success-row-val" id="successDateTime">17/10/2026 (07:00 - 07:30)</span>
+              </div>
+              <div class="success-row">
+                <span class="success-row-label"><i class="fa-regular fa-clock"></i> Thời lượng:</span>
+                <span class="success-row-val" id="successDuration">30 phút</span>
+              </div>
+              <div class="success-row">
+                <span class="success-row-label"><i class="fa-solid fa-shield-halved"></i> Tiền đã thanh toán:</span>
+                <span class="success-row-val" id="successDepositPaid" style="color:#059669;font-size:15px;">30.000đ (VietQR)</span>
+              </div>
+              <div class="success-row" id="rowSuccessRemaining">
+                <span class="success-row-label"><i class="fa-solid fa-hand-holding-dollar"></i> Còn lại thanh toán tại quầy:</span>
+                <span class="success-row-val" id="successRemaining">70.000đ</span>
+              </div>
+              <div class="success-row">
+                <span class="success-row-label"><i class="fa-solid fa-circle-check"></i> Trạng thái phiếu:</span>
+                <span class="success-row-val">
+                  <span style="background:#ECFDF5;color:#047857;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12.5px;border:1px solid #A7F3D0;" id="successBookingStatusBadge">
+                    <i class="fa-solid fa-circle-check"></i> Đã xác nhận
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div class="success-email-notice">
+              <i class="fa-regular fa-envelope"></i>
+              <span>Vé điện tử và hướng dẫn nhận sân đã được gửi tới email của bạn. Khung giờ sân đã được khóa giữ chỗ an toàn!</span>
+            </div>
+
+            <div class="success-actions">
+              <button type="button" class="btn-success-home" onclick="finishAndGoHome()">
+                <i class="fa-solid fa-house"></i>
+                <span>Quay về trang chủ</span>
+              </button>
+              <button type="button" class="btn-success-history" onclick="window.location.href='/customer/history'">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Xem lịch sử đặt sân</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
       </div>
 
     </div>
   </div>
 
   <!-- ========================================================================
-       JAVASCRIPT INTERACTIONS
+       NOTIFICATION DETAIL POPUP MODAL (Xem chi tiết thông báo)
+       ======================================================================== -->
+  <div class="notif-modal-backdrop" id="notifDetailModal" onclick="handleNotifModalBackdrop(event)">
+    <div class="notif-modal-card">
+      <div class="notif-modal-header">
+        <div class="notif-modal-header-title">
+          <i class="fa-solid fa-bell text-success" id="notifModalIcon"></i>
+          <span id="notifModalHeaderTitle">Chi tiết thông báo</span>
+        </div>
+        <button type="button" class="btn-close-wizard" onclick="closeNotifModal()" title="Đóng" style="font-size: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: none; background: #f1f5f9; cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="notif-modal-body">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span id="notifModalBadge" style="display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: #e6f9ed; color: #059669;">Hệ thống</span>
+          <span id="notifModalTime" style="font-size: 12px; color: #94a3b8;"><i class="fa-regular fa-clock"></i> Vừa xong</span>
+        </div>
+        <h3 id="notifModalTitle" style="font-size: 17px; font-weight: 800; color: #0f172a; margin-bottom: 12px; line-height: 1.4;">Tiêu đề thông báo</h3>
+        <div id="notifModalContent" style="font-size: 14px; color: #334155; line-height: 1.6; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; white-space: pre-line;">
+          Nội dung thông báo
+        </div>
+        <div id="notifModalExtraDetails" style="display: none; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;">
+          <!-- Chi tiết đặt sân -->
+        </div>
+      </div>
+      <div class="notif-modal-footer">
+        <button type="button" id="btnNotifActionSecondary" class="btn-secondary" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; font-weight: 600; font-size: 13px;" onclick="closeNotifModal()">Đóng</button>
+        <button type="button" id="btnNotifActionPrimary" class="btn-primary-action" style="padding: 8px 16px; border-radius: 8px; border: none; background: #059669; color: #fff; cursor: pointer; font-weight: 600; font-size: 13px;" onclick="handleNotifActionPrimary()">Xem lịch đặt của tôi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal (Màn hình xác nhận đăng xuất chuyên nghiệp) -->
+  <div class="logout-modal-backdrop" id="logoutConfirmModal" onclick="handleLogoutModalBackdrop(event)">
+    <div class="logout-modal-card">
+      <div class="logout-modal-icon">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </div>
+      <h3 class="logout-modal-title">Xác nhận đăng xuất</h3>
+      <p class="logout-modal-desc">
+        Bạn có chắc chắn muốn đăng xuất khỏi tài khoản SportHub không?<br>
+        Phiên làm việc hiện tại của bạn sẽ được kết thúc an toàn.
+      </p>
+      <div class="logout-modal-actions">
+        <button type="button" class="btn-logout-cancel" onclick="closeLogoutModal()">Hủy bỏ</button>
+        <button type="button" class="btn-logout-confirm" onclick="confirmLogoutAction()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất ngay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <form id="globalLogoutForm" th:action="@{/logout}" method="post" style="display:none;"></form>
+
+
+  <!-- ========================================================================
+       JAVASCRIPT INTERACTIONS (FULL-SCREEN, BRAND GREEN & CHECKOUT)
        ======================================================================== -->
   <script th:inline="javascript">
+    // Khóa định danh bất biến theo Khóa chính Database (Customer ID - Primary Key)
+    const CURRENT_USER_KEY = /*[[${currentUser != null and currentUser.customerId != null ? currentUser.customerId : (currentUser != null ? currentUser.username : 'guest')}]]*/ 'guest';
+    const SERVER_FAVORITES = /*[[${userFavorites != null ? userFavorites : {}}]]*/ [];
+    const FAVORITES_KEY = 'sporthub_favorites_' + CURRENT_USER_KEY;
+    const AVATAR_KEY = 'sporthub_custom_avatar_' + CURRENT_USER_KEY;
+    const NOTIF_KEY = 'sporthub_notifications_' + CURRENT_USER_KEY;
+
     // Danh sách tất cả sân thể thao được Spring inject
     const ALL_COURTS = [
       /*[# th:each="c : ${allCourts}"]*/
@@ -2088,7 +3557,7 @@
     let currentHourlyRate = 100000;
 
     let selectedDate = new Date().toISOString().split('T')[0];
-    let carouselStartDate = new Date(); // Ngày bắt đầu của dải 7 ngày carousel
+    let carouselStartDate = new Date();
     let bookedSlotsSet = new Set();
 
     let selectedStartSlot = null;
@@ -2096,7 +3565,18 @@
     let selectedDurationMinutes = 0;
     let selectedTotalAmount = 0;
 
-    // Mở modal khi người dùng bấm 'Đặt sân' ở trang chủ
+    // Thông tin hạng thành viên và giảm giá
+    const CUSTOMER_TIER_PERCENT = /*[[${tierDiscountPercent != null ? tierDiscountPercent : 5}]]*/ 5;
+    const CUSTOMER_TIER_NAME = /*[[${membershipTier != null ? membershipTier : 'Thành viên Bạc'}]]*/ 'Thành viên Bạc';
+
+    // State thanh toán Step 3
+    let currentDepositChoice = 'DEPOSIT_30';
+    let currentPaymentMethod = 'Chuyển khoản VietQR';
+    let currentVoucherCode = '';
+    let currentVoucherDiscount = 0;
+    let currentDiscountAmount = 0;
+
+    // Mở wizard toàn màn hình khi người dùng bấm 'Đặt sân' ở trang chủ
     function openBookingModal(btn) {
       const id = btn.getAttribute('data-id');
       const name = btn.getAttribute('data-name');
@@ -2112,11 +3592,17 @@
       currentLocation = loc;
       currentHourlyRate = rate;
 
-      // Reset các slot đã chọn
+      // Reset slot đã chọn
       selectedStartSlot = null;
       selectedEndSlot = null;
       selectedDurationMinutes = 0;
       selectedTotalAmount = 0;
+
+      // Reset state thanh toán
+      currentDepositChoice = 'DEPOSIT_30';
+      currentPaymentMethod = 'Chuyển khoản VietQR';
+      currentVoucherCode = '';
+      currentDiscountAmount = 0;
 
       // Đồng bộ ngày nếu ở bộ lọc tìm kiếm có chọn
       const homeDate = document.getElementById('dateInput') ? document.getElementById('dateInput').value : '';
@@ -2131,8 +3617,17 @@
       // Đưa về Bước 2
       goToStep2();
 
-      // Render các sân con của môn thể thao
-      renderSubcourtPills();
+      // Cập nhật banner sân đang chọn (thay thế nút chọn sân con)
+      document.getElementById('bannerCourtName').textContent = currentCourtName;
+      document.getElementById('bannerSportName').textContent = currentSportName;
+      document.getElementById('bannerLocation').textContent = currentLocation;
+      document.getElementById('bannerHourlyRate').textContent = formatVND(currentHourlyRate) + '/giờ';
+
+      const bannerIcon = document.getElementById('bannerSportIcon');
+      if (currentSportId === 'M_BD') bannerIcon.innerHTML = '<i class="fa-regular fa-futbol"></i>';
+      else if (currentSportId === 'M_CL') bannerIcon.innerHTML = '<i class="fa-solid fa-feather-pointed"></i>';
+      else if (currentSportId === 'M_BR') bannerIcon.innerHTML = '<i class="fa-solid fa-basketball"></i>';
+      else bannerIcon.innerHTML = '<i class="fa-solid fa-table-tennis-paddle-ball"></i>';
 
       // Render carousel 7 ngày
       renderDateCarousel();
@@ -2143,107 +3638,425 @@
       // Gọi API lấy dữ liệu lịch đặt từ database
       fetchCourtSlotsAndRender();
 
-      // Mở modal
+      // Khóa scroll trang cha và hiển thị màn hình đặt sân toàn màn hình
+      document.body.style.overflow = 'hidden';
       const modal = document.getElementById('bookingWizardModal');
       modal.classList.add('show');
     }
 
     function closeBookingModal() {
+      document.body.style.overflow = '';
       const modal = document.getElementById('bookingWizardModal');
       modal.classList.remove('show');
     }
 
-    // Chuyển giữa Bước 2 và Bước 3
+    // Chuyển sang Bước 2 (Chọn ngày & giờ)
     function goToStep2() {
       document.getElementById('viewStep2').style.display = 'block';
       document.getElementById('viewStep3').style.display = 'none';
+      document.getElementById('viewStep4').style.display = 'none';
+      document.getElementById('viewSuccess').style.display = 'none';
 
       const s2 = document.getElementById('stepperStep2');
       const s3 = document.getElementById('stepperStep3');
+      const s4 = document.getElementById('stepperStep4');
       const l23 = document.getElementById('stepperLine23');
       const l34 = document.getElementById('stepperLine34');
 
       s2.className = 'wizard-step-item step-active';
       s3.className = 'wizard-step-item step-upcoming';
+      s4.className = 'wizard-step-item step-upcoming';
       l23.className = 'wizard-step-line';
       l34.className = 'wizard-step-line';
     }
 
+    // Chuyển sang Bước 3 (Xác nhận thông tin & Mức cọc)
     function goToStep3() {
       if (!selectedStartSlot || !selectedEndSlot) {
-        alert('Vui lòng chọn 2 khung giờ bất kỳ trên bảng để xác định giờ bắt đầu và kết thúc!');
+        showToast('Vui lòng click 2 khung giờ bất kỳ trên bảng để xác định giờ bắt đầu và kết thúc!', true);
         return;
       }
 
       document.getElementById('viewStep2').style.display = 'none';
       document.getElementById('viewStep3').style.display = 'block';
+      document.getElementById('viewStep4').style.display = 'none';
+      document.getElementById('viewSuccess').style.display = 'none';
 
       const s2 = document.getElementById('stepperStep2');
       const s3 = document.getElementById('stepperStep3');
+      const s4 = document.getElementById('stepperStep4');
       const l23 = document.getElementById('stepperLine23');
+      const l34 = document.getElementById('stepperLine34');
 
       s2.className = 'wizard-step-item step-completed';
       s3.className = 'wizard-step-item step-active';
-      l23.className = 'wizard-step-line active-red';
+      s4.className = 'wizard-step-item step-upcoming';
+      l23.className = 'wizard-step-line active-green';
+      l34.className = 'wizard-step-line';
 
-      // Gán dữ liệu sang Step 3
+      // Đổ dữ liệu sang form Step 3
       document.getElementById('finalCourtId').value = currentCourtId;
       document.getElementById('finalBookingDate').value = selectedDate;
       document.getElementById('finalStartTime').value = selectedStartSlot;
       document.getElementById('finalDurationMinutes').value = selectedDurationMinutes;
       document.getElementById('finalTotalAmount').value = selectedTotalAmount;
 
-      document.getElementById('step3CourtLocation').textContent = currentLocation;
       document.getElementById('step3CourtDetail').textContent = currentCourtName + ' (' + currentSportName + ')';
+      document.getElementById('step3CourtLocation').textContent = currentLocation;
       document.getElementById('step3DateTime').textContent = formatDateVN(selectedDate) + ' (' + selectedStartSlot + ' - ' + selectedEndSlot + ')';
       document.getElementById('step3Duration').textContent = selectedDurationMinutes + ' phút (' + (selectedDurationMinutes / 60) + ' giờ)';
-      document.getElementById('step3Total').textContent = formatVND(selectedTotalAmount);
+      document.getElementById('step3BasePrice').textContent = formatVND(selectedTotalAmount);
 
-      const deposit = Math.round(selectedTotalAmount * 0.3);
-      const remaining = selectedTotalAmount - deposit;
-      document.getElementById('step3Deposit').textContent = formatVND(deposit);
-      document.getElementById('step3Remaining').textContent = formatVND(remaining);
+      updateStep3Calculations();
     }
 
-    // Render danh sách sân con dạng radio pills
-    function renderSubcourtPills() {
-      const container = document.getElementById('subcourtPillsGroup');
-      const titleLabel = document.getElementById('subcourtTitleLabel');
-      titleLabel.textContent = 'Chọn sân ' + currentSportName;
-
-      container.innerHTML = '';
-
-      let matchingCourts = ALL_COURTS.filter(c => c.sportId === currentSportId);
-      if (matchingCourts.length === 0) {
-        matchingCourts = [ { id: currentCourtId, name: currentCourtName } ];
+    // Chuyển sang Bước 4 (Màn hình Thanh toán)
+    function goToStep4() {
+      if (!selectedStartSlot || !selectedEndSlot) {
+        showToast('Vui lòng chọn khung giờ trước khi thanh toán!', true);
+        return;
       }
 
-      matchingCourts.forEach(c => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'subcourt-pill-btn' + (c.id === currentCourtId ? ' active' : '');
-        btn.innerHTML = `<span class="pill-radio-dot"></span><span>${c.name}</span>`;
+      document.getElementById('viewStep2').style.display = 'none';
+      document.getElementById('viewStep3').style.display = 'none';
+      document.getElementById('viewStep4').style.display = 'block';
+      document.getElementById('viewSuccess').style.display = 'none';
 
-        btn.onclick = () => {
-          if (currentCourtId !== c.id) {
-            currentCourtId = c.id;
-            currentCourtName = c.name;
-            if (c.location) currentLocation = c.location;
+      const s2 = document.getElementById('stepperStep2');
+      const s3 = document.getElementById('stepperStep3');
+      const s4 = document.getElementById('stepperStep4');
+      const l23 = document.getElementById('stepperLine23');
+      const l34 = document.getElementById('stepperLine34');
 
-            // Reset khung giờ
-            selectedStartSlot = null;
-            selectedEndSlot = null;
-            selectedDurationMinutes = 0;
-            selectedTotalAmount = 0;
+      s2.className = 'wizard-step-item step-completed';
+      s3.className = 'wizard-step-item step-completed';
+      s4.className = 'wizard-step-item step-active';
+      l23.className = 'wizard-step-line active-green';
+      l34.className = 'wizard-step-line active-green';
 
-            renderSubcourtPills();
-            updateRightPanel();
-            fetchCourtSlotsAndRender();
-          }
-        };
+      // Đổ dữ liệu sang Step 4
+      document.getElementById('step4CourtDetail').textContent = currentCourtName + ' (' + currentSportName + ')';
+      document.getElementById('step4DateTime').textContent = formatDateVN(selectedDate) + ' (' + selectedStartSlot + ' - ' + selectedEndSlot + ')';
+      document.getElementById('step4Duration').textContent = selectedDurationMinutes + ' phút';
 
-        container.appendChild(btn);
+      const totalAfterDiscount = Math.max(0, selectedTotalAmount - currentDiscountAmount);
+      document.getElementById('step4Total').textContent = formatVND(totalAfterDiscount);
+
+      let payNow = totalAfterDiscount;
+      let remaining = 0;
+      if (currentDepositChoice === 'DEPOSIT_30') {
+        payNow = Math.round(totalAfterDiscount * 0.3);
+        remaining = totalAfterDiscount - payNow;
+        document.getElementById('lblStep4PayNowTitle').innerHTML = '<i class="fa-solid fa-credit-card" style="color:#059669;"></i> Tiền cọc cần thanh toán ngay (30%):';
+        document.getElementById('rowStep4Remaining').style.display = 'flex';
+      } else {
+        document.getElementById('lblStep4PayNowTitle').innerHTML = '<i class="fa-solid fa-check-double" style="color:#059669;"></i> Tiền thanh toán trọn gói 100%:';
+        document.getElementById('rowStep4Remaining').style.display = 'none';
+      }
+
+      document.getElementById('step4AmountToPayNow').textContent = formatVND(payNow);
+      document.getElementById('step4Remaining').textContent = formatVND(remaining);
+      document.getElementById('step4PaymentMethodDisplay').textContent = currentPaymentMethod;
+
+      updateVietQRDetails();
+    }
+
+    // Lựa chọn cọc 30% hoặc toàn bộ 100%
+    function selectDepositChoice(choice) {
+      currentDepositChoice = choice;
+      document.getElementById('finalDepositChoice').value = choice;
+
+      const opt30 = document.getElementById('optDeposit30');
+      const opt100 = document.getElementById('optDeposit100');
+      const dot30 = document.getElementById('radioDot30');
+      const dot100 = document.getElementById('radioDot100');
+
+      if (choice === 'DEPOSIT_30') {
+        opt30.classList.add('selected');
+        opt100.classList.remove('selected');
+        dot30.className = 'fa-solid fa-circle-dot';
+        dot30.style.color = '#059669';
+        dot100.className = 'fa-regular fa-circle';
+        dot100.style.color = '#CBD5E1';
+        document.getElementById('lblPayNowTitle').innerHTML = '<i class="fa-solid fa-shield-halved" style="color:#059669;"></i> Tiền thanh toán ngay (30% cọc):';
+        document.getElementById('rowRemainingAtCounter').style.display = 'flex';
+      } else {
+        opt100.classList.add('selected');
+        opt30.classList.remove('selected');
+        dot100.className = 'fa-solid fa-circle-dot';
+        dot100.style.color = '#059669';
+        dot30.className = 'fa-regular fa-circle';
+        dot30.style.color = '#CBD5E1';
+        document.getElementById('lblPayNowTitle').innerHTML = '<i class="fa-solid fa-check-double" style="color:#059669;"></i> Thanh toán trọn gói 100%:';
+        document.getElementById('rowRemainingAtCounter').style.display = 'none';
+      }
+
+      updateStep3Calculations();
+      updateVietQRDetails();
+    }
+
+    // Lựa chọn phương thức thanh toán
+    function selectPayMethod(method) {
+      currentPaymentMethod = method;
+      document.getElementById('finalPaymentMethod').value = method;
+
+      const pills = [
+        { id: 'payMethodVietQR', name: 'Chuyển khoản VietQR' },
+        { id: 'payMethodMoMo', name: 'Ví MoMo' },
+        { id: 'payMethodVNPAY', name: 'Cổng VNPAY' }
+      ];
+
+      pills.forEach(p => {
+        const el = document.getElementById(p.id);
+        if (el) {
+          if (p.name === method) el.classList.add('active');
+          else el.classList.remove('active');
+        }
       });
+
+      if (document.getElementById('step4PaymentMethodDisplay')) {
+        document.getElementById('step4PaymentMethodDisplay').textContent = method;
+      }
+
+      // Toggle các khung thông tin hướng dẫn
+      document.getElementById('vietqrShowcaseBox').style.display = (method === 'Chuyển khoản VietQR') ? 'grid' : 'none';
+      document.getElementById('momoNoticeBox').style.display = (method === 'Ví MoMo') ? 'block' : 'none';
+      document.getElementById('vnpayNoticeBox').style.display = (method === 'Cổng VNPAY') ? 'block' : 'none';
+    }
+
+    // Áp dụng mã Voucher
+    function applyVoucherCode() {
+      const code = (document.getElementById('inputVoucherCode').value || '').trim().toUpperCase();
+      const feedback = document.getElementById('voucherFeedbackMsg');
+
+      if (!code) {
+        currentVoucherDiscount = 0;
+        currentVoucherCode = '';
+        feedback.style.display = 'none';
+        updateStep3Calculations();
+        return;
+      }
+
+      if (code === 'SPORTUTE10') {
+        currentVoucherCode = code;
+        currentVoucherDiscount = Math.round(selectedTotalAmount * 0.1);
+        feedback.style.display = 'block';
+        feedback.style.color = '#059669';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SPORTUTE10: Giảm 10% tổng hóa đơn (-' + formatVND(currentVoucherDiscount) + ')!';
+      } else if (code === 'SVUTE') {
+        currentVoucherCode = code;
+        currentVoucherDiscount = 20000;
+        if (currentVoucherDiscount > selectedTotalAmount) currentVoucherDiscount = selectedTotalAmount;
+        feedback.style.display = 'block';
+        feedback.style.color = '#059669';
+        feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SVUTE: Giảm trực tiếp 20.000đ!';
+      } else {
+        currentVoucherCode = '';
+        currentVoucherDiscount = 0;
+        feedback.style.display = 'block';
+        feedback.style.color = '#EF4444';
+        feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Mã ưu đãi không tồn tại hoặc đã hết hạn!';
+      }
+
+      document.getElementById('finalVoucherCode').value = currentVoucherCode;
+      updateStep3Calculations();
+      updateVietQRDetails();
+    }
+
+    // Cập nhật số tiền thanh toán hiển thị kết hợp cả ưu đãi thành viên và voucher
+    function updateStep3Calculations() {
+      // 1. Tính giảm giá hội viên theo cấp bậc
+      let tierDiscount = (CUSTOMER_TIER_PERCENT > 0) ? Math.round(selectedTotalAmount * (CUSTOMER_TIER_PERCENT / 100)) : 0;
+      
+      // 2. Tổng giảm giá = giảm giá hội viên + voucher
+      currentDiscountAmount = tierDiscount + currentVoucherDiscount;
+      if (currentDiscountAmount > selectedTotalAmount) currentDiscountAmount = selectedTotalAmount;
+
+      document.getElementById('finalDiscountAmount').value = currentDiscountAmount;
+
+      const totalAfterDiscount = Math.max(0, selectedTotalAmount - currentDiscountAmount);
+      document.getElementById('step3Total').textContent = formatVND(totalAfterDiscount);
+
+      // Hiển thị dòng ưu đãi hội viên
+      const rowTier = document.getElementById('rowTierDiscount');
+      if (rowTier) {
+        if (tierDiscount > 0) {
+          rowTier.style.display = 'flex';
+          const tierNameEl = document.getElementById('step3TierName');
+          if (tierNameEl) tierNameEl.textContent = CUSTOMER_TIER_NAME + ' (-' + CUSTOMER_TIER_PERCENT + '%)';
+          document.getElementById('step3TierDiscountVal').textContent = '-' + formatVND(tierDiscount);
+        } else {
+          rowTier.style.display = 'none';
+        }
+      }
+
+      // Hiển thị dòng voucher
+      const rowVoucher = document.getElementById('rowVoucherDiscount');
+      if (currentVoucherDiscount > 0) {
+        rowVoucher.style.display = 'flex';
+        document.getElementById('step3DiscountVal').textContent = '-' + formatVND(currentVoucherDiscount);
+      } else {
+        rowVoucher.style.display = 'none';
+      }
+
+      let payNow = totalAfterDiscount;
+      let remaining = 0;
+
+      if (currentDepositChoice === 'DEPOSIT_30') {
+        payNow = Math.round(totalAfterDiscount * 0.3);
+        remaining = totalAfterDiscount - payNow;
+      }
+
+      document.getElementById('step3AmountToPayNow').textContent = formatVND(payNow);
+      document.getElementById('step3Remaining').textContent = formatVND(remaining);
+      document.getElementById('vietqrPayAmount').textContent = formatVND(payNow);
+    }
+
+    // Cập nhật ảnh mã VietQR và thông tin chuyển khoản động
+    function updateVietQRDetails() {
+      const totalAfterDiscount = Math.max(0, selectedTotalAmount - currentDiscountAmount);
+      let payNow = totalAfterDiscount;
+      if (currentDepositChoice === 'DEPOSIT_30') {
+        payNow = Math.round(totalAfterDiscount * 0.3);
+      }
+
+      const phone = document.getElementById('custPhoneDisplay') ? document.getElementById('custPhoneDisplay').value.replace(/\D/g, '') : '0908111222';
+      const cleanCourtId = currentCourtId ? currentCourtId.replace(/[^a-zA-Z0-9]/g, '') : 'SAN';
+      const transferMemo = `SPORT ${cleanCourtId} ${phone.slice(-4)}`;
+
+      document.getElementById('vietqrTransferNote').textContent = transferMemo;
+
+      // Sinh URL VietQR nhanh và sắc nét qua api
+      const qrData = `2|99|0908111222|NGUYEN MINH TRIET|${payNow}|0|0|${transferMemo}`;
+      const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=6&data=${encodeURIComponent(qrData)}`;
+      document.getElementById('vietqrImage').src = qrImgUrl;
+    }
+
+    function copyToClipboard(text, label) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`Đã sao chép ${label}: ${text}`);
+        });
+      } else {
+        const temp = document.createElement('input');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        showToast(`Đã sao chép ${label}: ${text}`);
+      }
+    }
+
+    function copyPayAmount() {
+      const text = document.getElementById('vietqrPayAmount').textContent.replace(/\D/g, '');
+      copyToClipboard(text, 'Số tiền');
+    }
+
+    function copyTransferNote() {
+      const text = document.getElementById('vietqrTransferNote').textContent;
+      copyToClipboard(text, 'Nội dung chuyển khoản');
+    }
+
+    // Xác nhận thanh toán qua API & hiển thị màn hình thành công
+    function submitBookingPayment() {
+      const btn = document.getElementById('btnSubmitPayment');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Đang xác nhận giữ sân...</span>';
+
+      const formData = new FormData();
+      formData.append('courtId', currentCourtId);
+      formData.append('bookingDate', selectedDate);
+      formData.append('startTime', selectedStartSlot);
+      formData.append('durationMinutes', selectedDurationMinutes);
+      formData.append('totalAmount', selectedTotalAmount);
+      formData.append('paymentMethod', currentPaymentMethod);
+      formData.append('depositChoice', currentDepositChoice);
+      formData.append('voucherCode', currentVoucherCode);
+      formData.append('discountAmount', currentDiscountAmount);
+      const note = document.getElementById('inputBookingNote') ? document.getElementById('inputBookingNote').value : '';
+      formData.append('note', note);
+
+      fetch('/customer/booking/api/confirm', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        if (data.success) {
+          showSuccessView(data.bookingId || ('DS' + Date.now().toString().slice(-8)));
+        } else {
+          showToast(data.message || 'Đặt sân không thành công, vui lòng thử lại!', true);
+        }
+      })
+      .catch(err => {
+        console.error('Confirm error:', err);
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        showToast('Có lỗi xảy ra khi xác nhận đặt sân. Vui lòng thử lại!', true);
+      });
+    }
+
+    // Hiển thị màn hình đặt sân thành công
+    function showSuccessView(bookingId) {
+      document.getElementById('viewStep2').style.display = 'none';
+      document.getElementById('viewStep3').style.display = 'none';
+      document.getElementById('viewStep4').style.display = 'none';
+      document.getElementById('viewSuccess').style.display = 'block';
+
+      // Cập nhật Stepper: Tất cả các bước hoàn tất
+      const s4 = document.getElementById('stepperStep4');
+      if (s4) {
+        s4.className = 'wizard-step-item step-completed';
+        s4.innerHTML = '<div class="wizard-step-circle"><i class="fa-solid fa-check"></i></div><span class="wizard-step-label">4. Hoàn tất</span>';
+      }
+
+      // Đổ dữ liệu chi tiết vào phiếu xác nhận thành công
+      document.getElementById('successBookingCode').textContent = bookingId;
+      document.getElementById('successCourtName').textContent = currentCourtName + ' (' + currentSportName + ')';
+      document.getElementById('successLocation').textContent = currentLocation;
+      document.getElementById('successDateTime').textContent = formatDateVN(selectedDate) + ' (' + selectedStartSlot + ' - ' + selectedEndSlot + ')';
+      document.getElementById('successDuration').textContent = selectedDurationMinutes + ' phút (' + (selectedDurationMinutes / 60) + ' giờ)';
+
+      const totalAfterDiscount = Math.max(0, selectedTotalAmount - currentDiscountAmount);
+      let payNow = totalAfterDiscount;
+      let remaining = 0;
+      if (currentDepositChoice === 'DEPOSIT_30') {
+        payNow = Math.round(totalAfterDiscount * 0.3);
+        remaining = totalAfterDiscount - payNow;
+        document.getElementById('successDepositPaid').textContent = formatVND(payNow) + ' (' + currentPaymentMethod + ' - Cọc 30%)';
+        document.getElementById('successRemaining').textContent = formatVND(remaining);
+        document.getElementById('rowSuccessRemaining').style.display = 'flex';
+      } else {
+        document.getElementById('successDepositPaid').textContent = formatVND(payNow) + ' (' + currentPaymentMethod + ' - Trọn gói 100%)';
+        document.getElementById('rowSuccessRemaining').style.display = 'none';
+      }
+
+      // Tự động thêm thông báo đặt sân thành công (kích hoạt chấm đỏ thông báo theo yêu cầu)
+      if (typeof addBookingNotification === 'function') {
+        addBookingNotification({
+          bookingId: bookingId,
+          courtName: currentCourtName,
+          sportName: currentSportName,
+          location: currentLocation,
+          date: selectedDate,
+          time: `${selectedStartSlot} - ${selectedEndSlot}`,
+          amount: totalAfterDiscount
+        });
+      }
+    }
+
+    function copyBookingCode() {
+      const code = document.getElementById('successBookingCode').textContent;
+      copyToClipboard(code, 'Mã phiếu đặt sân');
+    }
+
+    function finishAndGoHome() {
+      closeBookingModal();
+      window.location.href = '/customer/booking';
     }
 
     // Render thanh trượt 7 ngày
@@ -2328,7 +4141,7 @@
     // Tải thông tin khung giờ đã đặt từ API
     function fetchCourtSlotsAndRender() {
       const grid = document.getElementById('timeSlotsGridContainer');
-      grid.innerHTML = '<div style="grid-column: span 4; text-align: center; padding: 24px; color: #64748B;"><i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật trạng thái sân...</div>';
+      grid.innerHTML = '<div style="grid-column: span 4; text-align: center; padding: 28px; color: #64748B;"><i class="fa-solid fa-spinner fa-spin"></i> Đang cập nhật lịch sân...</div>';
 
       fetch(`/customer/booking/api/court-slots?courtId=${currentCourtId}&date=${selectedDate}`)
         .then(res => {
@@ -2373,14 +4186,14 @@
         if (isBooked || isPast) {
           btn.classList.add('slot-booked');
           btn.disabled = true;
-          btn.title = isBooked ? 'Khung giờ này đã có người đặt trước' : 'Khung giờ đã qua';
+          btn.title = isBooked ? 'Khung giờ này đã có lịch xác nhận' : 'Khung giờ đã qua';
           btn.innerHTML = `<span>${time}</span>`;
         } else if (selectedStartSlot === time) {
           btn.classList.add('slot-start');
-          btn.innerHTML = `<span>${time}</span><span class="slot-state-label">BẮT ĐẦU</span>`;
+          btn.innerHTML = `<span>${time}</span><span class="slot-state-label"><i class="fa-solid fa-flag"></i> BẮT ĐẦU</span>`;
         } else if (selectedEndSlot === time) {
           btn.classList.add('slot-end');
-          btn.innerHTML = `<span>${time}</span><span class="slot-state-label">KẾT THÚC</span>`;
+          btn.innerHTML = `<span>${time}</span><span class="slot-state-label"><i class="fa-solid fa-flag-checkered"></i> KẾT THÚC</span>`;
         } else if (selectedStartSlot && selectedEndSlot && time > selectedStartSlot && time < selectedEndSlot) {
           btn.classList.add('slot-middle');
           btn.innerHTML = `<span>${time}</span>`;
@@ -2398,21 +4211,17 @@
     // Logic tick chọn 2 khung giờ bất kỳ (BẮT ĐẦU và KẾT THÚC)
     function handleSlotClick(clickedTime) {
       if (!selectedStartSlot || (selectedStartSlot && selectedEndSlot)) {
-        // Chưa chọn hoặc đã đủ 2 mốc -> Bắt đầu chọn mốc Bắt Đầu mới
         selectedStartSlot = clickedTime;
         selectedEndSlot = null;
         selectedDurationMinutes = 0;
         selectedTotalAmount = 0;
       } else {
-        // Đã có mốc Bắt Đầu, người dùng tick mốc thứ 2
         if (clickedTime === selectedStartSlot) {
-          // Bấm lại đúng ô đang chọn -> Hủy chọn
           selectedStartSlot = null;
           selectedEndSlot = null;
           selectedDurationMinutes = 0;
           selectedTotalAmount = 0;
         } else if (clickedTime < selectedStartSlot) {
-          // Bấm ô giờ nhỏ hơn -> Đổi ô đó thành bắt đầu nếu không bị vướng lịch đã đặt
           if (isRangeOccupied(clickedTime, selectedStartSlot)) {
             selectedStartSlot = clickedTime;
             selectedEndSlot = null;
@@ -2421,9 +4230,8 @@
             selectedStartSlot = clickedTime;
           }
         } else {
-          // Bấm ô giờ lớn hơn -> Kiểm tra nếu có slot nào ở giữa bị trùng lịch đã đặt
           if (isRangeOccupied(selectedStartSlot, clickedTime)) {
-            alert('Khung giờ bạn chọn có chứa thời gian đã có người đặt trước! Vui lòng chọn khoảng thời gian trống liên tục.');
+            showToast('Khung giờ bạn chọn có chứa thời gian đã có người đặt trước!', true);
             return;
           }
           selectedEndSlot = clickedTime;
@@ -2474,12 +4282,6 @@
       document.getElementById('summarySportName').textContent = currentSportName;
       document.getElementById('summarySubcourtName').textContent = currentCourtName;
 
-      const icon = document.getElementById('summarySubcourtIcon');
-      if (currentSportId === 'M_BD') icon.className = 'fa-regular fa-futbol';
-      else if (currentSportId === 'M_CL') icon.className = 'fa-solid fa-feather-pointed';
-      else if (currentSportId === 'M_BR') icon.className = 'fa-solid fa-basketball';
-      else icon.className = 'fa-regular fa-circle-dot';
-
       if (selectedStartSlot && selectedEndSlot) {
         document.getElementById('summaryTime').textContent = `${selectedStartSlot} - ${selectedEndSlot}`;
         document.getElementById('summaryPrice').textContent = formatVND(selectedTotalAmount);
@@ -2505,75 +4307,550 @@
       return `${d}/${m}/${y}`;
     }
 
-    // Đóng modal khi bấm Escape hoặc bấm nền ngoài
+    function showToast(msg, isError = false) {
+      const existing = document.querySelector('.toast-box');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'toast-box' + (isError ? ' error' : '');
+      toast.innerHTML = `
+        <i class="fa-solid ${isError ? 'fa-triangle-exclamation text-danger' : 'fa-circle-check text-success'}" style="font-size:20px;"></i>
+        <div style="font-size:13.5px;font-weight:600;color:#1E293B;">${msg}</div>
+      `;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 400);
+      }, 3500);
+    }
+
+    // Đóng modal khi bấm Escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeBookingModal();
     });
 
-    document.getElementById('bookingWizardModal').addEventListener('click', (e) => {
-      if (e.target.id === 'bookingWizardModal') closeBookingModal();
-    });
+    // =========================================================================
+    // QUICK SEARCH & SPORT / FAVORITE FILTERING (Tìm sân & Lọc sân)
+    // =========================================================================
+    let currentSportFilter = 'ALL';
+    let currentSearchKeyword = '';
 
-    // Toggle Favorite Heart
-    function toggleFavorite(btn, courtId) {
-      btn.classList.toggle('active');
-      const icon = btn.querySelector('i');
-      if (btn.classList.contains('active')) {
-        icon.className = 'fa-solid fa-heart';
-        let favs = JSON.parse(localStorage.getItem('sporthub_favorites') || '[]');
-        if (!favs.includes(courtId)) favs.push(courtId);
-        localStorage.setItem('sporthub_favorites', JSON.stringify(favs));
-      } else {
-        icon.className = 'fa-regular fa-heart';
-        let favs = JSON.parse(localStorage.getItem('sporthub_favorites') || '[]');
-        favs = favs.filter(id => id !== courtId);
-        localStorage.setItem('sporthub_favorites', JSON.stringify(favs));
+    let _inMemoryFavorites = (Array.isArray(SERVER_FAVORITES) && SERVER_FAVORITES.length > 0) ? [...SERVER_FAVORITES] : null;
+
+    function getFavorites() {
+      if (_inMemoryFavorites !== null) {
+        return _inMemoryFavorites;
       }
+      try {
+        const raw = JSON.parse(sessionStorage.getItem(FAVORITES_KEY) || '[]');
+        if (Array.isArray(raw) && raw.length > 0) {
+          _inMemoryFavorites = raw;
+          return _inMemoryFavorites;
+        }
+      } catch (e) {}
+      _inMemoryFavorites = (Array.isArray(SERVER_FAVORITES)) ? [...SERVER_FAVORITES] : [];
+      return _inMemoryFavorites;
     }
 
-    // Load initial favorites from localStorage
-    document.addEventListener('DOMContentLoaded', () => {
-      const favs = JSON.parse(localStorage.getItem('sporthub_favorites') || '[]');
-      favs.forEach(id => {
-        const card = document.getElementById('court-card-' + id);
-        if (card) {
-          const btn = card.querySelector('.btn-favorite');
-          if (btn) {
-            btn.classList.add('active');
-            btn.querySelector('i').className = 'fa-solid fa-heart';
+    function saveFavorites(list) {
+      _inMemoryFavorites = Array.isArray(list) ? [...list] : [];
+      try {
+        sessionStorage.setItem(FAVORITES_KEY, JSON.stringify(_inMemoryFavorites));
+      } catch (e) {}
+      updateFavoriteUI();
+    }
+
+    function updateFavoriteUI() {
+      const favs = getFavorites();
+      
+      // Cập nhật số lượng trên nút pill "Yêu thích" (ở giữa Tất cả và Bóng đá)
+      const pillBadge = document.getElementById('pillFavBadge');
+      if (pillBadge) {
+        pillBadge.textContent = `(${favs.length})`;
+      }
+
+      // Cập nhật trạng thái các icon tim trên thẻ sân
+      document.querySelectorAll('#courtCardGrid .court-card').forEach(card => {
+        const id = card.getAttribute('data-court-id');
+        const btn = card.querySelector('.btn-favorite');
+        if (btn && id) {
+          const isFav = favs.includes(id);
+          btn.classList.toggle('active', isFav);
+          const icon = btn.querySelector('i');
+          if (icon) {
+            icon.className = isFav ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+            icon.style.color = isFav ? '#ef4444' : '';
           }
         }
       });
+    }
 
-      // Auto-hide toast after 5s
-      const toast = document.getElementById('flashToast');
-      if (toast) {
-        setTimeout(() => {
-          toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-          toast.style.opacity = '0';
-          toast.style.transform = 'translateY(-10px)';
-          setTimeout(() => toast.remove(), 400);
-        }, 5000);
+    function toggleFavorite(btn, event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
       }
-    });
+      const card = btn.closest('.court-card');
+      if (!card) return;
+      const courtId = card.getAttribute('data-court-id');
+      if (!courtId) return;
 
-    // Filter by Favorite
-    function filterFavoriteOnly() {
-      const favs = JSON.parse(localStorage.getItem('sporthub_favorites') || '[]');
-      const cards = document.querySelectorAll('.court-card');
-      if (favs.length === 0) {
-        alert('Bạn chưa thêm sân nào vào danh sách Yêu thích! Hãy bấm vào biểu tượng trái tim trên các sân để lưu lại.');
-        return;
+      let favs = getFavorites();
+      const isFav = favs.includes(courtId);
+      if (isFav) {
+        favs = favs.filter(id => id !== courtId);
+        showToast('Đã bỏ yêu thích sân ' + (card.querySelector('.court-title')?.textContent || ''));
+      } else {
+        favs.push(courtId);
+        showToast('Đã lưu vào danh sách Yêu thích ❤️');
       }
+      saveFavorites(favs);
+
+      // Đồng bộ hóa trực tiếp và liên thông xuống Database Server
+      fetch('/customer/booking/api/favorites/toggle?courtId=' + encodeURIComponent(courtId), {
+        method: 'POST'
+      }).then(r => r.json()).then(res => {
+        if (res && res.favorites) {
+          saveFavorites(res.favorites);
+        }
+      }).catch(err => console.warn('Sync favorite error:', err));
+
+      // Nếu đang đứng ở bộ lọc Yêu thích, áp dụng lại để cập nhật danh sách ngay
+      if (currentSportFilter === 'FAVORITE') {
+        applyCurrentFilter();
+      }
+    }
+
+    function selectSportFilter(filterType) {
+      currentSportFilter = filterType;
+
+      // Cập nhật active class cho các nút pill
+      const pills = document.querySelectorAll('#sportPillsContainer .pill-btn');
+      pills.forEach(pill => pill.classList.remove('active'));
+
+      if (filterType === 'ALL') {
+        document.getElementById('pillAll')?.classList.add('active');
+      } else if (filterType === 'FAVORITE') {
+        document.getElementById('pillFavorite')?.classList.add('active');
+      } else {
+        const targetPill = document.getElementById('pill-' + filterType);
+        if (targetPill) targetPill.classList.add('active');
+      }
+
+      applyCurrentFilter();
+    }
+
+    function handleCourtSearch(query) {
+      currentSearchKeyword = (query || '').trim().toLowerCase();
+      const clearBtn = document.getElementById('btnClearCourtSearch');
+      if (clearBtn) clearBtn.style.display = currentSearchKeyword ? 'flex' : 'none';
+      applyCurrentFilter();
+    }
+
+    function clearCourtSearch() {
+      const input = document.getElementById('courtSearchInput');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('btnClearCourtSearch');
+      if (clearBtn) clearBtn.style.display = 'none';
+      currentSearchKeyword = '';
+      applyCurrentFilter();
+    }
+
+    function applyCurrentFilter() {
+      const normalizeStr = (str) => {
+        return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      };
+      const cleanQ = normalizeStr(currentSearchKeyword);
+      const favs = getFavorites();
+
+      const cards = document.querySelectorAll('#courtCardGrid .court-card');
+      let visibleCount = 0;
+
       cards.forEach(card => {
-        const id = card.getAttribute('data-court-id');
-        if (favs.includes(id)) {
+        const id = card.getAttribute('data-court-id') || '';
+        const sportId = card.getAttribute('data-sport-id') || '';
+        const title = normalizeStr(card.querySelector('.court-title')?.textContent || '');
+        const meta = normalizeStr(card.querySelector('.card-meta-row')?.textContent || '');
+
+        // 1. Kiểm tra điều kiện bộ lọc môn / yêu thích
+        let matchesFilter = false;
+        if (currentSportFilter === 'ALL') {
+          matchesFilter = true;
+        } else if (currentSportFilter === 'FAVORITE') {
+          matchesFilter = favs.includes(id);
+        } else {
+          matchesFilter = (sportId === currentSportFilter);
+        }
+
+        // 2. Kiểm tra điều kiện tìm kiếm từ khóa
+        let matchesSearch = true;
+        if (cleanQ) {
+          matchesSearch = title.includes(cleanQ) || meta.includes(cleanQ) || normalizeStr(id).includes(cleanQ);
+        }
+
+        if (matchesFilter && matchesSearch) {
           card.style.display = 'flex';
+          visibleCount++;
         } else {
           card.style.display = 'none';
         }
       });
+
+      // Xử lý thông báo khi không có sân phù hợp
+      let notice = document.getElementById('courtGridEmptyNotice');
+      if (visibleCount === 0) {
+        if (!notice) {
+          notice = document.createElement('div');
+          notice.id = 'courtGridEmptyNotice';
+          document.getElementById('courtCardGrid').appendChild(notice);
+        }
+        notice.style.display = 'block';
+
+        if (currentSportFilter === 'FAVORITE') {
+          notice.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #fff; border-radius: 20px; border: 1.5px dashed #fca5a5;';
+          notice.innerHTML = `
+            <i class="fa-solid fa-heart-crack" style="font-size: 40px; color: #f87171; margin-bottom: 14px; display: block;"></i>
+            <h4 style="font-size: 16px; font-weight: 700; color: #991b1b; margin-bottom: 6px;">Chưa có sân nào trong danh sách yêu thích</h4>
+            <p style="font-size: 13.5px; color: #64748b; margin-bottom: 18px;">Hãy bấm vào biểu tượng ❤️ trên góc phải mỗi thẻ sân để lưu lại vào đây nhé!</p>
+            <button type="button" onclick="selectSportFilter('ALL')" style="padding: 8px 18px; border-radius: 9999px; border: none; background: #047857; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;">
+              <i class="fa-solid fa-table-cells-large"></i> Xem tất cả sân
+            </button>
+          `;
+        } else if (cleanQ) {
+          notice.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #fff; border-radius: 18px; border: 1px dashed #cbd5e1;';
+          notice.innerHTML = `
+            <i class="fa-solid fa-magnifying-glass" style="font-size: 36px; color: #94a3b8; margin-bottom: 12px; display: block;"></i>
+            <h4 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Không tìm thấy sân phù hợp với "${currentSearchKeyword}"</h4>
+            <p style="font-size: 13.5px; color: #64748b; margin-bottom: 16px;">Vui lòng thử tìm với tên sân hoặc loại môn thể thao khác.</p>
+            <button type="button" onclick="clearCourtSearch()" style="padding: 7px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; color: #059669;">
+              <i class="fa-solid fa-rotate-left"></i> Xóa tìm kiếm
+            </button>
+          `;
+        } else {
+          notice.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #fff; border-radius: 18px; border: 1px dashed #cbd5e1;';
+          notice.innerHTML = `
+            <i class="fa-regular fa-calendar-xmark" style="font-size: 36px; color: #94a3b8; margin-bottom: 12px; display: block;"></i>
+            <h4 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">Không có sân phù hợp với bộ lọc hiện tại</h4>
+            <button type="button" onclick="selectSportFilter('ALL')" style="padding: 7px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; color: #059669;">
+              <i class="fa-solid fa-rotate-left"></i> Xem tất cả sân
+            </button>
+          `;
+        }
+      } else if (notice) {
+        notice.style.display = 'none';
+      }
     }
+
+    // =========================================================================
+    // NOTIFICATION SYSTEM (Thông báo thời gian thực & Chi tiết)
+    // =========================================================================
+    const DEFAULT_NOTIFICATIONS = [
+      {
+        id: 'notif_welcome',
+        type: 'system',
+        title: 'Chào mừng bạn đến với SportHub! 🎉',
+        time: 'Hôm nay',
+        dateStr: '17/10/2026',
+        desc: 'Hệ thống đặt sân thể thao trực tuyến SportHub chúc bạn có những trải nghiệm rèn luyện thể thao tuyệt vời.',
+        content: 'Chào mừng bạn đến với SportHub - Hệ thống đặt sân thể thao thông minh!\n\nTại SportHub, bạn có thể dễ dàng:\n• Tra cứu lịch sân trống trực quan theo thời gian thực\n• Đặt sân nhanh chóng với hình thức cọc 30% hoặc 100%\n• Quét mã VietQR chuyển khoản tức thì chuẩn xác\n• Lưu lại các sân yêu thích để đặt lại bất cứ lúc nào\n\nChúc bạn luôn tràn đầy năng lượng và có những giờ phút thể thao ý nghĩa!',
+        unread: false,
+        extraData: null
+      },
+      {
+        id: 'notif_promo',
+        type: 'promo',
+        title: 'Ưu đãi Giờ Vàng Thể Thao: Giảm 10%',
+        time: 'Hôm qua',
+        dateStr: '16/10/2026',
+        desc: 'Áp dụng cho khung giờ sáng từ 06:00 - 09:00 từ Thứ Hai đến Thứ Sáu tại tất cả các cụm sân.',
+        content: 'ƯU ĐÃI ĐẶC BIỆT: GIỜ VÀNG THỂ THAO 🏸\n\nNhằm khuyến khích tinh thần rèn luyện thể thao buổi sáng, SportHub áp dụng chương trình ưu đãi:\n• Giảm ngay 10% khi đặt sân khung giờ 06:00 - 09:00\n• Áp dụng từ Thứ Hai đến Thứ Sáu hàng tuần\n• Mã ưu đãi: GIOVANG10 (nhập tại bước thanh toán)\n\nSố lượng khung giờ ưu đãi có hạn, hãy nhanh tay giữ chỗ!',
+        unread: false,
+        extraData: null
+      }
+    ];
+
+    function getNotifications() {
+      try {
+        const stored = localStorage.getItem(NOTIF_KEY);
+        if (!stored) {
+          localStorage.setItem(NOTIF_KEY, JSON.stringify(DEFAULT_NOTIFICATIONS));
+          return DEFAULT_NOTIFICATIONS;
+        }
+        return JSON.parse(stored);
+      } catch (e) {
+        return DEFAULT_NOTIFICATIONS;
+      }
+    }
+
+    function saveNotifications(list) {
+      localStorage.setItem(NOTIF_KEY, JSON.stringify(list));
+      updateNotifBadge();
+      renderNotifications();
+    }
+
+    function updateNotifBadge() {
+      const list = getNotifications();
+      const unreadCount = list.filter(n => n.unread).length;
+      const dot = document.getElementById('notifBadgeDot');
+      if (dot) {
+        // "thông báo chỉ khi thực sự có thông báo thì mới có chấm đỏ"
+        dot.style.display = (unreadCount > 0) ? 'block' : 'none';
+      }
+    }
+
+    function toggleNotifDropdown(event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+          renderNotifications();
+        }
+      }
+    }
+
+    function closeNotifDropdown() {
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    }
+
+    function renderNotifications() {
+      const container = document.getElementById('notifListContainer');
+      if (!container) return;
+
+      const list = getNotifications();
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="notif-empty">
+            <i class="fa-regular fa-bell-slash"></i>
+            <div class="notif-empty-text">Hiện chưa có thông báo nào</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(item => {
+        let iconHtml = '<i class="fa-solid fa-bell"></i>';
+        let iconClass = 'system';
+        if (item.type === 'booking') {
+          iconHtml = '<i class="fa-solid fa-calendar-check"></i>';
+          iconClass = 'booking';
+        } else if (item.type === 'promo') {
+          iconHtml = '<i class="fa-solid fa-tag"></i>';
+          iconClass = 'promo';
+        }
+
+        return `
+          <div class="notif-item ${item.unread ? 'unread' : ''}" onclick="openNotifDetail('${item.id}')">
+            <div class="notif-item-icon ${iconClass}">
+              ${iconHtml}
+            </div>
+            <div class="notif-item-content">
+              <div class="notif-item-title">
+                <span>${item.title}</span>
+                ${item.unread ? '<span class="notif-unread-dot"></span>' : ''}
+              </div>
+              <div class="notif-item-desc">${item.desc || (item.content ? item.content.slice(0, 90) + '...' : '')}</div>
+              <div class="notif-item-time"><i class="fa-regular fa-clock"></i> ${item.time || item.dateStr || 'Gần đây'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openNotifDetail(notifId) {
+      closeNotifDropdown();
+
+      const list = getNotifications();
+      const notif = list.find(n => n.id === notifId);
+      if (!notif) return;
+
+      // Đánh dấu là đã đọc nếu đang unread
+      if (notif.unread) {
+        notif.unread = false;
+        saveNotifications(list);
+      }
+
+      // Cập nhật nội dung modal chi tiết
+      const modal = document.getElementById('notifDetailModal');
+      const titleElem = document.getElementById('notifModalTitle');
+      const contentElem = document.getElementById('notifModalContent');
+      const badgeElem = document.getElementById('notifModalBadge');
+      const timeElem = document.getElementById('notifModalTime');
+      const extraElem = document.getElementById('notifModalExtraDetails');
+      const primaryBtn = document.getElementById('btnNotifActionPrimary');
+
+      if (titleElem) titleElem.textContent = notif.title;
+      if (contentElem) contentElem.textContent = notif.content;
+      if (timeElem) timeElem.innerHTML = `<i class="fa-regular fa-clock"></i> ${notif.dateStr || notif.time || 'Vừa xong'}`;
+
+      if (badgeElem) {
+        if (notif.type === 'booking') {
+          badgeElem.textContent = 'Đặt sân';
+          badgeElem.style.background = '#e6f9ed';
+          badgeElem.style.color = '#059669';
+        } else if (notif.type === 'promo') {
+          badgeElem.textContent = 'Khuyến mãi';
+          badgeElem.style.background = '#fef3c7';
+          badgeElem.style.color = '#d97706';
+        } else {
+          badgeElem.textContent = 'Hệ thống';
+          badgeElem.style.background = '#eff6ff';
+          badgeElem.style.color = '#3b82f6';
+        }
+      }
+
+      // Nếu có chi tiết đặt sân bổ sung
+      if (extraElem) {
+        if (notif.extraData) {
+          extraElem.style.display = 'block';
+          extraElem.innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;">
+              <div><span style="color:#64748b;">Mã đặt sân:</span> <strong style="color:#0f172a;">#${notif.extraData.bookingId || '--'}</strong></div>
+              <div><span style="color:#64748b;">Sân:</span> <strong style="color:#059669;">${notif.extraData.courtName || '--'}</strong></div>
+              <div><span style="color:#64748b;">Ngày thi đấu:</span> <strong style="color:#0f172a;">${notif.extraData.date || '--'}</strong></div>
+              <div><span style="color:#64748b;">Khung giờ:</span> <strong style="color:#0f172a;">${notif.extraData.time || '--'}</strong></div>
+              <div><span style="color:#64748b;">Tổng tiền:</span> <strong style="color:#059669;">${notif.extraData.amount ? formatVND(notif.extraData.amount) : '--'}</strong></div>
+              <div><span style="color:#64748b;">Trạng thái:</span> <strong style="color:#059669;">Đã xác nhận</strong></div>
+            </div>
+          `;
+        } else {
+          extraElem.style.display = 'none';
+        }
+      }
+
+      if (primaryBtn) {
+        if (notif.type === 'booking') {
+          primaryBtn.style.display = 'inline-flex';
+          primaryBtn.textContent = 'Xem lịch đặt của tôi';
+        } else {
+          primaryBtn.style.display = 'none';
+        }
+      }
+
+      if (modal) modal.classList.add('show');
+    }
+
+    function closeNotifModal() {
+      const modal = document.getElementById('notifDetailModal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function handleNotifModalBackdrop(event) {
+      if (event.target.id === 'notifDetailModal') {
+        closeNotifModal();
+      }
+    }
+
+    function handleNotifActionPrimary() {
+      closeNotifModal();
+      window.location.href = '/customer/history';
+    }
+
+    function markAllNotificationsAsRead() {
+      const list = getNotifications();
+      list.forEach(n => n.unread = false);
+      saveNotifications(list);
+      showToast('Đã đánh dấu tất cả thông báo là đã đọc!');
+    }
+
+    function addBookingNotification(bookingData) {
+      const list = getNotifications();
+      const newNotif = {
+        id: 'notif_b_' + (bookingData.bookingId || Date.now()),
+        type: 'booking',
+        title: `Đặt sân thành công! #${bookingData.bookingId}`,
+        time: 'Vừa xong',
+        dateStr: new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}),
+        desc: `Sân ${bookingData.courtName || ''} (${bookingData.sportName || ''}), giờ: ${bookingData.time || ''}`,
+        content: `Chúc mừng bạn đã đặt sân thành công!\n\nChi tiết đặt sân:\n• Mã đơn: #${bookingData.bookingId}\n• Tên sân: ${bookingData.courtName} (${bookingData.sportName})\n• Khung giờ: ${bookingData.time}\n• Ngày đặt: ${formatDateVN(bookingData.date)}\n• Địa điểm: ${bookingData.location || 'SportUTE'}\n\nQuý khách vui lòng đến trước giờ thi đấu 10 phút để nhận sân tại quầy lễ tân. Chúc bạn có những giờ phút thể thao vui vẻ!`,
+        unread: true, // Kích hoạt chấm đỏ ngay lập tức!
+        extraData: {
+          bookingId: bookingData.bookingId,
+          courtName: bookingData.courtName,
+          date: formatDateVN(bookingData.date),
+          time: bookingData.time,
+          amount: bookingData.amount
+        }
+      };
+
+      list.unshift(newNotif);
+      saveNotifications(list);
+    }
+
+    // Đóng dropdown thông báo khi click bên ngoài
+    document.addEventListener('click', (e) => {
+      const notifWrapper = document.getElementById('notifWrapper');
+      if (notifWrapper && !notifWrapper.contains(e.target)) {
+        closeNotifDropdown();
+      }
+    });
+
+    // Khởi tạo trạng thái ban đầu khi tải xong DOM
+    
+    // =========================================================================
+    // LOGOUT CONFIRMATION MODAL LOGIC
+    // =========================================================================
+    function showLogoutModal() {
+      const modal = document.getElementById('logoutConfirmModal');
+      if (modal) modal.classList.add('show');
+    }
+
+    function closeLogoutModal() {
+      const modal = document.getElementById('logoutConfirmModal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    function handleLogoutModalBackdrop(event) {
+      if (event.target.id === 'logoutConfirmModal') {
+        closeLogoutModal();
+      }
+    }
+
+    function confirmLogoutAction() {
+      const form = document.getElementById('globalLogoutForm');
+      if (form) {
+        form.submit();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateFavoriteUI();
+      updateNotifBadge();
+
+      // Nếu có query ?q= từ trang khác chuyển qua, tự động điền vào ô tìm kiếm và lọc ngay
+      const urlParams = new URLSearchParams(window.location.search);
+      const qParam = urlParams.get('q');
+      if (qParam) {
+        const searchInput = document.getElementById('courtSearchInput');
+        if (searchInput) {
+          searchInput.value = qParam;
+          handleCourtSearch(qParam);
+          setTimeout(() => {
+            document.getElementById('courtCardGrid')?.scrollIntoView({behavior:'smooth'});
+          }, 300);
+        }
+      }
+
+      // Đồng bộ ảnh đại diện tùy chỉnh theo tài khoản người dùng
+      const savedAvatar = sessionStorage.getItem(AVATAR_KEY) || localStorage.getItem(AVATAR_KEY);
+      if (savedAvatar) {
+        document.querySelectorAll('.user-avatar-img').forEach(img => {
+          if (!img.getAttribute('src') || img.src.includes('user_avatar')) {
+            img.src = savedAvatar;
+            img.style.display = 'block';
+          }
+        });
+        document.querySelectorAll('.user-avatar-badge').forEach(b => {
+          b.style.display = 'none';
+        });
+      }
+    });
   </script>
 </body>
 </html>

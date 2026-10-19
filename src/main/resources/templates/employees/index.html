@@ -4,373 +4,342 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SportHub — Quản lý nhân viên</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Font Awesome 6.5.1 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Unified Admin Design System -->
+<link rel="stylesheet" th:href="@{/css/admin.css}">
 <style>
-:root{
-  --nav:#082c2f;--nav2:#061f25;--green:#1aaa62;--green2:#087d48;
-  --mint:#dff7e8;--blue:#1684ef;--orange:#ef9a28;--purple:#7958e9;
-  --ink:#132337;--muted:#728096;--bg:#f2f6f8;--line:#e2e9ed;
-  --card:#fff;--shadow:0 6px 22px rgba(15,42,52,.07);--shadow-sm:0 2px 8px rgba(15,42,52,.04)
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
-button,input,select{font:inherit}
-.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
-
-/* Sidebar */
-aside{
-  height:100vh;position:sticky;top:0;background:linear-gradient(180deg,var(--nav2),var(--nav));
-  color:#fff;padding:20px 14px;display:flex;flex-direction:column;overflow-y:auto;z-index:10
-}
-.brand{min-height:64px;padding:6px 10px 12px;margin:0 0 10px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.08);text-decoration:none}
-.brand-logo{max-height:48px;max-width:170px;object-fit:contain}
-.nav{display:flex;flex-direction:column;gap:2px}
-.nav a{
-  height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;color:#c7d8da;
-  text-decoration:none;border-radius:9px;font-size:12px;font-weight:600;transition:.18s
-}
-.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
-.nav a.active{
-  background:linear-gradient(90deg,#138e4f,#1ca35d);color:#fff;
-  box-shadow:inset 3px 0 #68f3a5,0 4px 14px rgba(26,170,98,.2)
-}
-.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
-.side-art{
-  margin-top:auto;height:120px;margin-left:-14px;margin-right:-14px;margin-bottom:-20px;
-  background:linear-gradient(180deg,transparent 0,#052a2d 88%),linear-gradient(135deg,#0c553caa,#061f25 65%);
-  position:relative;overflow:hidden
-}
-.side-copy{position:absolute;left:22px;bottom:24px;font-size:15px;line-height:1.2;font-weight:800;font-style:italic;color:#e8f8ef}
-.side-copy:after{content:"";display:block;width:32px;height:3px;background:#31d77c;margin-top:8px}
-
-/* Topbar */
-main{min-width:0}
-.topbar{
-  height:60px;background:#fff;border-bottom:1px solid var(--line);
-  display:grid;grid-template-columns:300px minmax(260px,560px) 1fr;
-  align-items:center;gap:20px;padding:0 24px;position:sticky;top:0;z-index:9
-}
-.centername{font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:10px}
-.mini-logo{
-  width:28px;height:28px;border-radius:8px;background:var(--mint);color:var(--green2);
-  display:grid;place-items:center;font-weight:900;font-size:11px
-}
-.search{position:relative}
-.search input{
-  width:100%;height:38px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:9px;
-  padding:0 14px 0 38px;font-size:12px;outline:none;transition:.2s
-}
-.search input:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
-.search svg{position:absolute;left:13px;top:11px;width:15px;height:15px;fill:none;stroke:#748297;stroke-width:1.8}
-.account{justify-self:end;display:flex;align-items:center;gap:11px}
-.avatar{
-  width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0e4b36,#199c58);
-  color:#fff;display:grid;place-items:center;font-weight:800;font-size:11.5px;
-  box-shadow:0 3px 10px rgba(14,75,54,.2)
-}
-.account b{font-size:12px;color:var(--ink);display:block}
-.account small{display:block;color:var(--green2);font-size:9.5px;font-weight:700;margin-top:1px}
-.btn-logout{
-  height:32px;padding:0 12px;border:1px solid #fee2e2;background:#fff5f5;color:#dc2626;border-radius:8px;
-  font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.18s
-}
-.btn-logout:hover{background:#fee2e2;border-color:#fca5a5;color:#b91c1c}
-
-/* Content Area */
-.content{max-width:1600px;margin:auto;padding:16px 22px 30px}
-.pagehead{
-  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;
-  padding:18px 24px;border-radius:14px;background:linear-gradient(90deg,#fff 0%,#f8fffb 55%,#dff7e8 100%);
-  border:1px solid var(--line);box-shadow:var(--shadow-sm)
-}
-.crumb{font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:700;letter-spacing:.3px}
-.pagehead h1{margin:0 0 3px;font-size:22px;letter-spacing:-.6px;color:#0b3b28}
-.pagehead p{margin:0;color:#5a6e64;font-size:12px}
-
-.btn{
-  height:36px;padding:0 16px;border:1px solid #d8e3dc;background:#fff;border-radius:8px;
-  font-weight:800;font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;
-  justify-content:center;gap:6px;transition:.18s;text-decoration:none;color:var(--ink)
-}
-.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
-.btn.primary{
-  background:linear-gradient(90deg,var(--green2),var(--green));color:#fff;border:none;
-  box-shadow:0 4px 12px rgba(26,170,98,.25)
-}
-.btn.danger{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
-.btn.danger:hover{background:#fecaca;color:#991b1b}
-
-/* Alerts */
-.alert{padding:12px 16px;border-radius:10px;margin-bottom:14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
-.alert-success{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
-.alert-danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
-
-/* Summary Grid */
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-.metric{
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
-  display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm)
-}
-.metric-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:18px;flex:none}
-.metric-icon.g{background:var(--mint);color:var(--green2)}
-.metric-icon.p{background:#f3e8ff;color:var(--purple)}
-.metric-icon.b{background:#e0f2fe;color:var(--blue)}
-.metric-icon.o{background:#fef3c7;color:var(--orange)}
-.metric label{font-size:11px;color:var(--muted);display:block;font-weight:700}
-.metric strong{font-size:18px;color:var(--ink);display:block;line-height:1.2;font-weight:800}
-
-/* Layout Split */
-.layout{display:grid;grid-template-columns:1.8fr 1fr;gap:14px;align-items:start}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-.card .head{
-  padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;
-  align-items:center;background:#fafbfc
-}
-.card .head h2{margin:0;font-size:13.5px;color:#0b3b28;font-weight:800}
-.tablewrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th{background:#f6f8fa;color:#5a6e64;font-size:11px;font-weight:800;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:middle}
-tr:hover td{background:#f8fbf9}
-tr.sel td{background:#eefbf3}
-
-/* Badges */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10.5px;font-weight:800}
-.badge.active{background:#dcfce7;color:#15803d}
-.badge.onleave{background:#fef3c7;color:#b45309}
-.badge.inactive{background:#fee2e2;color:#b91c1c}
-.badge.manager{background:#f3e8ff;color:#7e22ce}
-.badge.reception{background:#e0f2fe;color:#0369a1}
-.badge.tech{background:#f1f5f9;color:#475569}
-
-/* Form Card */
-.formcard{padding:0}
-.fields{padding:16px 18px;display:flex;flex-direction:column;gap:11px}
-.field label{display:block;font-size:11px;font-weight:800;color:#4a5d54;margin-bottom:4px}
-.field input,.field select{
-  width:100%;height:36px;border:1px solid #dce5ea;background:#f7f9fb;border-radius:8px;
-  padding:0 11px;font-size:12px;outline:none;transition:.2s
-}
-.field input:focus,.field select:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,170,98,.1)}
-.actions{padding:12px 18px;background:#fafbfc;border-top:1px solid var(--line);display:flex;gap:8px}
-
-@media(max-width:1100px){.layout{grid-template-columns:1fr}}
-@media(max-width:880px){
-  .app{grid-template-columns:70px 1fr}
-  .brand-logo,.nav span,.side-art,.centername span{display:none}
-  .topbar{grid-template-columns:1fr 1.5fr auto}
-  .summary{grid-template-columns:1fr 1fr}
-}
+.pos-manager { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+.pos-reception { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.pos-tech { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
 </style>
 </head>
 <body>
-
 <div class="app">
-<!-- Sidebar -->
-<aside>
-  <a href="/admin/dashboard" class="brand">
-    <img class="brand-logo" src="/images/sporthub-logo.png" alt="SportHub Logo">
-  </a>
-  <nav class="nav">
-    <a href="/admin/dashboard"><svg viewBox="0 0 24 24"><path d="M5 5h14v15H5zM8 2v5M16 2v5M8 11h8"/></svg><span>Tổng quan</span></a>
-    <a href="/admin/bookings"><svg viewBox="0 0 24 24"><path d="M5 16l3-8 4 4 4-7 3 11M4 19h16"/></svg><span>Đặt sân</span></a>
-    <a href="/admin/bookings?view=schedule"><svg viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 9h16M8 3v4M16 3v4"/></svg><span>Lịch sân</span></a>
-    <a href="/admin/courts"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4v16"/></svg><span>Sân thể thao</span></a>
-    <a href="/admin/customers"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7"/></svg><span>Khách hàng</span></a>
-    <a class="active" href="/admin/employees"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3.5 20c.8-3.6 3.2-5.5 5.5-5.5S13.7 16.4 14.5 20"/><path d="M13 19c.6-2.3 2.2-3.8 4.2-3.8 1.8 0 3.2 1 3.8 2.8"/></svg><span>Nhân viên</span></a>
-    <a href="/admin/payments"><svg viewBox="0 0 24 24"><path d="M5 7h14v12H5zM8 4h8v3M8 12h8"/></svg><span>Thanh toán</span></a>
-    <a href="/admin/promotions"><svg viewBox="0 0 24 24"><path d="M4 12l8-8 8 8-8 8zM8 8h.01M16 16h.01M8 16l8-8"/></svg><span>Khuyến mãi</span></a>
-    <a href="/admin/maintenance"><svg viewBox="0 0 24 24"><path d="M14.7 6.3l3 3m-9.4 8.1l-3.6.7.7-3.6 8.8-8.8 2.9 2.9-8.8 8.8z"/><path d="M12 20h8"/></svg><span>Bảo trì</span></a>
-    <a href="/admin/reports"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Báo cáo</span></a>
-    <a href="/admin/permissions"><svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg><span>Phân quyền</span></a>
-  </nav>
-  <div class="side-art"><div class="side-copy">Thể thao<br>kết nối<br>cuộc sống</div></div>
-</aside>
+  <!-- Shared Sidebar -->
+  <div th:replace="~{fragments/sidebar :: sidebar('employees')}"></div>
 
-<!-- Main Area -->
-<main>
-<header class="topbar">
-  <div class="centername">
-    <div class="mini-logo">SH</div>
-    <span>Trung tâm Thể thao SportHub</span>
-  </div>
-  <form action="/admin/employees" method="get" class="search">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/></svg>
-    <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm nhân viên theo mã, họ tên, SĐT, tài khoản...">
-  </form>
-  <div class="account">
-    <div class="avatar">QL</div>
-    <div><b>Quản lý trung tâm</b><small>Quản trị viên</small></div>
-    <form th:action="@{/logout}" method="post" style="margin:0">
-      <button type="submit" class="btn-logout" title="Đăng xuất"><i class="fa-solid fa-right-from-bracket"></i></button>
-    </form>
-  </div>
-</header>
-
-<div class="content">
-  <!-- Flash Messages -->
-  <div th:if="${successMessage}" class="alert alert-success">
-    <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
-  </div>
-  <div th:if="${errorMessage}" class="alert alert-danger">
-    <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span>
-  </div>
-
-  <div class="pagehead">
-    <div>
-      <div class="crumb">Trang chủ › Nhân sự › Danh mục nhân viên (UC05 - UC08)</div>
-      <h1>Quản lý nhân viên</h1>
-      <p>Quản lý hồ sơ nhân sự, phân quyền vị trí công tác và kích hoạt/ngừng tài khoản truy cập hệ thống</p>
-    </div>
-    <a href="/admin/employees" class="btn primary">＋ Thêm nhân viên mới</a>
-  </div>
-
-  <!-- Summary Cards -->
-  <section class="summary">
-    <div class="metric">
-      <div class="metric-icon g">👤</div>
-      <div><label>Tổng nhân sự</label><strong th:text="${stats.totalEmployees}">0</strong></div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon b">✔</div>
-      <div><label>Đang làm việc</label><strong th:text="${stats.activeEmployees}">0</strong></div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon o">☾</div>
-      <div><label>Nghỉ phép</label><strong th:text="${stats.onLeaveEmployees}">0</strong></div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon p">🔑</div>
-      <div><label>Ban quản lý (Quản trị)</label><strong th:text="${stats.managerCount}">0</strong></div>
-    </div>
-  </section>
-
-  <!-- Layout Main Split -->
-  <section class="layout">
-    <!-- CỘT TRÁI: DANH SÁCH NHÂN VIÊN (UC06) -->
-    <div class="card">
-      <div class="head">
-        <h2>Danh sách nhân viên</h2>
-        <form action="/admin/employees" method="get" style="display:flex;gap:8px;align-items:center">
-          <input type="hidden" name="keyword" th:value="${currentKeyword}">
-          <select name="position" onchange="this.form.submit()" style="height:30px;font-size:11px;border-radius:6px;border:1px solid #cbd5e1;padding:0 6px">
-            <option value="Tất cả" th:selected="${selectedPosition == 'Tất cả'}">Tất cả chức vụ</option>
-            <option value="Quản lý" th:selected="${selectedPosition == 'Quản lý'}">Quản lý</option>
-            <option value="Lễ tân" th:selected="${selectedPosition == 'Lễ tân'}">Lễ tân</option>
-            <option value="Vận hành" th:selected="${selectedPosition == 'Vận hành'}">Vận hành</option>
-            <option value="Kỹ thuật" th:selected="${selectedPosition == 'Kỹ thuật'}">Kỹ thuật</option>
-          </select>
-          <select name="status" onchange="this.form.submit()" style="height:30px;font-size:11px;border-radius:6px;border:1px solid #cbd5e1;padding:0 6px">
-            <option value="Tất cả" th:selected="${selectedStatus == 'Tất cả'}">Tất cả trạng thái</option>
-            <option value="Đang làm" th:selected="${selectedStatus == 'Đang làm'}">Đang làm</option>
-            <option value="Nghỉ phép" th:selected="${selectedStatus == 'Nghỉ phép'}">Nghỉ phép</option>
-            <option value="Đã nghỉ" th:selected="${selectedStatus == 'Đã nghỉ'}">Đã nghỉ</option>
-          </select>
+  <main>
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="centername">
+          <div class="mini-logo"><i class="fa-solid fa-user-tie"></i></div>
+          <span>Trung tâm Thể thao SportHub</span>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <form action="/admin/employees" method="get" class="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input name="keyword" th:value="${currentKeyword}" placeholder="Tìm nhân viên theo mã, họ tên, SĐT, tài khoản...">
         </form>
       </div>
+      <div class="topbar-right">
+        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <div class="topbar-user">
+          <div class="avatar" th:text="${currentUser != null ? currentUser.avatarInitials : 'QL'}">QL</div>
+          <div class="topbar-user-info">
+            <span class="topbar-user-name" th:text="${currentUser != null ? currentUser.fullName : 'Quản lý trung tâm'}">Quản lý trung tâm</span>
+            <span class="topbar-user-role" th:text="${currentUser != null ? currentUser.roleName : 'Quản trị viên'}">Quản trị viên</span>
+          </div>
+        </div>
+      </div>
+    </header>
 
-      <div class="tablewrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Mã NV</th>
-              <th>Họ và tên</th>
-              <th>Chức vụ</th>
-              <th>Số điện thoại</th>
-              <th>Tài khoản</th>
-              <th>Phân quyền</th>
-              <th>Trạng thái</th>
-              <th style="text-align:right">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="e : ${employees}" th:classappend="${employeeDTO.id == e.id ? 'sel' : ''}">
-              <td style="font-weight:800;color:var(--green2)" th:text="${e.id}">NV01</td>
-              <td><b th:text="${e.fullName}">Trần Quốc Bảo</b><div th:if="${e.email != null}" style="font-size:10px;color:var(--muted)" th:text="${e.email}"></div></td>
-              <td><span class="badge" th:classappend="${e.position == 'Quản lý' ? 'manager' : (e.position == 'Lễ tân' ? 'reception' : 'tech')}" th:text="${e.position}">Quản lý</span></td>
-              <td th:text="${e.phone}">0901234567</td>
-              <td><b th:text="${e.username != null ? e.username : '---'}" style="color:var(--blue)">bao.tq</b></td>
-              <td th:text="${e.roleName}">Quản lý trung tâm</td>
-              <td>
-                <span class="badge" th:classappend="${e.status == 'Đang làm' ? 'active' : (e.status == 'Nghỉ phép' ? 'onleave' : 'inactive')}" th:text="${e.status}">Đang làm</span>
-              </td>
-              <td style="text-align:right;white-space:nowrap">
-                <a th:href="@{/admin/employees(editId=${e.id})}" class="btn" style="height:28px;padding:0 8px;font-size:11px" title="Sửa thông tin"><i class="fa-solid fa-pen"></i></a>
-                <form th:action="@{/admin/employees/toggle/{id}(id=${e.id})}" method="post" style="display:inline" onsubmit="return confirm('Xác nhận đổi trạng thái làm việc nhân viên #' + '[[${e.id}]]' + '?');">
-                  <button type="submit" class="btn" style="height:28px;padding:0 8px;font-size:11px" th:classappend="${e.status == 'Đang làm' ? 'danger' : 'primary'}" th:title="${e.status == 'Đang làm' ? 'Ngừng hoạt động / Khóa tài khoản (UC08)' : 'Kích hoạt lại'}">
-                    <i th:class="${e.status == 'Đang làm' ? 'fa-solid fa-user-xmark' : 'fa-solid fa-user-check'}"></i>
+    <div class="content">
+      <!-- Flash Messages -->
+      <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i> <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage}" class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${errorMessage}"></span>
+      </div>
+
+      <!-- Pagehead Banner -->
+      <section class="pagehead">
+        <div class="pagehead-left">
+          <div class="pagehead-icon">
+            <i class="fa-solid fa-users-gear"></i>
+          </div>
+          <div>
+            <h1>Quản lý nhân viên & Nhân sự</h1>
+            <p>Quản lý hồ sơ nhân sự, phân quyền vị trí công tác và kích hoạt hoặc ngừng tài khoản truy cập hệ thống</p>
+          </div>
+        </div>
+        <div class="pagehead-actions">
+          <button type="button" class="btn primary" onclick="openEmployeeCreateModal()">
+            <i class="fa-solid fa-plus"></i> Thêm nhân viên mới
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI Summary Cards -->
+      <section class="summary">
+        <div class="metric">
+          <div class="metric-icon green"><i class="fa-solid fa-user-group"></i></div>
+          <div>
+            <label>Tổng nhân sự</label>
+            <strong th:text="${stats.totalEmployees}">0</strong>
+            <small>Toàn bộ nhân sự trung tâm</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon blue"><i class="fa-regular fa-circle-check"></i></div>
+          <div>
+            <label>Đang làm việc</label>
+            <strong th:text="${stats.activeEmployees}">0</strong>
+            <small>Ca trực đang hoạt động</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon amber"><i class="fa-regular fa-calendar-minus"></i></div>
+          <div>
+            <label>Nghỉ phép</label>
+            <strong th:text="${stats.onLeaveEmployees}">0</strong>
+            <small>Đang trong kỳ nghỉ phép</small>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-icon purple"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <label>Ban quản lý</label>
+            <strong th:text="${stats.managerCount}">0</strong>
+            <small>Tài khoản quản trị viên</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- BẢNG DANH SÁCH NHÂN SỰ 100% CHIỀU RỘNG (MODAL CRUD) -->
+      <section class="card" style="width:100%;">
+        <div class="card-head">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-list-check" style="color:var(--gray-500);"></i>
+            <h2>Danh sách nhân sự</h2>
+            <span class="badge status-inuse" th:text="${#lists.size(employees)} + ' nhân sự'">0 nhân sự</span>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <form action="/admin/employees" method="get" style="display:flex; gap:8px; align-items:center; margin:0;">
+              <input type="hidden" name="keyword" th:value="${currentKeyword}">
+              <select name="position" onchange="this.form.submit()" style="height:34px; font-size:12px; border-radius:8px; border:1px solid var(--line); padding:0 8px; background:var(--gray-50);">
+                <option value="Tất cả" th:selected="${selectedPosition == 'Tất cả'}">Tất cả chức vụ</option>
+                <option value="Quản lý" th:selected="${selectedPosition == 'Quản lý'}">Quản lý</option>
+                <option value="Lễ tân" th:selected="${selectedPosition == 'Lễ tân'}">Lễ tân</option>
+                <option value="Vận hành" th:selected="${selectedPosition == 'Vận hành'}">Vận hành</option>
+                <option value="Kỹ thuật" th:selected="${selectedPosition == 'Kỹ thuật'}">Kỹ thuật</option>
+              </select>
+              <select name="status" onchange="this.form.submit()" style="height:34px; font-size:12px; border-radius:8px; border:1px solid var(--line); padding:0 8px; background:var(--gray-50);">
+                <option value="Tất cả" th:selected="${selectedStatus == 'Tất cả'}">Tất cả trạng thái</option>
+                <option value="Đang làm" th:selected="${selectedStatus == 'Đang làm'}">Đang làm</option>
+                <option value="Nghỉ phép" th:selected="${selectedStatus == 'Nghỉ phép'}">Nghỉ phép</option>
+                <option value="Đã nghỉ" th:selected="${selectedStatus == 'Đã nghỉ'}">Đã nghỉ</option>
+              </select>
+            </form>
+          </div>
+        </div>
+
+        <div class="tablewrap tablewrap-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 80px;">Mã NV</th>
+                <th>Họ và tên</th>
+                <th>Chức vụ</th>
+                <th>Số điện thoại</th>
+                <th>Tài khoản</th>
+                <th>Phân quyền</th>
+                <th>Trạng thái</th>
+                <th style="text-align:right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="e : ${employees}" th:classappend="${employeeDTO.id == e.id ? 'selected-row' : ''}">
+                <td style="font-weight:800; color:var(--primary);" th:text="${e.id}">NV01</td>
+                <td>
+                  <b th:text="${e.fullName}">Trần Quốc Bảo</b>
+                  <div th:if="${e.email != null}" style="font-size:11px; color:var(--gray-500);" th:text="${e.email}"></div>
+                </td>
+                <td>
+                  <span class="badge" th:classappend="${e.position == 'Quản lý' ? 'pos-manager' : (e.position == 'Lễ tân' ? 'pos-reception' : 'pos-tech')}" th:text="${e.position}">Quản lý</span>
+                </td>
+                <td th:text="${e.phone}">0901234567</td>
+                <td>
+                  <b th:text="${e.username != null ? e.username : '---'}" style="color:var(--blue);">bao.tq</b>
+                </td>
+                <td>
+                  <span class="badge" style="background:var(--gray-100); color:var(--gray-700); border:1px solid var(--line);" th:text="${e.roleName}">Quản lý trung tâm</span>
+                </td>
+                <td>
+                  <span class="badge" th:classappend="${e.status == 'Đang làm' ? 'status-active' : (e.status == 'Nghỉ phép' ? 'status-maint' : 'status-disabled')}" th:text="${e.status}">Đang làm</span>
+                </td>
+                <td style="text-align:right; white-space:nowrap;">
+                  <button type="button" class="btn btn-sm"
+                          th:data-id="${e.id}"
+                          th:data-fullname="${e.fullName}"
+                          th:data-phone="${e.phone}"
+                          th:data-email="${e.email}"
+                          th:data-position="${e.position}"
+                          th:data-username="${e.username != null ? e.username : ''}"
+                          th:data-status="${e.status}"
+                          onclick="openEmployeeEditModal(this)"
+                          title="Sửa thông tin">
+                    <i class="fa-solid fa-pen"></i> Sửa
                   </button>
-                </form>
-              </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(employees)}">
-              <td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Không tìm thấy nhân viên phù hợp.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                  <form th:action="@{/admin/employees/toggle/{id}(id=${e.id})}" method="post" style="display:inline" onsubmit="return confirm('Xác nhận đổi trạng thái làm việc nhân viên #' + '[[${e.id}]]' + '?');">
+                    <button type="submit" class="btn btn-sm" th:classappend="${e.status == 'Đang làm' ? 'btn-danger' : 'btn-success'}" th:title="${e.status == 'Đang làm' ? 'Ngừng hoạt động / Khóa tài khoản' : 'Kích hoạt lại'}">
+                      <i th:class="${e.status == 'Đang làm' ? 'fa-solid fa-user-xmark' : 'fa-solid fa-user-check'}"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(employees)}">
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="fa-solid fa-inbox fs-2 mb-2 d-block"></i>
+                  Không tìm thấy nhân viên phù hợp.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
+  </main>
+</div>
 
-    <!-- CỘT PHẢI: FORM THÊM / CẬP NHẬT NHÂN VIÊN (UC05, UC06, UC07) -->
-    <div class="card formcard">
-      <div class="head">
-        <h2>Thông tin nhân viên</h2>
-        <span class="badge" th:text="${employeeDTO.id != null ? 'Cập nhật: #' + employeeDTO.id : 'Thêm mới (UC05)'}"></span>
-      </div>
-
-      <form th:action="@{/admin/employees/save}" th:object="${employeeDTO}" method="post">
-        <input type="hidden" th:field="*{id}">
-        <div class="fields">
-          <div class="field" th:if="${employeeDTO.id != null}">
-            <label>Mã nhân viên</label>
-            <input type="text" th:value="${employeeDTO.id}" readonly style="background:#f1f5f9;font-weight:700;color:var(--green2)">
-          </div>
-          <div class="field">
+<!-- ==========================================================================
+     MODAL: THÊM / CẬP NHẬT NHÂN VIÊN (MÔ HÌNH MODAL CRUD)
+     ========================================================================== -->
+<div class="modal-overlay" id="employeeModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>
+        <i class="fa-solid fa-user-tie" style="color:var(--primary);"></i>
+        <span id="employeeModalTitle">Thêm nhân viên mới</span>
+        <span id="employeeModalBadge" class="badge status-active modal-badge">Tạo mới</span>
+      </h3>
+      <button type="button" class="modal-close" onclick="closeEmployeeModal()">&times;</button>
+    </div>
+    <form id="employeeForm" th:action="@{/admin/employees/save}" method="post">
+      <input type="hidden" id="empFieldId" name="id">
+      <div class="modal-body">
+        <div class="field" id="empCodeRow" style="display:none; margin-bottom:14px;">
+          <label>Mã nhân viên</label>
+          <input type="text" id="empFieldCode" readonly style="font-weight:700; color:var(--primary); background:var(--gray-50);">
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="field" style="margin:0;">
             <label>Họ và tên nhân viên (*)</label>
-            <input type="text" th:field="*{fullName}" placeholder="Ví dụ: Lê Thị Thu Hà" required>
+            <input type="text" id="empFieldFullName" name="fullName" placeholder="Ví dụ: Lê Thị Thu Hà" required>
           </div>
-          <div class="field">
+          <div class="field" style="margin:0;">
             <label>Số điện thoại (*)</label>
-            <input type="text" th:field="*{phone}" placeholder="Ví dụ: 0912345678" required>
+            <input type="text" id="empFieldPhone" name="phone" placeholder="Ví dụ: 0912345678" required>
           </div>
-          <div class="field">
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="field" style="margin:0;">
             <label>Email liên hệ (*)</label>
-            <input type="email" th:field="*{email}" placeholder="Ví dụ: ha.lt@sporthub.vn" required>
+            <input type="email" id="empFieldEmail" name="email" placeholder="Ví dụ: ha.lt@sporthub.vn" required>
           </div>
-          <div class="field">
+          <div class="field" style="margin:0;">
             <label>Chức vụ (*)</label>
-            <select th:field="*{position}">
+            <select id="empFieldPosition" name="position">
               <option value="Lễ tân">Nhân viên Lễ tân</option>
               <option value="Quản lý">Quản lý trung tâm</option>
               <option value="Vận hành">Nhân viên Vận hành sân</option>
               <option value="Kỹ thuật">Kỹ thuật bảo trì</option>
             </select>
           </div>
-          <div class="field">
-            <label>Tài khoản đăng nhập hệ thống (UC07)</label>
-            <input type="text" th:field="*{username}" placeholder="Ví dụ: ha.le (mật khẩu mặc định: 123456)">
-            <small style="font-size:10px;color:var(--muted)">Nhập tên đăng nhập để liên kết hoặc cấp tài khoản mới</small>
+        </div>
+        <div class="form-grid-2" style="margin-bottom:14px;">
+          <div class="field" style="margin:0;">
+            <label>Tài khoản đăng nhập hệ thống</label>
+            <input type="text" id="empFieldUsername" name="username" placeholder="Ví dụ: ha.le">
           </div>
-          <div class="field">
+          <div class="field" style="margin:0;">
             <label>Trạng thái công tác</label>
-            <select th:field="*{status}">
+            <select id="empFieldStatus" name="status">
               <option value="Đang làm">Đang làm</option>
               <option value="Nghỉ phép">Nghỉ phép</option>
               <option value="Đã nghỉ">Đã nghỉ</option>
             </select>
           </div>
         </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn" onclick="closeEmployeeModal()">Hủy bỏ</button>
+        <button type="submit" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu nhân viên</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-        <div class="actions">
-          <button type="submit" class="btn primary"><i class="fa-solid fa-floppy-disk"></i> Lưu nhân viên</button>
-          <a href="/admin/employees" class="btn"><i class="fa-solid fa-rotate-right"></i> Làm mới</a>
-        </div>
-      </form>
+<script>
+function openEmployeeCreateModal() {
+  document.getElementById('employeeForm').reset();
+  document.getElementById('empFieldId').value = '';
+  document.getElementById('empCodeRow').style.display = 'none';
+  document.getElementById('employeeModalTitle').innerText = 'Thêm nhân viên mới';
+  const badge = document.getElementById('employeeModalBadge');
+  badge.innerText = 'Tạo mới';
+  badge.className = 'badge status-active modal-badge';
+  document.getElementById('employeeModal').classList.add('active');
+}
+
+function openEmployeeEditModal(btn) {
+  const id = btn.getAttribute('data-id');
+  const fullName = btn.getAttribute('data-fullname') || '';
+  const phone = btn.getAttribute('data-phone') || '';
+  const email = btn.getAttribute('data-email') || '';
+  const position = btn.getAttribute('data-position') || 'Lễ tân';
+  const username = btn.getAttribute('data-username') || '';
+  const status = btn.getAttribute('data-status') || 'Đang làm';
+
+  document.getElementById('empFieldId').value = id;
+  document.getElementById('empFieldCode').value = id;
+  document.getElementById('empCodeRow').style.display = 'block';
+  document.getElementById('empFieldFullName').value = fullName;
+  document.getElementById('empFieldPhone').value = phone;
+  document.getElementById('empFieldEmail').value = email;
+  document.getElementById('empFieldPosition').value = position;
+  document.getElementById('empFieldUsername').value = username;
+  document.getElementById('empFieldStatus').value = status;
+
+  document.getElementById('employeeModalTitle').innerText = 'Cập nhật nhân viên: #' + id;
+  const badge = document.getElementById('employeeModalBadge');
+  badge.innerText = 'Chế độ chỉnh sửa';
+  badge.className = 'badge status-inuse modal-badge';
+  document.getElementById('employeeModal').classList.add('active');
+}
+
+function closeEmployeeModal() {
+  document.getElementById('employeeModal').classList.remove('active');
+}
+
+// Close modal when clicking backdrop
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.remove('active');
+  });
+});
+
+// Auto-open modal if editId in URL
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get('editId');
+  if (editId) {
+    const btn = document.querySelector(`button[data-id="${editId}"]`);
+    if (btn) openEmployeeEditModal(btn);
+  }
+});
+</script>
     </div>
-  </section>
+  </main>
 </div>
-</main>
-</div>
-
 </body>
 </html>

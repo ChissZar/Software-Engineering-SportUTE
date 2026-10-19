@@ -44,10 +44,14 @@ public class Booking {
     @Builder.Default
     private List<Payment> payments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<BookingServiceDetail> serviceDetails = new ArrayList<>();
+
     public Booking() {
     }
 
-    public Booking(String id, Customer customer, Employee employee, Promotion promotion, BookingPolicy bookingPolicy, String status, List<BookingDetail> bookingDetails, List<Payment> payments) {
+    public Booking(String id, Customer customer, Employee employee, Promotion promotion, BookingPolicy bookingPolicy, String status, List<BookingDetail> bookingDetails, List<Payment> payments, List<BookingServiceDetail> serviceDetails) {
         this.id = id;
         this.customer = customer;
         this.employee = employee;
@@ -56,6 +60,11 @@ public class Booking {
         this.status = status;
         this.bookingDetails = bookingDetails != null ? bookingDetails : new ArrayList<>();
         this.payments = payments != null ? payments : new ArrayList<>();
+        this.serviceDetails = serviceDetails != null ? serviceDetails : new ArrayList<>();
+    }
+
+    public Booking(String id, Customer customer, Employee employee, Promotion promotion, BookingPolicy bookingPolicy, String status, List<BookingDetail> bookingDetails, List<Payment> payments) {
+        this(id, customer, employee, promotion, bookingPolicy, status, bookingDetails, payments, new ArrayList<>());
     }
     public static class BookingBuilder {
         public BookingBuilder() {

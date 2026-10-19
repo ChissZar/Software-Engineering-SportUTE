@@ -2,127 +2,220 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>SportHub - Quản lý bảng giá</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SportHub — Quản lý bảng giá & Khung giờ</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Bootstrap 5 CSS for modal & utility -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8fafc; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; }
-        .card-panel { border: none; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-    </style>
+    <!-- Unified Admin Design System -->
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
-<body class="d-flex">
+<body>
+<div class="app">
+    <!-- Shared Sidebar -->
     <div th:replace="~{fragments/sidebar :: sidebar('prices')}"></div>
 
-    <div class="flex-grow-1 p-4" style="height: 100vh; overflow-y: auto;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4 class="fw-bold mb-0">Quản lý khung giờ & bảng giá</h4>
-                <small class="text-muted">Cấu hình đơn giá thuê theo từng khung giờ và khoảng ngày hiệu lực</small>
+    <!-- Main Content Area -->
+    <main>
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="centername">
+                    <div class="mini-logo"><i class="fa-solid fa-money-bill-wave"></i></div>
+                    <span>Trung tâm Thể thao SportHub</span>
+                </div>
             </div>
-            <button class="btn btn-success rounded-3" data-bs-toggle="modal" data-bs-target="#priceModal">
-                <i class="fa-solid fa-plus me-1"></i> Thiết lập bảng giá
-            </button>
+            <div class="topbar-center">
+                <div class="search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="priceSearch" placeholder="Tìm kiếm theo mã hoặc sân áp dụng..." onkeyup="filterPrices()">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <div class="topbar-user">
+          <div class="avatar" th:text="${currentUser != null ? currentUser.avatarInitials : 'QL'}">QL</div>
+          <div class="topbar-user-info">
+            <span class="topbar-user-name" th:text="${currentUser != null ? currentUser.fullName : 'Quản lý trung tâm'}">Quản lý trung tâm</span>
+            <span class="topbar-user-role" th:text="${currentUser != null ? currentUser.roleName : 'Quản trị viên'}">Quản trị viên</span>
+          </div>
         </div>
+            </div>
+        </header>
 
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${errorMessage}"></div>
+        <!-- Page Content -->
+        <div class="content">
+            <!-- Header Banner -->
+            <section class="pagehead">
+                <div class="pagehead-left">
+                    <div class="pagehead-icon">
+                        <i class="fa-solid fa-tags"></i>
+                    </div>
+                    <div>
+                        <h1>Bảng giá & Khung giờ thuê</h1>
+                        <p>Cấu hình đơn giá thuê theo từng khung giờ và khoảng ngày hiệu lực cho từng sân</p>
+                    </div>
+                </div>
+                <div class="pagehead-actions">
+                    <button class="btn primary" data-bs-toggle="modal" data-bs-target="#priceModal">
+                        <i class="fa-solid fa-plus"></i> Thiết lập bảng giá mới
+                    </button>
+                </div>
+            </section>
 
-        <!-- Bảng danh sách bảng giá -->
-        <div class="card card-panel bg-white p-3">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light" style="font-size: 13px;">
-                        <tr>
-                            <th>Mã bảng giá</th>
-                            <th>Sân áp dụng</th>
-                            <th>Từ ngày</th>
-                            <th>Đến ngày</th>
-                            <th>Chi tiết khung giờ & đơn giá</th>
-                            <th class="text-end">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody style="font-size: 14px;">
-                        <tr th:each="p : ${prices}">
-                            <td class="fw-bold text-success" th:text="${p.id}"></td>
-                            <td class="fw-semibold" th:text="${p.courtName}"></td>
-                            <td th:text="${#temporals.format(p.fromDate, 'dd/MM/yyyy')}"></td>
-                            <td th:text="${p.toDate != null ? #temporals.format(p.toDate, 'dd/MM/yyyy') : 'Vô thời hạn'}"></td>
-                            <td>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span th:each="d : ${p.details}" class="badge bg-light text-dark border">
-                                        <span th:text="${d.timeSlot}"></span>: 
-                                        <b class="text-success" th:text="${#numbers.formatDecimal(d.priceAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></b>
+            <!-- Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+            <!-- Prices Table Card -->
+            <div class="card">
+                <div class="card-head">
+                    <h2>Danh sách bảng giá đang áp dụng</h2>
+                    <span class="badge status-inuse" th:text="${prices != null ? #lists.size(prices) + ' bảng giá' : '0 bảng giá'}">0 bảng giá</span>
+                </div>
+                <div class="tablewrap tablewrap-scroll">
+                    <table id="pricesTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 130px;">Mã bảng giá</th>
+                                <th style="width: 220px;">Sân áp dụng</th>
+                                <th style="width: 140px;">Từ ngày</th>
+                                <th style="width: 140px;">Đến ngày</th>
+                                <th>Chi tiết khung giờ & Đơn giá</th>
+                                <th class="text-end" style="width: 120px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${prices}">
+                                <td class="fw-bold" style="color: var(--primary);" th:text="${p.id}"></td>
+                                <td class="fw-semibold">
+                                    <i class="fa-solid fa-table-tennis-paddle-ball me-1 text-muted"></i>
+                                    <span th:text="${p.courtName}"></span>
+                                </td>
+                                <td>
+                                    <span class="badge status-active">
+                                        <i class="fa-regular fa-calendar me-1"></i>
+                                        <span th:text="${#temporals.format(p.fromDate, 'dd/MM/yyyy')}"></span>
                                     </span>
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="${p.toDate != null ? 'status-inuse' : 'status-disabled'}">
+                                        <i class="fa-regular fa-calendar-check me-1"></i>
+                                        <span th:text="${p.toDate != null ? #temporals.format(p.toDate, 'dd/MM/yyyy') : 'Vô thời hạn'}"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span th:each="d : ${p.details}" class="badge status-active" style="padding: 6px 12px; font-size: 12px;">
+                                            <i class="fa-regular fa-clock me-1"></i>
+                                            <span th:text="${d.timeSlot}"></span>: 
+                                            <b class="ms-1" style="color: var(--primary-dark);" th:text="${#numbers.formatDecimal(d.priceAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></b>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <form th:action="@{/admin/prices/delete/{id}(id=${p.id})}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa bảng giá này?');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Xóa bảng giá">
+                                            <i class="fa-regular fa-trash-can"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(prices)}">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-inbox fs-2 mb-2 d-block"></i>
+                                    Chưa có bảng giá nào được tạo trong hệ thống.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal Form Bảng giá -->
+<div class="modal fade" id="priceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: var(--radius-lg); border: 1px solid var(--line); box-shadow: var(--shadow-lg);">
+            <form th:action="@{/admin/prices/save}" th:object="${priceDTO}" method="post">
+                <div class="modal-header" style="border-bottom: 1px solid var(--line); padding: 18px 24px;">
+                    <h5 class="modal-title fw-bold" style="font-size: 16px; color: var(--gray-900);">Thiết lập bảng giá mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 24px;">
+                    <div class="field">
+                        <label>Chọn sân áp dụng (*)</label>
+                        <select th:field="*{courtId}" required>
+                            <option value="" disabled selected>-- Chọn sân áp dụng --</option>
+                            <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'"></option>
+                        </select>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="field mb-0">
+                                <label>Từ ngày hiệu lực (*)</label>
+                                <input type="date" th:field="*{fromDate}" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="field mb-0">
+                                <label>Đến ngày hiệu lực (để trống nếu vô thời hạn)</label>
+                                <input type="date" th:field="*{toDate}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px dashed var(--line); padding-top: 18px; margin-top: 18px;">
+                        <h6 class="fw-bold mb-3" style="font-size: 13.5px; color: var(--gray-900);">
+                            <i class="fa-solid fa-clock-rotate-left me-1" style="color: var(--primary);"></i> Khung giờ & Mức giá cơ bản
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="field mb-0">
+                                    <label>Khung giờ (VD: 05:00 - 23:00)</label>
+                                    <input type="text" th:field="*{details[0].timeSlot}" placeholder="05:00 - 23:00" required>
                                 </div>
-                            </td>
-                            <td class="text-end">
-                                <form th:action="@{/admin/prices/delete/{id}(id=${p.id})}" method="post" class="d-inline"
-                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa bảng giá này?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="fa-regular fa-trash-can"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(prices)}">
-                            <td colspan="6" class="text-center py-4 text-muted">Chưa có bảng giá nào được tạo.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="field mb-0">
+                                    <label>Đơn giá thuê (VNĐ/giờ)</label>
+                                    <input type="number" th:field="*{details[0].priceAmount}" placeholder="120000" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--line); padding: 16px 24px;">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn primary">
+                        <i class="fa-solid fa-check"></i> Lưu bảng giá
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <!-- Modal Form Bảng giá -->
-    <div class="modal fade" id="priceModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form th:action="@{/admin/prices/save}" th:object="${priceDTO}" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title fw-bold">Thiết lập bảng giá mới</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label" style="font-size: 13px;">Chọn sân (*)</label>
-                            <select th:field="*{courtId}" class="form-select" required>
-                                <option value="" disabled selected>-- Chọn sân áp dụng --</option>
-                                <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'"></option>
-                            </select>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label class="form-label" style="font-size: 13px;">Từ ngày (*)</label>
-                                <input type="date" th:field="*{fromDate}" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label" style="font-size: 13px;">Đến ngày</label>
-                                <input type="date" th:field="*{toDate}" class="form-control">
-                            </div>
-                        </div>
-
-                        <hr>
-                        <h6 class="fw-bold mb-2" style="font-size: 14px;">Khung giờ & Mức giá cơ bản</h6>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <label class="form-label" style="font-size: 12px;">Khung giờ</label>
-                                <input type="text" th:field="*{details[0].timeSlot}" class="form-control" placeholder="05:00 - 23:00" required>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label" style="font-size: 12px;">Đơn giá (VNĐ/giờ)</label>
-                                <input type="number" th:field="*{details[0].priceAmount}" class="form-control" placeholder="120000" min="0" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="btn btn-success">Lưu bảng giá</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function filterPrices() {
+        const query = document.getElementById('priceSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('#pricesTable tbody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    }
+</script>
 </body>
 </html>
