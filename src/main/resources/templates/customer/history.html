@@ -1496,7 +1496,7 @@
       <h3 class="logout-modal-title">Xác nhận hủy đặt sân</h3>
       <p class="logout-modal-desc" id="cancelConfirmDesc">
         Bạn có chắc chắn muốn hủy phiếu đặt sân này không?<br>
-        Tiền cọc sẽ được hoàn lại theo quy định của chính sách hủy sân SportHub.
+        Khoản đã thu sẽ được tính hoàn theo chính sách và chờ lễ tân chi trả; hủy phiếu không tự chuyển tiền. Nếu đã chuyển khoản nhưng chưa được xác nhận, vui lòng liên hệ lễ tân đối soát trước khi hủy.
       </p>
       <div class="logout-modal-actions">
         <button type="button" class="btn-logout-cancel" onclick="closeCancelModal()">Giữ lại lịch</button>
@@ -1828,7 +1828,7 @@
       currentCancelForm = form;
       const desc = document.getElementById('cancelConfirmDesc');
       if (desc) {
-        desc.innerHTML = `Bạn có chắc chắn muốn hủy phiếu đặt sân <strong>#${bookingId}</strong> không?<br>Tiền cọc sẽ được hoàn lại theo quy định của chính sách hủy sân SportHub.`;
+        desc.innerHTML = `Bạn có chắc chắn muốn hủy phiếu đặt sân <strong>#${bookingId}</strong> không?<br>Khoản đã thu sẽ được tính hoàn theo chính sách và chờ lễ tân chi trả; hủy phiếu không tự chuyển tiền. Nếu đã chuyển khoản nhưng chưa được xác nhận, vui lòng liên hệ lễ tân đối soát trước khi hủy.`;
       }
       const modal = document.getElementById('cancelConfirmModal');
       if (modal) modal.classList.add('show');

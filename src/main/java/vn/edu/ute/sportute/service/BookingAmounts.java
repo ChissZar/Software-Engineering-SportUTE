@@ -14,6 +14,20 @@ public class BookingAmounts {
             .map(p -> "Hoàn tiền".equals(p.getTransactionType()) ? p.getAmount().negate() : p.getAmount())
             .reduce(BigDecimal.ZERO,BigDecimal::add);
     }
+    public static BigDecimal cancellationRefund(Booking b) {
+        BigDecimal received = b.getPayments().stream().filter(BookingAmounts::counted)
+            .filter(p -> !"Hoàn tiền".equals(p.getTransactionType())).map(Payment::getAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal rate = b.getBookingPolicy() != null && b.getBookingPolicy().getCancellationFeeRate() != null
+            ? b.getBookingPolicy().getCancellationFeeRate() : BigDecimal.TEN;
+        if (rate.signum() < 0 || rate.compareTo(BigDecimal.valueOf(100)) > 0)
+            throw new IllegalArgumentException("Tỷ lệ phí hủy phải từ 0 đến 100%");
+        BigDecimal fee = received.multiply(rate).divide(BigDecimal.valueOf(100),0,RoundingMode.HALF_UP);
+        BigDecimal alreadyRefundedOrPending = b.getPayments().stream()
+            .filter(p -> "Hoàn tiền".equals(p.getTransactionType()) && (counted(p) || "PENDING".equals(p.getPaymentStatus())))
+            .map(Payment::getAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+        return received.subtract(fee).subtract(alreadyRefundedOrPending).max(BigDecimal.ZERO);
+    }
     public BigDecimal total(Booking b) {
         BigDecimal court = b.getQuotedAmount();
         if (court == null) {

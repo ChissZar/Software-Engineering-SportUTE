@@ -187,8 +187,10 @@
                 <td th:text="${p.transactionDate != null ? #temporals.format(p.transactionDate, 'dd/MM/yyyy HH:mm') : 'Không có dữ liệu cũ'}"></td>
                 <td>
                   <span class="badge status-inuse" th:text="${p.status}"></span>
-                  <form th:if="${p.status == 'Chờ xác nhận'}" th:action="@{/admin/payments/{id}/confirm(id=${p.id})}" method="post" data-confirm="Xác nhận đã đối soát khoản tiền này?">
-                    <button name="accept" value="true" class="btn" type="submit">Đã nhận / chi tiền</button>
+                  <form th:if="${p.status == 'Chờ xác nhận'}" th:action="@{/admin/payments/{id}/confirm(id=${p.id})}" method="post" th:attr="data-confirm=${p.transactionType == 'Hoàn tiền' ? 'Bạn đã thực sự trả tiền cho khách? Thao tác này chỉ ghi nhận, không tự chuyển tiền.' : 'Bạn đã kiểm tra và thực sự nhận đủ khoản tiền này?'}">
+                    <button name="accept" value="true" class="btn" type="submit" th:text="${p.transactionType == 'Hoàn tiền' ? 'Xác nhận đã hoàn tiền' : 'Xác nhận đã nhận tiền'}">Xác nhận đã nhận tiền</button>
+                  </form>
+                  <form th:if="${p.status == 'Chờ xác nhận'}" th:action="@{/admin/payments/{id}/confirm(id=${p.id})}" method="post" data-confirm="Hủy khoản chờ này? Thao tác chỉ cập nhật sổ theo dõi, không hoàn hoặc thu hồi tiền đã chuyển qua ngân hàng.">
                     <button name="accept" value="false" class="btn" type="submit">Hủy khoản chờ</button>
                   </form>
                 </td>
@@ -208,7 +210,7 @@
 </div>
 
 <section class="card" style="margin:24px"><div class="card-head"><h2>Đối chiếu theo phiếu đặt</h2><a class="btn" href="/admin/payments">Làm mới giao dịch</a></div>
-<p style="padding:12px">Khoản chờ xác nhận chưa được tính vào đã thu. Số liệu cũ được giữ nguyên để đối chiếu, chưa phải xác nhận ngân hàng.</p>
+<p style="padding:12px">Đối soát thủ công: kiểm tra tiền vào trên ngân hàng trước khi xác nhận đã nhận tiền; thực sự trả tiền cho khách trước khi xác nhận đã hoàn tiền. Các nút chỉ ghi nhận sổ giao dịch, không chuyển tiền qua ngân hàng. Khoản chờ thu/hoàn chưa tính vào thu/hoàn thực tế. Không tạo thêm giao dịch trùng khi đã có khoản chờ.</p>
 <div class="tablewrap"><table><thead><tr><th>Phiếu</th><th>Tổng phải trả</th><th>Đã cọc</th><th>Tổng đã thu</th><th>Đã hoàn</th><th>Còn thiếu</th></tr></thead><tbody>
 <tr th:each="entry : ${balances}"><td th:text="${entry.key}"></td><td th:each="key : ${ {'total','deposit','paid','refunded','remaining'} }" th:text="${#numbers.formatDecimal(entry.value[key],0,'COMMA',0,'POINT') + ' đ'}"></td></tr>
 </tbody></table></div></section>

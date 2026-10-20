@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>SportHub — Quản trị Phân quyền & Vai trò Người dùng (RBAC)</title>
-  
+
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,10 +14,10 @@
 
   <!-- FontAwesome 6.5.1 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+
   <!-- Bootstrap 5.3.8 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-  
+
   <!-- Unified Admin CSS -->
   <link rel="stylesheet" th:href="@{/css/admin.css}">
 
@@ -871,9 +871,7 @@
           <p>Hệ thống quản lý định danh RBAC kết nối cơ sở dữ liệu thực: Quản lý vai trò, ma trận quyền hạn chức năng và gán thẩm quyền tài khoản</p>
         </div>
         <div class="welcome-actions">
-          <button class="btn primary" onclick="openNewRoleModal()">
-            <i class="fa-solid fa-plus"></i> Tạo vai trò mới
-          </button>
+
           <button class="btn" onclick="document.getElementById('ma-tran-quyen').scrollIntoView({behavior:'smooth'})">
             <i class="fa-solid fa-bolt"></i> Ma trận quyền hạn
           </button>
@@ -1034,9 +1032,7 @@
                 <p>Bảng VAITRO & ánh xạ thẩm quyền</p>
               </div>
             </div>
-            <button class="btn-action-sm" onclick="openNewRoleModal()">
-              <i class="fa-solid fa-plus me-1"></i> Thêm
-            </button>
+
           </div>
 
           <div class="roles-stack">
@@ -1270,36 +1266,6 @@
   </div>
 </div>
 
-<!-- MODAL: CREATE NEW ROLE -->
-<div class="modal-overlay" id="newRoleModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3>Tạo Vai trò Mới</h3>
-      <button class="close-btn" onclick="closeModal('newRoleModal')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Mã vai trò (Bắt đầu bằng VT_)</label>
-        <input type="text" id="newRoleCode" placeholder="Ví dụ: VT_KETOAN">
-      </div>
-      <div class="form-group">
-        <label>Tên vai trò (ROLE_*)</label>
-        <input type="text" id="newRoleName" placeholder="Ví dụ: ROLE_ACCOUNTANT">
-      </div>
-      <div class="form-group">
-        <label>Mô tả nhiệm vụ & phạm vi quyền</label>
-        <textarea id="newRoleDesc" rows="3" placeholder="Nhập tóm tắt chức trách của vai trò mới..."></textarea>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-subtle" onclick="closeModal('newRoleModal')">Hủy</button>
-      <button class="btn-emerald" onclick="submitNewRole()">
-        <i class="fa-solid fa-floppy-disk me-1"></i> Lưu vai trò
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- FLOATING TOAST -->
 <div class="toast-pill" id="toastMessage">
   <i class="fa-solid fa-circle-check"></i>
@@ -1397,40 +1363,6 @@ function toggleAccountStatusApi(btn) {
   })
   .catch(err => {
     showToast('Lỗi khi đổi trạng thái: ' + err);
-  });
-}
-
-function openNewRoleModal() {
-  document.getElementById('newRoleModal').classList.add('open');
-}
-
-function submitNewRole() {
-  const id = document.getElementById('newRoleCode').value.trim();
-  const name = document.getElementById('newRoleName').value.trim();
-  const desc = document.getElementById('newRoleDesc').value.trim();
-
-  if (!id || !name) {
-    appNotice('Vui lòng nhập đầy đủ mã vai trò và tên vai trò!');
-    return;
-  }
-
-  fetch('/admin/permissions/role/create', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, name, description: desc })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      closeModal('newRoleModal');
-      showToast(data.message);
-      setTimeout(() => location.reload(), 900);
-    } else {
-      appNotice(data.message || 'Không thể tạo vai trò mới');
-    }
-  })
-  .catch(err => {
-    showToast('Lỗi khi tạo vai trò: ' + err);
   });
 }
 

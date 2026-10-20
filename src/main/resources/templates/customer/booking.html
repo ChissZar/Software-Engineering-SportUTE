@@ -3187,7 +3187,7 @@
                 <div class="policy-box">
                   <div>
                     <i class="fa-solid fa-circle-check text-success"></i>
-                    <span><strong>Cam kết 100% giữ sân:</strong> Phiếu đặt giữ chỗ của bạn được hệ thống khóa lịch tự động ngay khi thanh toán.</span>
+                    <span><strong>Trạng thái đặt sân:</strong> Phiếu mới chờ lễ tân đối soát. Kiểm tra trạng thái Đã xác nhận trong lịch sử trước khi đến sân.</span>
                   </div>
                   <div>
                     <i class="fa-solid fa-clock-rotate-left text-primary"></i>
@@ -3299,27 +3299,28 @@
                 </p>
 
                 <!-- Payment Methods Grid (VietQR, MoMo, VNPAY) -->
+                <p role="note" style="padding:12px;border:1px solid #f59e0b;border-radius:10px;background:#fffbeb;color:#92400e;line-height:1.6">Thanh toán được đối soát thủ công. QR và thông tin tài khoản bên dưới là minh họa, không dùng để chuyển tiền thật. Vui lòng liên hệ lễ tân để xác nhận tài khoản nhận tiền. Gửi phiếu chưa đồng nghĩa đã nhận tiền hoặc lịch đã được xác nhận.</p>
                 <div class="payment-methods-grid">
                   <!-- VietQR -->
                   <div class="pay-method-pill active" id="payMethodVietQR" onclick="selectPayMethod('Chuyển khoản VietQR')">
                     <div class="pay-method-icon"><i class="fa-solid fa-qrcode"></i></div>
                     <div class="pay-method-text">
-                      <span class="pay-method-name">Chuyển khoản VietQR</span>
-                      <span class="pay-method-hint">Quét mã 24/7 mọi ngân hàng</span>
+                      <span class="pay-method-name">Chuyển khoản — đối soát thủ công</span>
+                      <span class="pay-method-hint">Lễ tân kiểm tra và xác nhận tiền vào</span>
                     </div>
                   </div>
 
                   <!-- MoMo -->
-                  <div class="pay-method-pill" id="payMethodMoMo" onclick="selectPayMethod('Ví MoMo')">
+                  <div class="pay-method-pill" id="payMethodMoMo" aria-disabled="true" style="opacity:.55;cursor:not-allowed">
                     <div class="pay-method-icon"><i class="fa-solid fa-wallet"></i></div>
                     <div class="pay-method-text">
                       <span class="pay-method-name">Ví điện tử MoMo</span>
-                      <span class="pay-method-hint">Quét mã qua App MoMo</span>
+                      <span class="pay-method-hint">Chưa tích hợp</span>
                     </div>
                   </div>
 
                   <!-- VNPAY -->
-                  <div class="pay-method-pill" id="payMethodVNPAY" onclick="selectPayMethod('Cổng VNPAY')">
+                  <div class="pay-method-pill" id="payMethodVNPAY" aria-disabled="true" style="opacity:.55;cursor:not-allowed">
                     <div class="pay-method-icon"><i class="fa-regular fa-credit-card"></i></div>
                     <div class="pay-method-text">
                       <span class="pay-method-name">VNPAY / Thẻ ATM</span>
@@ -3389,13 +3390,13 @@
                 <div id="vnpayNoticeBox" style="display:none;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:14px;padding:20px;text-align:center;">
                   <i class="fa-regular fa-credit-card" style="font-size:36px;color:#2563EB;margin-bottom:10px;"></i>
                   <h4 style="font-size:15px;font-weight:800;color:#1E3A8A;margin-bottom:6px;">Cổng thanh toán liên ngân hàng VNPAY-QR</h4>
-                  <p style="font-size:13px;color:#1D4ED8;">Sau khi bấm xác nhận, hệ thống sẽ tự động tạo giao dịch cọc an toàn được mã hóa 256-bit SSL.</p>
+                  <p style="font-size:13px;color:#1D4ED8;">VNPAY chưa được tích hợp. Ứng dụng không tự xác minh hoặc chuyển tiền.</p>
                 </div>
 
                 <!-- Quick Transfer Info Reminder -->
                 <div style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:12px;padding:12px 16px;font-size:12.5px;color:#065F46;margin-top:16px;display:flex;align-items:center;gap:10px;">
                   <i class="fa-solid fa-circle-check" style="font-size:16px;color:#059669;flex-shrink:0;"></i>
-                  <span>Sau khi chuyển khoản trên ứng dụng ngân hàng, vui lòng bấm nút <strong>"Xác nhận đã thanh toán"</strong> bên phải để hệ thống hoàn tất đặt sân.</span>
+                  <span>Bấm <strong>"Gửi phiếu chờ đối soát"</strong> để tạo yêu cầu. Nếu đã chuyển tiền theo hướng dẫn của lễ tân, hãy cung cấp chứng từ để đối chiếu. Lịch chỉ được xác nhận sau khi đủ điều kiện thu cọc.</span>
                 </div>
               </div>
             </div>
@@ -3451,7 +3452,7 @@
                 </button>
                 <button type="button" class="btn-wizard-next btn-pay-confirm" id="btnSubmitPayment" onclick="submitBookingPayment()">
                   <i class="fa-solid fa-circle-check"></i>
-                  <span>Xác nhận đã thanh toán</span>
+                  <span>Gửi phiếu chờ đối soát</span>
                 </button>
               </div>
 
@@ -4869,11 +4870,11 @@
       const newNotif = {
         id: 'notif_b_' + (bookingData.bookingId || Date.now()),
         type: 'booking',
-        title: `Đặt sân thành công! #${bookingData.bookingId}`,
+        title: `Đã tạo phiếu chờ xác nhận #${bookingData.bookingId}`,
         time: 'Vừa xong',
         dateStr: new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}),
         desc: `Sân ${bookingData.courtName || ''} (${bookingData.sportName || ''}), giờ: ${bookingData.time || ''}`,
-        content: `Chúc mừng bạn đã đặt sân thành công!\n\nChi tiết đặt sân:\n• Mã đơn: #${bookingData.bookingId}\n• Tên sân: ${bookingData.courtName} (${bookingData.sportName})\n• Khung giờ: ${bookingData.time}\n• Ngày đặt: ${formatDateVN(bookingData.date)}\n• Địa điểm: ${bookingData.location || 'SportUTE'}\n\nQuý khách vui lòng đến trước giờ thi đấu 10 phút để nhận sân tại quầy lễ tân. Chúc bạn có những giờ phút thể thao vui vẻ!`,
+        content: `Đã tạo phiếu đặt sân, đang chờ lễ tân đối soát tiền.\n\nChi tiết đặt sân:\n• Mã đơn: #${bookingData.bookingId}\n• Tên sân: ${bookingData.courtName} (${bookingData.sportName})\n• Khung giờ: ${bookingData.time}\n• Ngày đặt: ${formatDateVN(bookingData.date)}\n• Địa điểm: ${bookingData.location || 'SportUTE'}\n\nVui lòng kiểm tra trạng thái Đã xác nhận trong lịch sử trước khi đến sân.`,
         unread: true, // Kích hoạt chấm đỏ ngay lập tức!
         extraData: {
           bookingId: bookingData.bookingId,

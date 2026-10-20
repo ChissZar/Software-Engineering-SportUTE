@@ -34,6 +34,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/admin/bookings/api/**", "/customer/booking/api/**", "/customer/community/api/**", "/customer/api/**", "/admin/services/api/**", "/admin/permissions/**", "/v3/api-docs/**", "/swagger-ui/**")) 
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/customer/password/change").hasAuthority("ROLE_CUSTOMER")
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/customer/community/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_MANAGER")
                 .requestMatchers("/customer/community/mine").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_MANAGER")
                 .requestMatchers("/favicon.ico", "/favicon.png", "/login", "/register/**", "/forgot-password/**", "/otp-action", "/auth/**", "/error", "/css/**", "/js/**", "/images/**", "/uploads/**", "/customer/api/avatar/**", "/api/chat", "/customer/api/chat", "/customer/community/**", "/v3/api-docs/**", "/v3/api-docs", "/swagger-ui/**", "/swagger-ui", "/swagger-ui.html").permitAll()

@@ -376,7 +376,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     @Override
     public void cancelBookingByCustomer(String bookingId, String accountUsernameOrEmail, String reason) {
         Customer customer = resolveCustomer(accountUsernameOrEmail);
-        Booking booking = bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findForUpdate(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiếu đặt sân: " + bookingId));
 
         if (booking.getCustomer() == null || !booking.getCustomer().getId().equals(customer.getId())) {
@@ -391,33 +391,11 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
             throw new IllegalArgumentException("Không thể hủy phiếu khi đang sử dụng sân hoặc đã hoàn tất!");
         }
 
-        // Tính phí hủy theo chính sách
-        BookingPolicy policy = booking.getBookingPolicy();
-        BigDecimal cancelRate = BigDecimal.valueOf(10.0);
-        if (policy != null && policy.getCancellationFeeRate() != null) {
-            cancelRate = policy.getCancellationFeeRate();
-        }
-
-        BigDecimal totalPaid = booking.getPayments().stream()
-                .filter(vn.edu.ute.sportute.service.BookingAmounts::counted)
-                .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
-                .map(Payment::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal cancellationFee = totalPaid.multiply(cancelRate).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
-        BigDecimal refundAmount = totalPaid.subtract(cancellationFee);
-        if (refundAmount.compareTo(BigDecimal.ZERO) < 0) refundAmount = BigDecimal.ZERO;
+        BigDecimal refundAmount = vn.edu.ute.sportute.service.BookingAmounts.cancellationRefund(booking);
 
         for (Payment pending : booking.getPayments()) if ("PENDING".equals(pending.getPaymentStatus()) && !"Hoàn tiền".equals(pending.getTransactionType())) pending.setPaymentStatus("VOID");
         booking.setStatus("Đã hủy");
         bookingRepository.save(booking);
-
-        // Giải phóng sân
-        if (!booking.getBookingDetails().isEmpty()) {
-            Court court = booking.getBookingDetails().get(0).getCourt();
-            court.setStatus("Hoạt động");
-            courtRepository.save(court);
-        }
 
         // Ghi nhận hoàn tiền
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
@@ -429,7 +407,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                     .amount(refundAmount)
                     .paymentMethod("Chuyển khoản")
                     .build();
-            paymentRepository.save(refund);
+            booking.getPayments().add(paymentRepository.save(refund));
         }
 
         // Tự động hủy/gỡ bài ghép đối thủ trên sàn giao lưu (nếu có)

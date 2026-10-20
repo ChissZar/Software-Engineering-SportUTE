@@ -494,68 +494,27 @@ public class AdminBookingServiceImpl implements AdminBookingService {
 
     @Override
     public void cancelBooking(String id) {
-        Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiếu đặt sân: " + id));
-
-        for (Payment pending : booking.getPayments()) if ("PENDING".equals(pending.getPaymentStatus()) && !"Hoàn tiền".equals(pending.getTransactionType())) pending.setPaymentStatus("VOID");
-        booking.setStatus("Đã hủy");
-        bookingRepository.save(booking);
-
-        if (!booking.getBookingDetails().isEmpty()) {
-            Court court = booking.getBookingDetails().get(0).getCourt();
-            court.setStatus("Hoạt động");
-            courtRepository.save(court);
-        }
-
-        if (matchmakingService != null) {
-            try {
-                matchmakingService.cancelPostByBookingId(id, "Quản trị viên");
-            } catch (Exception ignored) {}
-        }
+        cancelBookingWithPolicy(CancelBookingDTO.builder().bookingId(id).build());
     }
 
     @Override
     public void cancelBookingWithPolicy(CancelBookingDTO dto) {
-        Booking booking = bookingRepository.findById(dto.getBookingId())
+        Booking booking = bookingRepository.findForUpdate(dto.getBookingId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiếu đặt sân: " + dto.getBookingId()));
 
         if ("Đã hủy".equalsIgnoreCase(booking.getStatus())) {
             throw new IllegalArgumentException("Phiếu đặt này đã bị hủy trước đó!");
         }
-        if ("Hoàn tất".equalsIgnoreCase(booking.getStatus())) {
-            throw new IllegalArgumentException("Không thể hủy phiếu đã hoàn tất!");
+        if ("Hoàn tất".equalsIgnoreCase(booking.getStatus()) || "Đang sử dụng".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalArgumentException("Không thể hủy phiếu đang sử dụng hoặc đã hoàn tất!");
         }
 
-        // Lấy chính sách cọc & hủy
-        BookingPolicy policy = booking.getBookingPolicy();
-        BigDecimal cancelRate = BigDecimal.valueOf(10.0); // Mặc định 10%
-        if (policy != null && policy.getCancellationFeeRate() != null) {
-            cancelRate = policy.getCancellationFeeRate();
-        }
-
-        // Tổng tiền đã thu/cọc
-        BigDecimal totalPaid = booking.getPayments().stream()
-                .filter(vn.edu.ute.sportute.service.BookingAmounts::counted)
-                .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
-                .map(Payment::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Tính phí hủy và tiền hoàn
-        BigDecimal cancellationFee = totalPaid.multiply(cancelRate).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
-        BigDecimal refundAmount = totalPaid.subtract(cancellationFee);
-        if (refundAmount.compareTo(BigDecimal.ZERO) < 0) refundAmount = BigDecimal.ZERO;
+        BigDecimal refundAmount = vn.edu.ute.sportute.service.BookingAmounts.cancellationRefund(booking);
 
         // Cập nhật trạng thái "Đã hủy" (RB1: không xóa vật lý)
         for (Payment pending : booking.getPayments()) if ("PENDING".equals(pending.getPaymentStatus()) && !"Hoàn tiền".equals(pending.getTransactionType())) pending.setPaymentStatus("VOID");
         booking.setStatus("Đã hủy");
         bookingRepository.save(booking);
-
-        // Giải phóng sân
-        if (!booking.getBookingDetails().isEmpty()) {
-            Court court = booking.getBookingDetails().get(0).getCourt();
-            court.setStatus("Hoạt động");
-            courtRepository.save(court);
-        }
 
         // Ghi nhận hoàn tiền nếu có
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
@@ -567,7 +526,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     .amount(refundAmount)
                     .paymentMethod("Chuyển khoản")
                     .build();
-            paymentRepository.save(refund);
+            booking.getPayments().add(paymentRepository.save(refund));
         }
 
         if (matchmakingService != null) {

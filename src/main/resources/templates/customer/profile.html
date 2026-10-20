@@ -1933,20 +1933,21 @@
         </h1>
         <p class="subpage-card-subtitle">Để bảo vệ tài khoản, bạn nên sử dụng mật khẩu mạnh có chữ hoa, số và ký tự đặc biệt</p>
 
-        <form onsubmit="handleSubpagePasswordSubmit(event)">
+        <form id="changePasswordForm" method="post" th:action="@{/customer/password/change}" onsubmit="handleSubpagePasswordSubmit(event)">
+          <p id="passwordFeedback" role="status" aria-live="polite" hidden></p>
           <div class="form-group">
             <label>Mật khẩu hiện tại (*)</label>
-            <input type="password" class="form-control" placeholder="••••••••" required>
+            <input type="password" name="currentPassword" autocomplete="current-password" class="form-control" placeholder="••••••••" required>
           </div>
 
           <div class="form-grid-2">
             <div class="form-group">
               <label>Mật khẩu mới (*)</label>
-              <input type="password" id="subpageNewPwd" class="form-control" placeholder="Tối thiểu 8 ký tự" required minlength="8">
+              <input type="password" id="subpageNewPwd" name="newPassword" autocomplete="new-password" maxlength="72" class="form-control" placeholder="Tối thiểu 8 ký tự" required minlength="8">
             </div>
             <div class="form-group">
               <label>Xác nhận mật khẩu mới (*)</label>
-              <input type="password" id="subpageConfirmPwd" class="form-control" placeholder="Nhập lại mật khẩu mới" required minlength="8">
+              <input type="password" id="subpageConfirmPwd" name="confirmPassword" autocomplete="new-password" maxlength="72" class="form-control" placeholder="Nhập lại mật khẩu mới" required minlength="8">
             </div>
           </div>
 
@@ -2680,16 +2681,43 @@
     // =========================================================================
     // 4. TIỆN ÍCH KHÁC (VOUCHER, SEARCH, PASSWORD)
     // =========================================================================
-    function handleSubpagePasswordSubmit(e) {
+    async function handleSubpagePasswordSubmit(e) {
       e.preventDefault();
-      const p1 = document.getElementById('subpageNewPwd').value;
-      const p2 = document.getElementById('subpageConfirmPwd').value;
-      if (p1 !== p2) {
-        showToastNotification('Mật khẩu xác nhận không khớp, vui lòng kiểm tra lại!', true);
-        return;
+      const form = e.currentTarget;
+      const feedback = document.getElementById('passwordFeedback');
+      const button = form.querySelector('button[type="submit"]');
+      if (button.disabled) return;
+      const show = (message, ok = false) => {
+        feedback.hidden = false;
+        feedback.textContent = message;
+        feedback.style.color = ok ? '#047857' : '#b91c1c';
+      };
+      const password = form.elements.newPassword.value;
+      if (password !== form.elements.confirmPassword.value) {
+        show('Mật khẩu xác nhận không khớp, vui lòng kiểm tra lại.'); return;
       }
-      showToastNotification('Đã cập nhật mật khẩu mới thành công!');
-      setTimeout(() => switchView('main'), 800);
+      if (new TextEncoder().encode(password).length > 72) {
+        show('Mật khẩu mới không được vượt quá 72 byte UTF-8.'); return;
+      }
+      button.disabled = true;
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST', credentials: 'same-origin',
+          body: new URLSearchParams(new FormData(form)),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (response.redirected || response.status === 401 || response.status === 403) {
+          show('Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng tải lại trang và đăng nhập.'); return;
+        }
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          show(result.message || 'Không thể đổi mật khẩu. Vui lòng thử lại.'); return;
+        }
+        form.reset();
+        show(result.message, true);
+      } catch (_) {
+        show('Không thể kết nối máy chủ. Vui lòng thử lại.');
+      } finally { button.disabled = false; }
     }
 
     function copyAndUseVoucher(code) {

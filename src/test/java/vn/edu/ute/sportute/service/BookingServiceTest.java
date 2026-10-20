@@ -132,6 +132,7 @@ public class BookingServiceTest {
 
     @Test
     void testCancelBookingWithPolicyRefund() {
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
         BookingPolicy policy = BookingPolicy.builder().id("CS01").name("Tiêu chuẩn")
                 .cancellationFeeRate(BigDecimal.valueOf(10.0))
                 .build();
@@ -146,7 +147,7 @@ public class BookingServiceTest {
         booking.getBookingDetails().add(detail);
         booking.getPayments().add(Payment.builder().id("GD01").amount(BigDecimal.valueOf(200000)).transactionType("Thu").build());
 
-        when(bookingRepository.findById("DS01")).thenReturn(Optional.of(booking));
+        when(bookingRepository.findForUpdate("DS01")).thenReturn(Optional.of(booking));
 
         CancelBookingDTO dto = CancelBookingDTO.builder()
                 .bookingId("DS01")

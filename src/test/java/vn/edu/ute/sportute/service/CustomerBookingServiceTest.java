@@ -113,6 +113,7 @@ public class CustomerBookingServiceTest {
 
     @Test
     void testCancelCustomerBooking_RefundCalculated() {
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
         Account account = Account.builder().id("TK01").username("minhanh").build();
         Customer customer = Customer.builder().id("KH01").fullName("Minh Anh").account(account).build();
         Court court = Court.builder().id("S01").name("Sân 1").status("Đang sử dụng").build();
@@ -129,12 +130,14 @@ public class CustomerBookingServiceTest {
 
         when(accountRepository.findByUsernameOrEmail("minhanh", "minhanh")).thenReturn(Optional.of(account));
         when(customerRepository.findByAccount_Id("TK01")).thenReturn(Optional.of(customer));
-        when(bookingRepository.findById("DS01")).thenReturn(Optional.of(booking));
+        when(bookingRepository.findForUpdate("DS01")).thenReturn(Optional.of(booking));
 
         customerBookingService.cancelBookingByCustomer("DS01", "minhanh", "Bận việc");
 
         assertEquals("Đã hủy", booking.getStatus());
-        assertEquals("Hoạt động", court.getStatus());
+        // Cancelling a future booking must not overwrite another booking's current court usage.
+        assertEquals("Đang sử dụng", court.getStatus());
+        verify(courtRepository, never()).save(any());
         verify(paymentRepository, times(1)).save(argThat(p -> 
                 "Hoàn tiền".equals(p.getTransactionType()) && p.getAmount().compareTo(BigDecimal.valueOf(90000)) == 0
         ));

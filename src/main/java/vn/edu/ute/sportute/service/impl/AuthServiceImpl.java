@@ -18,6 +18,25 @@ import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+    @Override
+    @Transactional
+    public void changePassword(String username, String currentPassword, String newPassword, String confirmation) {
+        if (username == null || username.isBlank()) throw new IllegalArgumentException("Vui lòng đăng nhập lại");
+        Account account = accountRepository.findByUsernameOrEmail(username, username)
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại"));
+        if (currentPassword == null || !passwordEncoder.matches(currentPassword, account.getPassword()))
+            throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
+        if (newPassword == null || newPassword.isBlank() || newPassword.length() < 8
+                || newPassword.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72)
+            throw new IllegalArgumentException("Mật khẩu mới cần ít nhất 8 ký tự và không vượt quá 72 byte UTF-8");
+        if (!newPassword.equals(confirmation))
+            throw new IllegalArgumentException("Xác nhận mật khẩu mới không khớp");
+        if (passwordEncoder.matches(newPassword, account.getPassword()))
+            throw new IllegalArgumentException("Mật khẩu mới phải khác mật khẩu hiện tại");
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
+    }
+
     @org.springframework.beans.factory.annotation.Autowired
     private IdGenerator idGenerator;
 
