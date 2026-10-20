@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@lombok.AllArgsConstructor
 public class MaintenanceDTO {
+    private String status;
     private String id;
 
     @NotBlank(message = "Vui lòng chọn sân cần bảo trì")

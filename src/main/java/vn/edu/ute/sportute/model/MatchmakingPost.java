@@ -6,15 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchmakingPost {
-    private String id;              // Mã kèo: KEO-001, KEO-002,...
-    private String bookingId;       // Liên kết mã phiếu đặt sân nếu có
+    private String id;              // Mã kèo: KEO001, KEO002,...
+    private String bookingId;       // Liên kết bắt buộc với phiếu đặt sân
     private String sportName;       // Bóng đá, Cầu lông, Pickleball, Bóng rổ
     private String courtName;       // Sân bóng đá 1, Sân cầu lông 2,...
-    private String courtId;         // S01, S02,...
+    private String courtId;         // S001, S002,...
     private String matchDate;       // yyyy-MM-dd
     private String startTime;       // HH:mm
     private String endTime;         // HH:mm
@@ -22,6 +22,12 @@ public class MatchmakingPost {
     private int durationMinutes = 120;
 
     // Người tạo kèo (Chủ sân)
+    private String creatorAccountId;
+    private String opponentAccountId;
+    private boolean creatorNotificationRead;
+    private boolean opponentNotificationRead;
+    private boolean owner;
+    private boolean participant;
     private String creatorName;
     private String creatorPhone;
     private String creatorEmail;

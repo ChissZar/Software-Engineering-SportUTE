@@ -17,7 +17,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, St
     // 1. Kiểm tra trùng lịch khi TẠO MỚI (không có excludeBookingId)[cite: 3]
     @Query("SELECT COUNT(ct) > 0 FROM BookingDetail ct " +
            "WHERE ct.court.id = :courtId " +
-           "AND ct.booking.status <> 'Đã hủy' " +
+           "AND ct.booking.status <> :#{'Đã hủy'} " +
            "AND ct.startTime < :endTime AND ct.endTime > :startTime")
     boolean existsOverlappingBooking(@Param("courtId") String courtId,
                                     @Param("startTime") LocalDateTime startTime,
@@ -26,7 +26,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, St
     // 2. Kiểm tra trùng lịch khi CẬP NHẬT (loại trừ chính mã phiếu đang chỉnh sửa)[cite: 3]
     @Query("SELECT COUNT(ct) > 0 FROM BookingDetail ct " +
            "WHERE ct.court.id = :courtId " +
-           "AND ct.booking.status <> 'Đã hủy' " +
+           "AND ct.booking.status <> :#{'Đã hủy'} " +
            "AND ct.booking.id <> :excludeBookingId " +
            "AND ct.startTime < :endTime AND ct.endTime > :startTime")
     boolean existsOverlappingBookingExceptSelf(@Param("courtId") String courtId,
@@ -37,7 +37,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, St
     // 3. Lấy danh sách chi tiết đặt sân đang trùng lịch để Chatbot trả lời chi tiết ai/giờ nào đã đặt
     @Query("SELECT ct FROM BookingDetail ct " +
            "WHERE ct.court.id = :courtId " +
-           "AND ct.booking.status <> 'Đã hủy' " +
+           "AND ct.booking.status <> :#{'Đã hủy'} " +
            "AND ct.startTime < :endTime AND ct.endTime > :startTime")
     List<BookingDetail> findOverlappingBookings(@Param("courtId") String courtId,
                                                @Param("startTime") LocalDateTime startTime,
@@ -46,7 +46,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, St
     // 4. Lấy tất cả lịch đặt đang hiệu lực của một sân trong ngày
     @Query("SELECT ct FROM BookingDetail ct " +
            "WHERE ct.court.id = :courtId " +
-           "AND ct.booking.status <> 'Đã hủy' " +
+           "AND ct.booking.status <> :#{'Đã hủy'} " +
            "AND ct.startTime >= :startOfDay AND ct.startTime < :endOfDay " +
            "ORDER BY ct.startTime ASC")
     List<BookingDetail> findActiveBookingsByCourtAndDate(@Param("courtId") String courtId,

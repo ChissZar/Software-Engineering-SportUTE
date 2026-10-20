@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/customer")
 public class CustomerBookingController {
+    @org.springframework.beans.factory.annotation.Autowired
+    private vn.edu.ute.sportute.service.BookingPricingService pricing;
+
 
     private final CustomerBookingService customerBookingService;
     private final SportService sportService;
@@ -82,12 +85,6 @@ public class CustomerBookingController {
                 return custOpt.get();
             }
         }
-        Optional<Customer> byEmail = customerRepository.findByEmail(usernameOrEmail);
-        if (byEmail.isPresent()) return byEmail.get();
-
-        Optional<Customer> byPhone = customerRepository.findByPhone(usernameOrEmail);
-        if (byPhone.isPresent()) return byPhone.get();
-
         return null;
     }
 
@@ -153,17 +150,7 @@ public class CustomerBookingController {
             return ResponseEntity.notFound().build();
         }
 
-        BigDecimal hourlyRate = BigDecimal.valueOf(100000);
-        var effectivePrice = priceRepository.findEffectivePrice(courtId, targetDate);
-        if (effectivePrice.isPresent() && !effectivePrice.get().getPriceDetails().isEmpty()) {
-            hourlyRate = effectivePrice.get().getPriceDetails().get(0).getPriceAmount();
-        } else if (court.getSport() != null) {
-            String mId = court.getSport().getId();
-            if ("M_BD".equalsIgnoreCase(mId)) hourlyRate = BigDecimal.valueOf(100000);
-            else if ("M_CL".equalsIgnoreCase(mId)) hourlyRate = BigDecimal.valueOf(120000);
-            else if ("M_BR".equalsIgnoreCase(mId)) hourlyRate = BigDecimal.valueOf(150000);
-            else if ("M_PB".equalsIgnoreCase(mId)) hourlyRate = BigDecimal.valueOf(120000);
-        }
+        BigDecimal hourlyRate = pricing.hourlyRate(courtId, targetDate);
 
         LocalDateTime startOfDay = targetDate.atStartOfDay();
         LocalDateTime endOfDay = targetDate.atTime(23, 59, 59);
@@ -175,6 +162,7 @@ public class CustomerBookingController {
                 .collect(Collectors.toList());
 
         List<Maintenance> maints = maintenanceRepository.findAll().stream()
+                .filter(m -> !"CANCELLED".equals(m.getLifecycleStatus()) && !"COMPLETED".equals(m.getLifecycleStatus()))
                 .filter(m -> m.getCourt() != null && m.getCourt().getId().equals(courtId))
                 .filter(m -> m.getStartDate().isBefore(endOfDay) && m.getEndDate().isAfter(startOfDay))
                 .collect(Collectors.toList());
@@ -223,7 +211,7 @@ public class CustomerBookingController {
             String username = (authentication != null) ? authentication.getName() : "khachle";
             customerBookingService.bookCourtOnline(request, username);
             redirectAttributes.addFlashAttribute("successMessage", 
-                    "Đặt sân trực tuyến thành công! Phiếu của bạn đã được xác nhận giữ chỗ ('Đã xác nhận'). Vui lòng kiểm tra mục 'Lịch sử đặt sân'.");
+                    "Đã tạo phiếu đặt sân. Khoản chuyển tiền đang chờ lễ tân đối soát; theo dõi tại Lịch sử đặt sân.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
@@ -259,9 +247,11 @@ public class CustomerBookingController {
             resp.put("bookingDate", request.getBookingDate() != null ? request.getBookingDate().toString() : "");
             resp.put("startTime", request.getStartTime() != null ? request.getStartTime().toString() : "");
             resp.put("durationMinutes", request.getDurationMinutes());
-            resp.put("totalAmount", request.getTotalAmount());
+            resp.put("totalAmount", booking.getQuotedAmount());
+            resp.put("discountAmount", booking.getDiscountApplied());
+            resp.put("status", booking.getStatus());
             resp.put("depositChoice", request.getDepositChoice());
-            resp.put("message", "Đặt sân trực tuyến thành công!");
+            resp.put("message", "Đã tạo phiếu; khoản chuyển tiền đang chờ xác nhận.");
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             resp.put("success", false);
@@ -282,118 +272,30 @@ public class CustomerBookingController {
             return ResponseEntity.ok(resp);
         }
 
-        String cleanCode = code.trim().toUpperCase();
-
-        // 1. Kiểm tra các mã đặc biệt theo quy chuẩn test case
-        if ("SUMMER2026".equals(cleanCode)) {
-            // TC_CUST_05: Giảm 10%, tối đa 50k
-            // TC_CUST_06: Yêu cầu đơn tối thiểu 300k
-            if (totalAmount.compareTo(BigDecimal.valueOf(300000)) < 0) {
-                resp.put("valid", false);
-                resp.put("message", "Đơn hàng chưa đạt giá trị tối thiểu 300.000đ để áp dụng voucher này");
-                return ResponseEntity.ok(resp);
-            }
-            BigDecimal discount = totalAmount.multiply(BigDecimal.valueOf(10)).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
-            if (discount.compareTo(BigDecimal.valueOf(50000)) > 0) {
-                discount = BigDecimal.valueOf(50000);
-            }
-            resp.put("valid", true);
-            resp.put("code", cleanCode);
-            resp.put("discountAmount", discount);
-            resp.put("message", "Áp dụng thành công mã SUMMER2026: Giảm 10% (tối đa 50.000đ)!");
-            return ResponseEntity.ok(resp);
-        }
-
-        if ("GIAM50K".equals(cleanCode)) {
-            // TC_PRICE_05: Giảm tiền mặt cố định 50.000đ
-            BigDecimal discount = BigDecimal.valueOf(50000);
-            if (discount.compareTo(totalAmount) > 0) discount = totalAmount;
-            resp.put("valid", true);
-            resp.put("code", cleanCode);
-            resp.put("discountAmount", discount);
-            resp.put("message", "Áp dụng thành công mã GIAM50K: Giảm trực tiếp 50.000đ!");
-            return ResponseEntity.ok(resp);
-        }
-
-        if ("GIAM20".equals(cleanCode) || "MAX100K".equals(cleanCode)) {
-            // TC_PRICE_06: Giảm 20%, tối đa 100.000đ
-            BigDecimal discount = totalAmount.multiply(BigDecimal.valueOf(20)).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
-            if (discount.compareTo(BigDecimal.valueOf(100000)) > 0) {
-                discount = BigDecimal.valueOf(100000);
-            }
-            resp.put("valid", true);
-            resp.put("code", cleanCode);
-            resp.put("discountAmount", discount);
-            resp.put("message", "Áp dụng thành công mã: Giảm 20% (tối đa 100.000đ)!");
-            return ResponseEntity.ok(resp);
-        }
-
-        if ("EXPIRED".equals(cleanCode) || "HETHAN".equals(cleanCode)) {
-            // TC_CUST_07: Báo lỗi mã hết hạn
-            resp.put("valid", false);
-            resp.put("message", "Mã khuyến mãi đã hết hạn sử dụng");
-            return ResponseEntity.ok(resp);
-        }
-
-        if ("SPORTUTE10".equals(cleanCode)) {
-            BigDecimal discount = totalAmount.multiply(BigDecimal.valueOf(10)).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
-            resp.put("valid", true);
-            resp.put("code", cleanCode);
-            resp.put("discountAmount", discount);
-            resp.put("message", "Áp dụng thành công mã SPORTUTE10: Giảm 10%!");
-            return ResponseEntity.ok(resp);
-        }
-
-        if ("SVUTE".equals(cleanCode)) {
-            BigDecimal discount = BigDecimal.valueOf(20000);
-            if (discount.compareTo(totalAmount) > 0) discount = totalAmount;
-            resp.put("valid", true);
-            resp.put("code", cleanCode);
-            resp.put("discountAmount", discount);
-            resp.put("message", "Áp dụng thành công mã SVUTE: Giảm trực tiếp 20.000đ!");
-            return ResponseEntity.ok(resp);
-        }
-
-        // 2. Tra cứu trong cơ sở dữ liệu KHUYENMAI
-        Optional<vn.edu.ute.sportute.entity.Promotion> promoOpt = promotionRepository.findById(cleanCode);
-        if (promoOpt.isEmpty()) {
-            promoOpt = promotionRepository.findAll().stream()
-                    .filter(p -> p.getId().equalsIgnoreCase(cleanCode) || p.getName().equalsIgnoreCase(cleanCode))
-                    .findFirst();
-        }
-
-        if (promoOpt.isPresent()) {
-            vn.edu.ute.sportute.entity.Promotion p = promoOpt.get();
-            LocalDate today = LocalDate.now();
-            if (p.getToDate() != null && p.getToDate().isBefore(today)) {
-                // TC_CUST_07
-                resp.put("valid", false);
-                resp.put("message", "Mã khuyến mãi đã hết hạn sử dụng");
-                return ResponseEntity.ok(resp);
-            }
-            if (p.getFromDate() != null && p.getFromDate().isAfter(today)) {
-                resp.put("valid", false);
-                resp.put("message", "Mã khuyến mãi chưa đến thời gian áp dụng!");
-                return ResponseEntity.ok(resp);
-            }
-
-            BigDecimal discount = p.getDiscountAmount() != null ? p.getDiscountAmount() : BigDecimal.ZERO;
-            if (discount.compareTo(BigDecimal.valueOf(100)) <= 0) {
-                // Tỷ lệ %
-                discount = totalAmount.multiply(discount).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
-            }
-            if (discount.compareTo(totalAmount) > 0) discount = totalAmount;
-
+        try {
+            var p = pricing.promotion(code);
             resp.put("valid", true);
             resp.put("code", p.getId());
-            resp.put("discountAmount", discount);
-            resp.put("message", "Áp dụng thành công mã " + p.getId() + " (" + p.getName() + ")!");
-            return ResponseEntity.ok(resp);
+            resp.put("discountAmount", pricing.discount(p, totalAmount.max(BigDecimal.ZERO)));
+            resp.put("message", "Đã áp dụng " + p.getName());
+        } catch (IllegalArgumentException ex) {
+            resp.put("valid", false);
+            resp.put("message", ex.getMessage());
         }
-
-        resp.put("valid", false);
-        resp.put("message", "Mã ưu đãi không tồn tại hoặc đã hết hạn!");
         return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/booking/api/promotions")
+    @ResponseBody
+    public java.util.List<java.util.Map<String,Object>> availablePromotions() {
+        return promotionRepository.findAll().stream().filter(p ->
+            (p.getFromDate() == null || !p.getFromDate().isAfter(LocalDate.now())) &&
+            (p.getToDate() == null || !p.getToDate().isBefore(LocalDate.now())))
+            .map(p -> { java.util.Map<String,Object> m = new java.util.LinkedHashMap<>();
+                m.put("code", p.getId()); m.put("name", p.getName());
+                m.put("value", p.getDiscountAmount()); m.put("type", p.getDiscountType());
+                m.put("expires", p.getToDate() == null ? "Không giới hạn" : p.getToDate().toString()); return m; })
+            .toList();
     }
 
     @GetMapping("/history")
@@ -419,15 +321,10 @@ public class CustomerBookingController {
         List<AdminBookingDTO> allCustomerBookings;
         if (customer != null) {
             allCustomerBookings = rawAllBookings.stream()
-                    .filter(b -> customer.getId().equalsIgnoreCase(b.getCustomerId()) ||
-                            (customer.getPhone() != null && customer.getPhone().equals(b.getCustomerPhone())) ||
-                            (customer.getFullName() != null && customer.getFullName().equalsIgnoreCase(b.getCustomerName())))
+                    .filter(b -> customer.getId().equals(b.getCustomerId()))
                     .collect(Collectors.toList());
-            if (allCustomerBookings.isEmpty() && ("admin".equalsIgnoreCase(username) || rawAllBookings.size() <= 2)) {
-                allCustomerBookings = rawAllBookings;
-            }
         } else {
-            allCustomerBookings = rawAllBookings;
+            allCustomerBookings = List.of();
         }
 
         // Tính toán thống kê trên toàn bộ lịch sử đặt sân của khách hàng
@@ -438,7 +335,7 @@ public class CustomerBookingController {
         long cancelledCount = allCustomerBookings.stream().filter(b -> "Đã hủy".equalsIgnoreCase(b.getStatus())).count();
         BigDecimal totalSpent = allCustomerBookings.stream()
                 .filter(b -> !"Đã hủy".equalsIgnoreCase(b.getStatus()))
-                .map(b -> b.getTotalAmount() != null ? b.getTotalAmount() : BigDecimal.ZERO)
+                .map(b -> b.getPaidAmount() != null ? b.getPaidAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // 2. Lọc danh sách hiển thị theo trạng thái tab được chọn và từ khóa tìm kiếm

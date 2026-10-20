@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="topbar-right">
-                <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+                <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
                     <i class="fa-regular fa-bell"></i>
                 </button>
                 <div class="topbar-user">
@@ -141,7 +141,7 @@
                                             <i class="fa-solid fa-pen" style="color: var(--primary);"></i> Sửa
                                         </button>
                                         <form th:action="@{/admin/sports/toggle/{id}(id=${s.id})}" method="post" class="d-inline" style="margin: 0;"
-                                              onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái môn này?');">
+                                              data-confirm="Bạn có chắc muốn đổi trạng thái môn này?">
                                             <button type="submit" class="btn btn-sm btn-danger" title="Đổi trạng thái kinh doanh">
                                                 <i class="fa-solid fa-power-off"></i>
                                             </button>
@@ -339,5 +339,6 @@
         });
     }
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

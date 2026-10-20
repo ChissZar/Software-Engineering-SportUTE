@@ -39,7 +39,7 @@
         </div>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -130,7 +130,7 @@
                 <th>Nhân viên phụ trách</th>
                 <th>Thời gian bắt đầu</th>
                 <th>Thời gian kết thúc</th>
-                <th>Nội dung / Lý do</th>
+                <th>Trạng thái</th><th>Nội dung / Lý do</th>
                 <th style="text-align:right; width: 140px;">Thao tác</th>
               </tr>
             </thead>
@@ -151,16 +151,19 @@
                     <span th:text="${m.endDate != null ? #temporals.format(m.endDate, 'dd/MM/yyyy HH:mm') : ''}"></span>
                   </span>
                 </td>
-                <td th:text="${m.reason}"></td>
+                <td th:text="${m.status}"></td><td th:text="${m.reason}"></td>
                 <td style="text-align:right; white-space:nowrap;">
-                  <form th:action="@{/admin/maintenance/delete/{id}(id=${m.id})}" method="post" style="display:inline"
-                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch bảo trì này và mở lại sân?');">
-                    <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-check me-1"></i> Hoàn tất / Xóa</button>
+                  <form th:if="${m.status == 'Sắp tới'}" th:action="@{/admin/maintenance/delete/{id}(id=${m.id})}" method="post" style="display:inline"
+                        data-confirm="Hủy lịch bảo trì chưa bắt đầu?">
+                    <button type="submit" class="btn btn-sm btn-danger"><i class="fa-solid fa-check me-1"></i> Hủy lịch</button>
+                  </form>
+                  <form th:if="${m.status == 'Đang bảo trì'}" th:action="@{/admin/maintenance/complete/{id}(id=${m.id})}" method="post" data-confirm="Xác nhận bảo trì đã hoàn tất và mở lại khung giờ còn lại?">
+                    <button class="btn" type="submit">Hoàn tất</button>
                   </form>
                 </td>
               </tr>
               <tr th:if="${maintenances == null or #lists.isEmpty(maintenances)}">
-                <td colspan="7" class="text-center py-5 text-muted">
+                <td colspan="8" class="text-center py-5 text-muted">
                   <i class="fa-solid fa-inbox fs-2 mb-2 d-block"></i>
                   Hiện tại không có lịch bảo trì nào.
                 </td>
@@ -186,11 +189,11 @@
       </h3>
       <button type="button" class="modal-close" onclick="closeMaintModal()">&times;</button>
     </div>
-    <form id="maintForm" th:action="@{/admin/maintenance/save}" method="post">
+    <form id="maintForm" th:object="${maintenanceDTO}" th:action="@{/admin/maintenance/save}" method="post">
       <div class="modal-body">
         <div class="field" style="margin-bottom:14px;">
           <label>Sân cần bảo trì (*)</label>
-          <select name="courtId" required>
+          <select name="courtId" th:field="*{courtId}" required>
             <option value="" disabled selected>-- Chọn sân bảo trì --</option>
             <option th:each="c : ${courts}" th:value="${c.id}" th:text="${c.name} + ' (' + ${c.sportName} + ')'"></option>
           </select>
@@ -198,16 +201,16 @@
         <div class="form-grid-2" style="margin-bottom:14px;">
           <div class="field" style="margin:0;">
             <label>Thời gian bắt đầu (*)</label>
-            <input type="datetime-local" name="startDate" required>
+            <input type="datetime-local" name="startDate" th:field="*{startDate}" required>
           </div>
           <div class="field" style="margin:0;">
             <label>Thời gian kết thúc (*)</label>
-            <input type="datetime-local" name="endDate" required>
+            <input type="datetime-local" name="endDate" th:field="*{endDate}" required>
           </div>
         </div>
         <div class="field" style="margin:0;">
           <label>Lý do / Nội dung bảo dưỡng (*)</label>
-          <textarea name="reason" placeholder="Ví dụ: Thay lưới mới, sửa đèn chiếu sáng, vệ sinh mặt sàn..." rows="3" required></textarea>
+          <textarea name="reason" th:field="*{reason}" maxlength="200" placeholder="Ví dụ: Thay lưới mới, sửa đèn chiếu sáng, vệ sinh mặt sàn..." rows="3" required></textarea>
         </div>
       </div>
       <div class="modal-foot">
@@ -244,5 +247,7 @@ document.querySelectorAll('.modal-overlay').forEach(modal => {
   });
 });
 </script>
+<script src="/js/app-dialog.js" defer></script>
+<script th:if="${errorMessage}">document.getElementById("maintModal").classList.add("active");</script>
 </body>
 </html>

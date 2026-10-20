@@ -1,0 +1,3 @@
+const fs=require('fs'),path=require('path'),vm=require('vm');let failures=0,checked=0;
+function walk(dir){for(const item of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,item.name);if(item.isDirectory())walk(p);else if(p.endsWith('.html')){const html=fs.readFileSync(p,'utf8');let index=0;for(const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)){index++;if(!m[1].trim())continue;checked++;try{new vm.Script(m[1],{filename:p+':script'+index})}catch(e){failures++;console.log(e.stack.split('\n').slice(0,5).join('\n'))}}}}}
+walk('src/main/resources/templates');console.log({checked,failures});process.exitCode=failures?1:0;

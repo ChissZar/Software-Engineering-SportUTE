@@ -18,6 +18,9 @@ import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final AccountRepository accountRepository;
     private final CustomerRepository customerRepository;
@@ -72,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Account account = Account.builder()
-                .id(IdGenerator.generateId("TK"))
+                .id(idGenerator.generateId("TK"))
                 .username(username)
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -92,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
             customerRepository.save(customer);
         } else {
             Customer customer = Customer.builder()
-                    .id(IdGenerator.generateId("KH"))
+                    .id(idGenerator.generateId("KH"))
                     .fullName(request.getFullName())
                     .phone(request.getPhone())
                     .email(request.getEmail())

@@ -11,7 +11,17 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class Booking {
+
+    @Column(name = "CreatedAt", updatable = false)
+    private java.time.LocalDateTime createdAt;
+    @Column(name = "QuotedAmount", precision = 18, scale = 0)
+    private java.math.BigDecimal quotedAmount;
+    @Column(name = "DiscountApplied", precision = 18, scale = 0)
+    private java.math.BigDecimal discountApplied;
+    @PrePersist
+    void timestamp() { if (createdAt == null) createdAt = java.time.LocalDateTime.now(); }
 
     @Id
     @Column(name = "MaPhieu", length = 10, nullable = false)

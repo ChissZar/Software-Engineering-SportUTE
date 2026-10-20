@@ -76,9 +76,9 @@
         </div>
 
         <!-- Group 3: Hệ thống & Bảo mật -->
-        <div class="nav-group" th:if="${currentUser == null or currentUser.canManageSystem or currentUser.canManageMaintenance}">
+        <div class="nav-group" th:if="${currentUser == null or currentUser.canManageCenter or currentUser.canManageMaintenance}">
             <div class="nav-title">Hệ thống</div>
-            <a th:if="${currentUser == null or currentUser.canManageSystem}" 
+            <a th:if="${currentUser != null and currentUser.canManageCenter}" 
                href="/admin/employees" th:classappend="${activeMenu == 'employees' ? 'active' : ''}">
                 <i class="fa-solid fa-user-tie"></i>
                 <span>Nhân viên</span>
@@ -99,7 +99,7 @@
     <!-- Sidebar Footer / Right Actions: Chuông thông báo + Thông tin tài khoản + Đăng xuất -->
     <div class="sidebar-footer">
         <!-- Chuông thông báo (hiển thị rõ trên taskbar ngang của Lễ tân & Vận hành) -->
-        <button type="button" class="horizontal-topbar-bell" title="Thông báo hệ thống" onclick="alert('Hiện tại không có thông báo mới.')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" type="button" class="horizontal-topbar-bell" title="Thông báo hệ thống" onclick="appNotice('Hiện tại không có thông báo mới.')">
             <i class="fa-regular fa-bell"></i>
             <span class="bell-badge-dot"></span>
         </button>
@@ -183,6 +183,8 @@
         }
       })();
     </script>
+<script src="/js/app-dialog.js" defer></script>
 </aside>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

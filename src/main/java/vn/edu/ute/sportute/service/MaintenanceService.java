@@ -8,5 +8,6 @@ public interface MaintenanceService {
     List<MaintenanceDTO> getAllMaintenances();
     void createMaintenance(MaintenanceDTO dto, String employeeId);
     void deleteMaintenance(String id);
+    void completeMaintenance(String id);
     Map<String, Long> getMaintenanceStatistics();
 }

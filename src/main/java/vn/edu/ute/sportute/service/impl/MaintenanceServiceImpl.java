@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class MaintenanceServiceImpl implements MaintenanceService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final MaintenanceRepository maintenanceRepository;
     private final CourtRepository courtRepository;
@@ -47,6 +50,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .employeeName(m.getEmployee() != null ? m.getEmployee().getFullName() : "N/A")
                 .startDate(m.getStartDate())
                 .endDate(m.getEndDate())
+                .status(status(m))
                 .reason(m.getReason())
                 .build()).collect(Collectors.toList());
     }
@@ -57,16 +61,15 @@ public class MaintenanceServiceImpl implements MaintenanceService {
             throw new IllegalArgumentException("Thời gian bắt đầu bảo trì phải trước thời gian kết thúc!");
         }
 
-        Court court = courtRepository.findById(dto.getCourtId())
+        Court court = courtRepository.findForUpdate(dto.getCourtId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sân: " + dto.getCourtId()));
 
-        Employee employee = null;
-        if (employeeId != null) {
-            employee = employeeRepository.findByAccount_Id(employeeId).orElse(null);
-        }
-        if (employee == null) {
-            employee = employeeRepository.findAll().stream().findFirst().orElse(null);
-        }
+        Employee employee = employeeRepository.findByAccount_Username(employeeId)
+            .orElseThrow(() -> new IllegalArgumentException("Tài khoản chưa liên kết hồ sơ nhân viên. Vui lòng bổ sung hồ sơ trước khi lập lịch."));
+        if (dto.getReason().length() > 200) throw new IllegalArgumentException("Lý do tối đa 200 ký tự");
+        if (!dto.getEndDate().isAfter(LocalDateTime.now())) throw new IllegalArgumentException("Thời gian kết thúc phải ở tương lai");
+        if (maintenanceRepository.existsOverlappingMaintenance(court.getId(), dto.getStartDate(), dto.getEndDate()))
+            throw new IllegalArgumentException("Sân đã có lịch bảo trì trong khoảng này");
 
         // Quy tắc toàn vẹn UC45 / RB2: Kiểm tra lịch bảo trì có chồng lấn lịch đặt sân hay không
         boolean hasBookingConflict = bookingDetailRepository.existsOverlappingBooking(
@@ -77,7 +80,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         }
 
         Maintenance maintenance = Maintenance.builder()
-                .id(IdGenerator.generateId("BT"))
+                .id(idGenerator.generateId("BT"))
                 .court(court)
                 .employee(employee)
                 .startDate(dto.getStartDate())
@@ -87,25 +90,29 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 
         maintenanceRepository.save(maintenance);
 
-        // Chuyển trạng thái sân sang "Bảo trì" nếu thời gian hiện tại nằm trong khung bảo trì
-        LocalDateTime now = LocalDateTime.now();
-        if (!now.isBefore(dto.getStartDate()) && !now.isAfter(dto.getEndDate())) {
-            court.setStatus("Bảo trì");
-            courtRepository.save(court);
-        }
+        // Availability is derived from the interval, never from a permanent court status.
+    }
+
+    private String status(Maintenance m) {
+        if ("CANCELLED".equals(m.getLifecycleStatus())) return "Đã hủy";
+        if ("COMPLETED".equals(m.getLifecycleStatus()) || !LocalDateTime.now().isBefore(m.getEndDate())) return "Hoàn tất";
+        return LocalDateTime.now().isBefore(m.getStartDate()) ? "Sắp tới" : "Đang bảo trì";
+    }
+
+    public void completeMaintenance(String id) {
+        Maintenance m = maintenanceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lịch"));
+        if (!"Đang bảo trì".equals(status(m))) throw new IllegalArgumentException("Chỉ hoàn tất lịch đang bảo trì");
+        m.setLifecycleStatus("COMPLETED");
+        maintenanceRepository.save(m);
     }
 
     @Override
     public void deleteMaintenance(String id) {
         Maintenance m = maintenanceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Lịch bảo trì không tồn tại"));
-        Court court = m.getCourt();
-        maintenanceRepository.delete(m);
-        // Trả lại trạng thái cho sân nếu đang bảo trì
-        if ("Bảo trì".equalsIgnoreCase(court.getStatus())) {
-            court.setStatus("Hoạt động");
-            courtRepository.save(court);
-        }
+        if (!"Sắp tới".equals(status(m))) throw new IllegalArgumentException("Chỉ hủy lịch chưa bắt đầu");
+        m.setLifecycleStatus("CANCELLED");
+        maintenanceRepository.save(m);
     }
 
     @Override
@@ -115,8 +122,8 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         List<Maintenance> all = maintenanceRepository.findAll();
         Map<String, Long> stats = new HashMap<>();
         stats.put("total", (long) all.size());
-        stats.put("inProgress", all.stream().filter(m -> !now.isBefore(m.getStartDate()) && !now.isAfter(m.getEndDate())).count());
-        stats.put("upcoming", all.stream().filter(m -> now.isBefore(m.getStartDate())).count());
+        stats.put("inProgress", all.stream().filter(m -> "Đang bảo trì".equals(status(m))).count());
+        stats.put("upcoming", all.stream().filter(m -> "Sắp tới".equals(status(m))).count());
         return stats;
     }
 }

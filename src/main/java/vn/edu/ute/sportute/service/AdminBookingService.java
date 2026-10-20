@@ -45,4 +45,7 @@ public interface AdminBookingService {
 
     // 11. Báo cáo thống kê
     Map<String, Object> getBookingStatistics();
+
+    // 12. Bán lẻ F&B và dịch vụ tại quầy (Không cần đặt sân)
+    AdminBookingDTO createRetailOrder(RetailOrderRequestDTO req, String employeeAccountId);
 }

@@ -13,7 +13,12 @@ public interface MatchmakingService {
 
     MatchmakingPost createPost(MatchmakingPost post);
 
-    MatchmakingPost acceptMatch(String postId, String opponentName, String opponentPhone, String opponentEmail, String message);
+    MatchmakingPost acceptMatch(String postId, String opponentName, String opponentPhone, String opponentEmail, String message, String accountId);
+
+    MatchmakingPost visibleTo(MatchmakingPost post, String accountId);
+    boolean isOwner(MatchmakingPost post, String accountId);
+    boolean isParticipant(MatchmakingPost post, String accountId);
+    void markNotificationRead(String postId, String accountId);
 
     boolean reportViolation(String postId, String reason, String reporterName);
 

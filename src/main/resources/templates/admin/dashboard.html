@@ -112,7 +112,7 @@
       </div>
 
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo hệ thống" onclick="alert('Hệ thống hoạt động bình thường, không có cảnh báo mới.')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo hệ thống" onclick="appNotice('Hệ thống hoạt động bình thường, không có cảnh báo mới.')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -546,7 +546,7 @@
               <i class="fa-solid fa-arrow-down-up-across-line" style="color: #3b82f6; font-size: 15px;"></i>
               <h2>Recent Transaction</h2>
             </div>
-            <button class="btn-filter-pill" type="button" onclick="alert('Lọc theo môn thể thao, khoảng thời gian hoặc trạng thái thanh toán.')">
+            <button class="btn-filter-pill" type="button" onclick="appNotice('Lọc theo môn thể thao, khoảng thời gian hoặc trạng thái thanh toán.')">
               <span>Filter</span>
               <i class="fa-solid fa-sliders"></i>
             </button>
@@ -731,5 +731,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

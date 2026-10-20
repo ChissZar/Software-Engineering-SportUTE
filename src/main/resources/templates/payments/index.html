@@ -37,7 +37,7 @@
         </form>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -157,7 +157,7 @@
                 <th>Số tiền</th>
                 <th>Loại giao dịch</th>
                 <th>Hình thức</th>
-                <th>Trạng thái</th>
+                <th>Thời điểm ghi nhận</th><th>Trạng thái / Đối soát</th>
               </tr>
             </thead>
             <tbody>
@@ -184,12 +184,17 @@
                     <span th:text="${p.paymentMethod}"></span>
                   </span>
                 </td>
+                <td th:text="${p.transactionDate != null ? #temporals.format(p.transactionDate, 'dd/MM/yyyy HH:mm') : 'Không có dữ liệu cũ'}"></td>
                 <td>
                   <span class="badge status-inuse" th:text="${p.status}"></span>
+                  <form th:if="${p.status == 'Chờ xác nhận'}" th:action="@{/admin/payments/{id}/confirm(id=${p.id})}" method="post" data-confirm="Xác nhận đã đối soát khoản tiền này?">
+                    <button name="accept" value="true" class="btn" type="submit">Đã nhận / chi tiền</button>
+                    <button name="accept" value="false" class="btn" type="submit">Hủy khoản chờ</button>
+                  </form>
                 </td>
               </tr>
               <tr th:if="${payments == null or #lists.isEmpty(payments)}">
-                <td colspan="8" class="text-center py-5 text-muted">
+                <td colspan="9" class="text-center py-5 text-muted">
                   <i class="fa-solid fa-inbox fs-2 mb-2 d-block"></i>
                   Không có giao dịch nào phù hợp.
                 </td>
@@ -202,6 +207,11 @@
   </main>
 </div>
 
+<section class="card" style="margin:24px"><div class="card-head"><h2>Đối chiếu theo phiếu đặt</h2><a class="btn" href="/admin/payments">Làm mới giao dịch</a></div>
+<p style="padding:12px">Khoản chờ xác nhận chưa được tính vào đã thu. Số liệu cũ được giữ nguyên để đối chiếu, chưa phải xác nhận ngân hàng.</p>
+<div class="tablewrap"><table><thead><tr><th>Phiếu</th><th>Tổng phải trả</th><th>Đã cọc</th><th>Tổng đã thu</th><th>Đã hoàn</th><th>Còn thiếu</th></tr></thead><tbody>
+<tr th:each="entry : ${balances}"><td th:text="${entry.key}"></td><td th:each="key : ${ {'total','deposit','paid','refunded','remaining'} }" th:text="${#numbers.formatDecimal(entry.value[key],0,'COMMA',0,'POINT') + ' đ'}"></td></tr>
+</tbody></table></div></section>
 <!-- Modal Ghi Nhận Giao Dịch (Option 1) -->
 <div class="modal-overlay" id="paymentModal">
   <div class="modal-card">
@@ -209,7 +219,7 @@
       <h3><i class="fa-solid fa-receipt" style="color:var(--primary);"></i> Ghi Nhận Giao Dịch Tại Quầy</h3>
       <button type="button" class="modal-close" onclick="closePaymentModal()">&times;</button>
     </div>
-    <form th:action="@{/admin/payments/record}" method="post">
+    <form th:action="@{/admin/payments/record}" method="post" data-confirm="Xác nhận đã thực thu/chi số tiền nhập ở quầy?"><input type="hidden" name="requestToken" th:value="${paymentToken}">
       <div class="modal-body">
         <div class="field">
           <label>Phiếu đặt sân (*)</label>
@@ -264,5 +274,6 @@
     if (e.target === this) closePaymentModal();
   });
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

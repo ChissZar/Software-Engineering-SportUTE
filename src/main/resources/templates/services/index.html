@@ -36,7 +36,7 @@
         </form>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -232,13 +232,13 @@
                       <i class="fa-solid fa-pen" style="color:var(--primary);"></i> Sửa
                     </button>
                     <form th:action="@{/admin/services/toggle/{id}(id=${s.id})}" method="post" style="display:inline; margin:0;"
-                          onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái kinh doanh của mặt hàng này?');">
+                          data-confirm="Bạn có chắc muốn đổi trạng thái kinh doanh của mặt hàng này?">
                       <button type="submit" class="btn btn-sm" th:classappend="${s.status == 'Đang bán' ? 'btn-danger' : 'btn-confirm'}" title="Đổi trạng thái kinh doanh">
                         <i class="fa-solid fa-power-off"></i>
                       </button>
                     </form>
                     <form th:action="@{/admin/services/delete/{id}(id=${s.id})}" method="post" style="display:inline; margin:0;"
-                          onsubmit="return confirm('Bạn có chắc muốn xóa mặt hàng này khỏi hệ thống?');">
+                          data-confirm="Bạn có chắc muốn xóa mặt hàng này khỏi hệ thống?">
                       <button type="submit" class="btn btn-sm btn-danger" title="Xóa mặt hàng">
                         <i class="fa-regular fa-trash-can"></i>
                       </button>
@@ -486,5 +486,6 @@
     if (e.target === this) closeServiceModal();
   });
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

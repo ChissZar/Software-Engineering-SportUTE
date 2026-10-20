@@ -10,7 +10,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class Maintenance {
+
+    @Column(name = "LifecycleStatus", length = 20)
+    @Builder.Default
+    private String lifecycleStatus = "SCHEDULED";
 
     @Id
     @Column(name = "MaBaoTri", length = 10, nullable = false)

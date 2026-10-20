@@ -45,6 +45,9 @@ public class EmployeeServiceTest {
 
     @BeforeEach
     void setUp() {
+        TestIds.inject(employeeService);
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken("admin","",List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"))));
         sampleEmployee = Employee.builder()
                 .id("NV001")
                 .fullName("Lê Thị Thu Hà")
@@ -54,6 +57,9 @@ public class EmployeeServiceTest {
                 .status("Đang làm")
                 .build();
     }
+
+    @org.junit.jupiter.api.AfterEach
+    void clearAuth() { org.springframework.security.core.context.SecurityContextHolder.clearContext(); }
 
     @Test
     @DisplayName("UC05, UC07: Thêm mới nhân viên và tự động cấp tài khoản vai trò VT_LT")

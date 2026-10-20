@@ -46,6 +46,7 @@ public class ServiceItemServiceTest {
                 bookingServiceDetailRepository,
                 bookingRepository
         );
+        TestIds.inject(serviceItemService);
     }
 
     @Test

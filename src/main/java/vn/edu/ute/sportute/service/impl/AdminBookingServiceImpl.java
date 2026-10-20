@@ -22,6 +22,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class AdminBookingServiceImpl implements AdminBookingService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private vn.edu.ute.sportute.service.BookingPricingService pricing;
+    @org.springframework.beans.factory.annotation.Autowired
+    private vn.edu.ute.sportute.service.BookingAmounts amounts;
+
 
     private final BookingRepository bookingRepository;
     private final BookingDetailRepository bookingDetailRepository;
@@ -36,6 +44,9 @@ public class AdminBookingServiceImpl implements AdminBookingService {
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private vn.edu.ute.sportute.service.MatchmakingService matchmakingService;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private vn.edu.ute.sportute.service.ServiceItemService serviceItemService;
 
     public AdminBookingServiceImpl(BookingRepository bookingRepository,
                                   BookingDetailRepository bookingDetailRepository,
@@ -82,7 +93,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     }
                     return true;
                 })
-                .sorted((b1, b2) -> b2.getId().compareTo(b1.getId()))
+                .sorted(Comparator.comparing(Booking::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())).thenComparing(Booking::getId))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -116,7 +127,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 : ("guest." + cleanPhone + "@sporthub.local");
 
         Customer newCust = Customer.builder()
-                .id(IdGenerator.generateId("KH"))
+                .id(idGenerator.generateId("KH"))
                 .fullName((fullName != null && !fullName.trim().isEmpty()) ? fullName.trim() : "Khách lẻ " + cleanPhone)
                 .phone(cleanPhone)
                 .email(defaultEmail)
@@ -135,6 +146,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         LocalDateTime startDateTime = LocalDateTime.of(dto.getBookingDate(), dto.getStartTime());
         LocalDateTime endDateTime = LocalDateTime.of(dto.getBookingDate(), dto.getEndTime());
 
+        courtRepository.findForUpdate(dto.getCourtId()).orElseThrow(() -> new IllegalArgumentException("Sân không tồn tại"));
         // 1. Kiểm tra xung đột lịch bảo trì (RB2)
         boolean inMaintenance = maintenanceRepository.existsOverlappingMaintenance(
                 dto.getCourtId(), startDateTime, endDateTime
@@ -167,7 +179,8 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 .orElseThrow(() -> new IllegalArgumentException("Sân không tồn tại"));
         Employee employee = null;
         if (employeeAccountId != null) {
-            employee = employeeRepository.findByAccount_Id(employeeAccountId).orElse(null);
+            employee = employeeRepository.findByAccount_Username(employeeAccountId)
+                    .or(() -> employeeRepository.findByAccount_Id(employeeAccountId)).orElse(null);
         }
 
         // Tìm chính sách đặt sân
@@ -185,19 +198,8 @@ public class AdminBookingServiceImpl implements AdminBookingService {
             promotion = promotionRepository.findById(dto.getPromotionId()).orElse(null);
         }
 
-        // Tự động tính giá nếu chưa nhập
-        BigDecimal totalAmount = dto.getTotalAmount();
-        if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) <= 0) {
-            PriceEstimateResponseDTO estimate = calculateEstimate(PriceEstimateRequestDTO.builder()
-                    .courtId(dto.getCourtId())
-                    .date(dto.getBookingDate())
-                    .startTime(dto.getStartTime())
-                    .endTime(dto.getEndTime())
-                    .policyId(policy != null ? policy.getId() : null)
-                    .promotionCode(promotion != null ? promotion.getId() : null)
-                    .build());
-            totalAmount = estimate.getTotalAmount();
-        }
+        var quote = pricing.quote(dto.getCourtId(), dto.getBookingDate(), dto.getStartTime(), dto.getEndTime(), dto.getPromotionId());
+        BigDecimal totalAmount = quote.total();
 
         Booking booking;
         BookingDetail detail;
@@ -207,7 +209,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     ? dto.getStatus() : "Chờ xác nhận";
 
             booking = Booking.builder()
-                    .id(IdGenerator.generateId("DS"))
+                    .id(idGenerator.generateId("DS"))
                     .customer(customer)
                     .employee(employee)
                     .bookingPolicy(policy)
@@ -216,7 +218,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     .build();
 
             detail = BookingDetail.builder()
-                    .id(IdGenerator.generateId("CT"))
+                    .id(idGenerator.generateId("CT"))
                     .booking(booking)
                     .court(court)
                     .startTime(startDateTime)
@@ -238,7 +240,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 detail.setEndTime(endDateTime);
             } else {
                 detail = BookingDetail.builder()
-                        .id(IdGenerator.generateId("CT"))
+                        .id(idGenerator.generateId("CT"))
                         .booking(booking)
                         .court(court)
                         .startTime(startDateTime)
@@ -248,27 +250,12 @@ public class AdminBookingServiceImpl implements AdminBookingService {
             }
         }
 
+        booking.setQuotedAmount(totalAmount);
+        booking.setDiscountApplied(quote.discount());
         Booking savedBooking = bookingRepository.save(booking);
         dto.setId(savedBooking.getId());
 
-        // Lưu / cập nhật giao dịch thanh toán
-        if (totalAmount != null && totalAmount.compareTo(BigDecimal.ZERO) > 0) {
-            Payment payment;
-            if (savedBooking.getPayments().isEmpty()) {
-                String txType = "Đã xác nhận".equalsIgnoreCase(savedBooking.getStatus()) ? "Thu" : "Cọc";
-                payment = Payment.builder()
-                        .id(IdGenerator.generateId("GD"))
-                        .booking(savedBooking)
-                        .transactionType(txType)
-                        .amount(totalAmount)
-                        .paymentMethod("Tiền mặt")
-                        .build();
-            } else {
-                payment = savedBooking.getPayments().get(0);
-                payment.setAmount(totalAmount);
-            }
-            paymentRepository.save(payment);
-        }
+        // Khoản thu được ghi nhận riêng tại Thanh toán & thu cọc; sửa phiếu không sửa lịch sử giao dịch.
     }
 
     @Override
@@ -329,13 +316,15 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         }
 
         // Quyết toán tiền còn lại nếu có
+        if (booking.getPayments().stream().anyMatch(p -> "PENDING".equals(p.getPaymentStatus())))
+            throw new IllegalArgumentException("Vui lòng đối soát các khoản chờ xác nhận trước khi trả sân");
         AdminBookingDTO dto = mapToDTO(booking);
         BigDecimal remaining = dto.getRemainingAmount();
         if (remaining != null && remaining.compareTo(BigDecimal.ZERO) > 0) {
             String pMethod = (paymentMethod != null && !paymentMethod.isBlank()) ? paymentMethod : "Tiền mặt tại quầy";
             if (pMethod.length() > 30) pMethod = pMethod.substring(0, 30);
             Payment settlePayment = Payment.builder()
-                    .id(IdGenerator.generateId("GD"))
+                    .id(idGenerator.generateId("GD"))
                     .booking(booking)
                     .transactionType("Thanh toán")
                     .amount(remaining)
@@ -398,6 +387,9 @@ public class AdminBookingServiceImpl implements AdminBookingService {
             extraFee = dto.getAdditionalFee();
         }
 
+        BigDecimal oldCourtTotal = amounts.total(booking).subtract(booking.getServiceDetails().stream().map(BookingServiceDetail::getSubtotal).reduce(BigDecimal.ZERO,BigDecimal::add));
+        booking.setQuotedAmount(oldCourtTotal.add(extraFee));
+        bookingRepository.save(booking);
         // Cập nhật giờ kết thúc mới
         detail.setEndTime(newEnd);
         bookingDetailRepository.save(detail);
@@ -405,7 +397,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         // Ghi nhận giao dịch phát sinh
         if (extraFee.compareTo(BigDecimal.ZERO) > 0) {
             Payment extraPayment = Payment.builder()
-                    .id(IdGenerator.generateId("GD"))
+                    .id(idGenerator.generateId("GD"))
                     .booking(booking)
                     .transactionType("Thu")
                     .amount(extraFee)
@@ -456,6 +448,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
 
         // Lấy tổng tiền đã trả cũ
         BigDecimal oldPaid = booking.getPayments().stream()
+                .filter(vn.edu.ute.sportute.service.BookingAmounts::counted)
                 .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -471,11 +464,14 @@ public class AdminBookingServiceImpl implements AdminBookingService {
             bookingDetailRepository.save(detail);
         }
 
+        booking.setQuotedAmount(estimate.getTotalAmount());
+        booking.setDiscountApplied(estimate.getDiscountAmount());
+        bookingRepository.save(booking);
         // Nếu phát sinh chênh lệch
         if (priceDiff.compareTo(BigDecimal.ZERO) > 0) {
             // Cần thu thêm
             Payment extraPayment = Payment.builder()
-                    .id(IdGenerator.generateId("GD"))
+                    .id(idGenerator.generateId("GD"))
                     .booking(booking)
                     .transactionType("Thu")
                     .amount(priceDiff)
@@ -485,9 +481,10 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         } else if (priceDiff.compareTo(BigDecimal.ZERO) < 0) {
             // Cần hoàn tiền chênh lệch
             Payment refundPayment = Payment.builder()
-                    .id(IdGenerator.generateId("GD"))
+                    .id(idGenerator.generateId("GD"))
                     .booking(booking)
                     .transactionType("Hoàn tiền")
+                    .paymentStatus("PENDING")
                     .amount(priceDiff.abs())
                     .paymentMethod("Chuyển khoản")
                     .build();
@@ -500,6 +497,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiếu đặt sân: " + id));
 
+        for (Payment pending : booking.getPayments()) if ("PENDING".equals(pending.getPaymentStatus()) && !"Hoàn tiền".equals(pending.getTransactionType())) pending.setPaymentStatus("VOID");
         booking.setStatus("Đã hủy");
         bookingRepository.save(booking);
 
@@ -537,6 +535,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
 
         // Tổng tiền đã thu/cọc
         BigDecimal totalPaid = booking.getPayments().stream()
+                .filter(vn.edu.ute.sportute.service.BookingAmounts::counted)
                 .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -547,6 +546,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         if (refundAmount.compareTo(BigDecimal.ZERO) < 0) refundAmount = BigDecimal.ZERO;
 
         // Cập nhật trạng thái "Đã hủy" (RB1: không xóa vật lý)
+        for (Payment pending : booking.getPayments()) if ("PENDING".equals(pending.getPaymentStatus()) && !"Hoàn tiền".equals(pending.getTransactionType())) pending.setPaymentStatus("VOID");
         booking.setStatus("Đã hủy");
         bookingRepository.save(booking);
 
@@ -560,9 +560,10 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         // Ghi nhận hoàn tiền nếu có
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
             Payment refund = Payment.builder()
-                    .id(IdGenerator.generateId("GD"))
+                    .id(idGenerator.generateId("GD"))
                     .booking(booking)
                     .transactionType("Hoàn tiền")
+                    .paymentStatus("PENDING")
                     .amount(refundAmount)
                     .paymentMethod("Chuyển khoản")
                     .build();
@@ -600,6 +601,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         LocalDateTime startOfDay = targetDate.atStartOfDay();
         LocalDateTime endOfDay = targetDate.atTime(23, 59, 59);
         List<Maintenance> allMaintenance = maintenanceRepository.findAll().stream()
+                .filter(m -> !"CANCELLED".equals(m.getLifecycleStatus()) && !"COMPLETED".equals(m.getLifecycleStatus()))
                 .filter(m -> m.getStartDate().isBefore(endOfDay) && m.getEndDate().isAfter(startOfDay))
                 .collect(Collectors.toList());
 
@@ -782,19 +784,11 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         BigDecimal rawAmount = hourlyRate.multiply(BigDecimal.valueOf(minutes))
                 .divide(BigDecimal.valueOf(60), 0, RoundingMode.HALF_UP);
 
-        BigDecimal discount = BigDecimal.ZERO;
-        if (req.getPromotionCode() != null && !req.getPromotionCode().trim().isEmpty()) {
-            Optional<Promotion> promoOpt = promotionRepository.findById(req.getPromotionCode().trim());
-            if (promoOpt.isPresent()) {
-                Promotion p = promoOpt.get();
-                if (p.getDiscountAmount() != null) {
-                    discount = p.getDiscountAmount();
-                }
-            }
-        }
-
-        BigDecimal totalAmount = rawAmount.subtract(discount);
-        if (totalAmount.compareTo(BigDecimal.ZERO) < 0) totalAmount = BigDecimal.ZERO;
+        var quote = pricing.quote(req.getCourtId(), req.getDate(), req.getStartTime(), req.getEndTime(), req.getPromotionCode());
+        hourlyRate = quote.rate();
+        rawAmount = quote.raw();
+        BigDecimal discount = quote.discount();
+        BigDecimal totalAmount = quote.total();
 
         // Chính sách cọc
         BookingPolicy policy = null;
@@ -843,6 +837,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         stats.put("cancelled", list.stream().filter(b -> "Đã hủy".equalsIgnoreCase(b.getStatus())).count());
 
         BigDecimal totalRevenue = paymentRepository.findAll().stream()
+                .filter(vn.edu.ute.sportute.service.BookingAmounts::counted)
                 .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -877,7 +872,8 @@ public class AdminBookingServiceImpl implements AdminBookingService {
 
         if (b.getPayments() != null && !b.getPayments().isEmpty()) {
             paidAmount = b.getPayments().stream()
-                    .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
+                    .filter(vn.edu.ute.sportute.service.BookingAmounts::counted)
+                .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
                     .map(Payment::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             totalAmount = paidAmount;
@@ -907,7 +903,15 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     sportName = detail.getCourt().getSport().getName();
                 }
             }
+        } else if (b.getServiceDetails() != null && !b.getServiceDetails().isEmpty()) {
+            bDate = b.getServiceDetails().get(0).getOrderTime().toLocalDate();
+            sTime = b.getServiceDetails().get(0).getOrderTime().toLocalTime();
+            eTime = sTime.plusMinutes(15);
+            courtName = "Bán lẻ F&B tại quầy";
+            sportName = "F&B Dịch vụ";
         }
+
+        if (b.getQuotedAmount() != null) totalAmount = b.getQuotedAmount();
 
         // Chính sách
         String policyId = b.getBookingPolicy() != null ? b.getBookingPolicy().getId() : "CS01";
@@ -929,7 +933,9 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     .collect(java.util.stream.Collectors.joining(", "));
         }
 
-        totalAmount = totalAmount.add(serviceTotal);
+        totalAmount = amounts.total(b);
+        paidAmount = vn.edu.ute.sportute.service.BookingAmounts.paid(b);
+
         BigDecimal depositAmount = totalAmount.multiply(depRate).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
         BigDecimal remainingAmount = totalAmount.subtract(paidAmount);
         if (remainingAmount.compareTo(BigDecimal.ZERO) < 0) remainingAmount = BigDecimal.ZERO;
@@ -937,8 +943,7 @@ public class AdminBookingServiceImpl implements AdminBookingService {
         // Khuyến mãi
         String promoId = b.getPromotion() != null ? b.getPromotion().getId() : "";
         String promoName = b.getPromotion() != null ? b.getPromotion().getName() : "";
-        BigDecimal discountAmount = b.getPromotion() != null && b.getPromotion().getDiscountAmount() != null 
-                ? b.getPromotion().getDiscountAmount() : BigDecimal.ZERO;
+        BigDecimal discountAmount = b.getDiscountApplied() != null ? b.getDiscountApplied() : BigDecimal.ZERO;
 
         return AdminBookingDTO.builder()
                 .id(b.getId())
@@ -968,5 +973,78 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                 .discountAmount(discountAmount)
                 .status(b.getStatus() != null ? b.getStatus() : "Chờ xác nhận")
                 .build();
+    }
+
+    @Override
+    public AdminBookingDTO createRetailOrder(RetailOrderRequestDTO req, String employeeAccountId) {
+        if (req.getItems() == null || req.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Giỏ hàng bán lẻ chưa có món nào!");
+        }
+
+        // 1. Nhận diện hoặc tạo khách hàng (Mặc định: Khách vãng lai tại quầy)
+        String phone = (req.getCustomerPhone() != null && !req.getCustomerPhone().trim().isEmpty())
+                ? req.getCustomerPhone().trim()
+                : "0900000000";
+        String name = (req.getCustomerName() != null && !req.getCustomerName().trim().isEmpty())
+                ? req.getCustomerName().trim()
+                : "Khách vãng lai tại quầy";
+
+        Customer customer = findOrCreateCustomer(phone, name, null, "Khách mua lẻ F&B tại quầy");
+
+        // 2. Nhân viên lập đơn
+        Employee employee = null;
+        if (employeeAccountId != null) {
+            employee = employeeRepository.findByAccount_Id(employeeAccountId).orElse(null);
+        }
+
+        // 3. Chính sách tiêu chuẩn
+        BookingPolicy policy = bookingPolicyRepository.findAll().stream().findFirst().orElse(null);
+
+        // 4. Tạo phiếu đặt kiểu Bán Lẻ (không gắn sân)
+        String bookingId = idGenerator.generateId("BL");
+        Booking booking = Booking.builder()
+                .id(bookingId)
+                .customer(customer)
+                .employee(employee)
+                .bookingPolicy(policy)
+                .status("Hoàn tất")
+                .build();
+
+        Booking savedBooking = bookingRepository.save(booking);
+
+        // 5. Thêm các món vào chi tiết dịch vụ & trừ kho
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        if (serviceItemService != null) {
+            for (var itemReq : req.getItems()) {
+                if (itemReq.getQuantity() != null && itemReq.getQuantity() > 0) {
+                    itemReq.setBookingId(bookingId);
+                    BookingServiceDetail detail = serviceItemService.addServiceToBooking(itemReq);
+                    totalAmount = totalAmount.add(detail.getSubtotal());
+                }
+            }
+        }
+
+        // 6. Ghi nhận giao dịch thanh toán ngay tại quầy
+        String paymentMethod = (req.getPaymentMethod() != null && !req.getPaymentMethod().trim().isEmpty())
+                ? req.getPaymentMethod().trim()
+                : "Tiền mặt";
+
+        Payment payment = Payment.builder()
+                .id(idGenerator.generateId("GD"))
+                .booking(savedBooking)
+                .transactionType("Thu")
+                .amount(totalAmount)
+                .paymentMethod(paymentMethod)
+                .build();
+        paymentRepository.save(payment);
+
+        AdminBookingDTO dto = mapToDTO(savedBooking);
+        dto.setCourtName("Bán lẻ F&B tại quầy");
+        dto.setSportName("F&B Dịch vụ");
+        dto.setTotalAmount(totalAmount);
+        dto.setPaidAmount(totalAmount);
+        dto.setRemainingAmount(BigDecimal.ZERO);
+        dto.setServiceAmount(totalAmount);
+        return dto;
     }
 }

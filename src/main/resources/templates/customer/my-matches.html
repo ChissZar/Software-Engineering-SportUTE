@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kèo của tôi • SportHub</title>
+<link rel="stylesheet" href="/css/admin.css"><style>body{background:#f6faf9}main{max-width:1000px;margin:32px auto;padding:20px}.matches{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px}.match-card{background:white;border:1px solid #dce8e3;border-radius:16px;padding:24px}.match-card p{margin:12px 0}.message{white-space:pre-wrap;background:#f1f8f5;padding:12px;border-radius:8px}</style></head>
+<body><main><a href="/customer/community">← Sàn giao lưu</a> · <a href="/customer/history">Lịch sử đặt sân</a><h1>Kèo của tôi</h1><p>Kèo đã đăng và đã nhận. Thông tin liên hệ chỉ hiển thị cho hai bên tham gia.</p>
+<p th:if="${#lists.isEmpty(posts)}">Bạn chưa đăng hoặc nhận kèo nào.</p><div class="matches">
+<article class="match-card" th:each="p : ${posts}" th:id="${p.id}"><h2 th:text="${p.courtName}"></h2><p><b th:text="${p.id}"></b> · <span th:text="${p.status == 'MATCHED' ? 'Đã ghép đối' : (p.status == 'WAITING' ? 'Đang tìm đối' : (p.status == 'CANCELLED' ? 'Đã hủy' : 'Hết hạn'))}"></span></p>
+<p th:text="${p.matchDate + ' • ' + p.startTime + ' – ' + p.endTime}"></p><p th:text="${p.owner ? 'Bạn là người đăng' : 'Bạn là người nhận'}"></p>
+<div th:if="${p.status == 'MATCHED'}"><p>Người đăng: <b th:text="${p.creatorName}"></b><br>Điện thoại/Zalo: <a th:href="${'tel:' + p.creatorPhone}" th:text="${p.creatorPhone}"></a></p>
+<p>Người nhận: <b th:text="${p.opponentName}"></b><br>Điện thoại/Zalo: <a th:href="${'tel:' + p.opponentPhone}" th:text="${p.opponentPhone}"></a></p><p>Lời nhắn người nhận:</p><p class="message" th:text="${p.opponentMessage}"></p></div>
+<p>Lời nhắn người đăng:</p><p class="message" th:text="${p.message}"></p></article></div></main><script src="/js/match-notifications.js" defer></script></body></html>

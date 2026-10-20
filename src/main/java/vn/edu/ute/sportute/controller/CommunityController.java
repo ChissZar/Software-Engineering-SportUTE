@@ -48,6 +48,23 @@ public class CommunityController {
         return byEmail.orElse(null);
     }
 
+    private String accountId(Authentication auth) {
+        if (auth == null) return null;
+        return accountRepository.findByUsernameOrEmail(auth.getName(),auth.getName()).map(Account::getId).orElse(null);
+    }
+    private String requireAccount(Authentication auth) {
+        String id = accountId(auth);
+        if (id == null) throw new IllegalArgumentException("Vui lòng đăng nhập");
+        return id;
+    }
+
+    @GetMapping("/mine")
+    public String mine(Model model, Authentication auth) {
+        String id = requireAccount(auth);
+        model.addAttribute("posts", matchmakingService.getAllPosts().stream().filter(p -> matchmakingService.isParticipant(p,id)).map(p -> matchmakingService.visibleTo(p,id)).toList());
+        return "customer/my-matches";
+    }
+
     @GetMapping({"", "/"})
     public String communityPage(@RequestParam(value = "sport", required = false) String sport,
                                 @RequestParam(value = "date", required = false) String date,
@@ -63,7 +80,7 @@ public class CommunityController {
 
         // Chỉ hiển thị các kèo đang chờ đối thủ và chưa quá giờ thi đấu
         List<MatchmakingPost> activePosts = matchmakingService.getActivePosts(sport, date);
-        model.addAttribute("allPosts", activePosts);
+        model.addAttribute("allPosts", activePosts.stream().map(p -> matchmakingService.visibleTo(p,accountId(authentication))).toList());
 
         long waitingCount = activePosts.size();
         model.addAttribute("waitingCount", waitingCount);
@@ -79,19 +96,19 @@ public class CommunityController {
     public ResponseEntity<List<MatchmakingPost>> getPostsApi(
             @RequestParam(value = "sport", required = false) String sport,
             @RequestParam(value = "date", required = false) String date,
-            @RequestParam(value = "all", required = false, defaultValue = "false") boolean all) {
+            @RequestParam(value = "all", required = false, defaultValue = "false") boolean all, Authentication authentication) {
         if (all) {
-            return ResponseEntity.ok(matchmakingService.getAllPosts());
+            return ResponseEntity.ok(matchmakingService.getAllPosts().stream().map(p -> matchmakingService.visibleTo(p,accountId(authentication))).toList());
         }
-        return ResponseEntity.ok(matchmakingService.getActivePosts(sport, date));
+        return ResponseEntity.ok(matchmakingService.getActivePosts(sport, date).stream().map(p -> matchmakingService.visibleTo(p,accountId(authentication))).toList());
     }
 
     @GetMapping("/api/detail/{id}")
     @ResponseBody
-    public ResponseEntity<MatchmakingPost> getPostDetailApi(@PathVariable("id") String id) {
+    public ResponseEntity<MatchmakingPost> getPostDetailApi(@PathVariable("id") String id, Authentication authentication) {
         MatchmakingPost post = matchmakingService.getPostById(id);
         if (post == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(post);
+        return ResponseEntity.ok(matchmakingService.visibleTo(post,accountId(authentication)));
     }
 
     @PostMapping("/api/create")
@@ -99,31 +116,10 @@ public class CommunityController {
     public ResponseEntity<Map<String, Object>> createPostApi(
             @RequestBody MatchmakingPost post,
             Authentication authentication) {
-        Map<String, Object> resp = new HashMap<>();
-        try {
-            Customer customer = findCustomer(authentication);
-            if (customer != null) {
-                if (post.getCreatorName() == null || post.getCreatorName().isBlank()) {
-                    post.setCreatorName(customer.getFullName());
-                }
-                if (post.getCreatorPhone() == null || post.getCreatorPhone().isBlank()) {
-                    post.setCreatorPhone(customer.getPhone());
-                }
-                if (post.getCreatorEmail() == null || post.getCreatorEmail().isBlank()) {
-                    post.setCreatorEmail(customer.getEmail());
-                }
-            }
-
-            MatchmakingPost created = matchmakingService.createPost(post);
-            resp.put("success", true);
-            resp.put("message", "Đăng tin tìm đối thủ thành công! Kèo của bạn đã xuất hiện trên Sàn Giao Lưu.");
-            resp.put("post", created);
-            return ResponseEntity.ok(resp);
-        } catch (Exception e) {
-            resp.put("success", false);
-            resp.put("message", e.getMessage());
-            return ResponseEntity.badRequest().body(resp);
-        }
+        Map<String,String> body = new HashMap<>();
+        body.put("bookingId",post.getBookingId()); body.put("skillLevel",post.getSkillLevel());
+        body.put("teamSize",post.getTeamSize()); body.put("message",post.getMessage());
+        return createFromBookingApi(body, authentication);
     }
 
     @PostMapping("/api/accept")
@@ -146,10 +142,10 @@ public class CommunityController {
                 if (opponentEmail == null || opponentEmail.isBlank()) opponentEmail = customer.getEmail();
             }
 
-            MatchmakingPost matched = matchmakingService.acceptMatch(postId, opponentName, opponentPhone, opponentEmail, message);
+            MatchmakingPost matched = matchmakingService.acceptMatch(postId, opponentName, opponentPhone, opponentEmail, message, requireAccount(authentication));
             resp.put("success", true);
             resp.put("message", "Nhận kèo thành công! Hãy lưu lại thông tin liên hệ và đến sân đúng giờ bạn nhé.");
-            resp.put("post", matched);
+            resp.put("post", matchmakingService.visibleTo(matched,accountId(authentication)));
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             resp.put("success", false);
@@ -172,6 +168,8 @@ public class CommunityController {
             String reporter = (customer != null && customer.getFullName() != null)
                     ? customer.getFullName() : (authentication != null ? authentication.getName() : "Người dùng");
 
+            if (!matchmakingService.isParticipant(matchmakingService.getPostById(postId), requireAccount(authentication)))
+                throw new IllegalArgumentException("Chỉ người tham gia mới được báo cáo kèo");
             boolean ok = matchmakingService.reportViolation(postId, reason, reporter);
             if (ok) {
                 resp.put("success", true);
@@ -212,6 +210,7 @@ public class CommunityController {
             String requester = (customer != null && customer.getFullName() != null)
                     ? customer.getFullName() : (authentication != null ? authentication.getName() : "Người dùng");
 
+            if (!matchmakingService.isOwner(post, requireAccount(authentication))) throw new IllegalArgumentException("Chỉ người đăng mới được hủy kèo");
             boolean ok = matchmakingService.cancelPost(postId, requester);
             if (ok) {
                 resp.put("success", true);
@@ -250,6 +249,8 @@ public class CommunityController {
                 return ResponseEntity.badRequest().body(resp);
             }
 
+            String creatorId = requireAccount(authentication);
+            if (customer == null || !customer.getId().equals(booking.getCustomerId())) throw new IllegalArgumentException("Bạn không sở hữu phiếu này");
             // Kiểm tra trạng thái phiếu
             if ("Đã hủy".equalsIgnoreCase(booking.getStatus())) {
                 resp.put("success", false);
@@ -290,6 +291,7 @@ public class CommunityController {
             java.time.format.DateTimeFormatter dateFmt = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
             MatchmakingPost post = MatchmakingPost.builder()
+                    .creatorAccountId(creatorId)
                     .bookingId(booking.getId())
                     .sportName(booking.getSportName() != null ? booking.getSportName() : "Thể thao")
                     .courtName(booking.getCourtName())
@@ -310,7 +312,7 @@ public class CommunityController {
             MatchmakingPost created = matchmakingService.createPost(post);
             resp.put("success", true);
             resp.put("message", "Đăng tin tìm đối thủ thành công cho phiếu #" + bookingId + "! Kèo đã xuất hiện trên Sàn Ghép Kèo.");
-            resp.put("post", created);
+            resp.put("post", matchmakingService.visibleTo(created,accountId(authentication)));
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             log.error("[CommunityController] Lỗi tạo kèo từ phiếu đặt: {}", e.getMessage());

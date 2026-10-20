@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="topbar-right">
-                <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+                <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
                     <i class="fa-regular fa-bell"></i>
                 </button>
                 <div class="topbar-user">
@@ -124,7 +124,7 @@
                                 </td>
                                 <td class="text-end">
                                     <form th:action="@{/admin/prices/delete/{id}(id=${p.id})}" method="post" class="d-inline"
-                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa bảng giá này?');">
+                                          data-confirm="Bạn có chắc chắn muốn xóa bảng giá này?">
                                         <button type="submit" class="btn btn-sm btn-danger" title="Xóa bảng giá">
                                             <i class="fa-regular fa-trash-can"></i> Xóa
                                         </button>
@@ -219,5 +219,6 @@
         });
     }
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

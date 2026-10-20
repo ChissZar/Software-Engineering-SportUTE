@@ -31,6 +31,8 @@ public class PaymentServiceTest {
     @Mock
     private BookingRepository bookingRepository;
 
+    @Mock private BookingAmounts amounts;
+
     @InjectMocks
     private PaymentServiceImpl paymentService;
 
@@ -42,6 +44,8 @@ public class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
+        TestIds.inject(paymentService);
+        org.springframework.test.util.ReflectionTestUtils.setField(paymentService, "amounts", amounts);
         sampleCustomer = Customer.builder()
                 .id("KH001")
                 .fullName("Nguyễn Văn An")
@@ -102,12 +106,13 @@ public class PaymentServiceTest {
     @Test
     @DisplayName("Ghi nhận giao dịch thanh toán thành công và lưu vào cơ sở dữ liệu")
     void testRecordPaymentSuccess() {
-        when(bookingRepository.findById("DS001")).thenReturn(Optional.of(sampleBooking));
+        when(bookingRepository.findForUpdate("DS001")).thenReturn(Optional.of(sampleBooking));
         when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
+        when(amounts.total(sampleBooking)).thenReturn(new BigDecimal("300000"));
         paymentService.recordPayment("DS001", new BigDecimal("100000"), "Thu", "Tiền mặt");
 
-        verify(bookingRepository, times(1)).findById("DS001");
+        verify(bookingRepository, times(1)).findForUpdate("DS001");
         verify(paymentRepository, times(1)).save(any(Payment.class));
     }
 

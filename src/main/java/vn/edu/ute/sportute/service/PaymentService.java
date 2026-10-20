@@ -11,4 +11,5 @@ public interface PaymentService {
     PaymentDTO getPaymentById(String id);
     void recordPayment(String bookingId, BigDecimal amount, String transactionType, String paymentMethod);
     Map<String, Object> getPaymentStatistics();
+    void confirmPayment(String id, boolean accept);
 }

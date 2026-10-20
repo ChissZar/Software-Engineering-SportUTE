@@ -27,6 +27,8 @@ import java.util.*;
 @Controller
 @RequestMapping("/admin/bookings")
 public class AdminBookingController {
+    @org.springframework.beans.factory.annotation.Autowired
+    private vn.edu.ute.sportute.service.PaymentService paymentService;
 
     private final AdminBookingService adminBookingService;
     private final CourtService courtService;
@@ -515,6 +517,7 @@ public class AdminBookingController {
 
     // 3. Quy trình Đặt Sân Lễ Tân Đa Bước (Front-Desk Booking Wizard)
     @PostMapping("/api/receptionist-create")
+    @org.springframework.transaction.annotation.Transactional
     @ResponseBody
     public ResponseEntity<Map<String, Object>> receptionistCreateBooking(
             @RequestBody vn.edu.ute.sportute.dto.request.ReceptionistBookingWizardDTO req,
@@ -525,7 +528,8 @@ public class AdminBookingController {
             if (customerId == null || customerId.isBlank() || "NEW".equalsIgnoreCase(customerId)) {
                 String phone = (req.getNewCustomerPhone() != null && !req.getNewCustomerPhone().isBlank()) 
                         ? req.getNewCustomerPhone().trim() 
-                        : "09" + String.valueOf(System.currentTimeMillis()).substring(5);
+                        : null;
+                if (phone == null) throw new IllegalArgumentException("Vui lòng nhập số điện thoại thật của khách hàng");
                 String name = (req.getNewCustomerName() != null && !req.getNewCustomerName().isBlank()) 
                         ? req.getNewCustomerName().trim() 
                         : "Khách lẻ " + phone;
@@ -540,8 +544,6 @@ public class AdminBookingController {
             String status;
             if (req.isAutoCheckIn()) {
                 status = "Đang sử dụng"; // Khách vào nhận sân ngay tại quầy
-            } else if (req.getPaidAmount() != null && req.getPaidAmount().compareTo(BigDecimal.ZERO) > 0) {
-                status = "Đã xác nhận";
             } else {
                 status = "Chờ xác nhận";
             }
@@ -574,6 +576,12 @@ public class AdminBookingController {
                 }
             }
 
+            if (req.getPaidAmount() != null && req.getPaidAmount().signum() > 0) {
+                AdminBookingDTO bill = adminBookingService.getBookingById(bookingId);
+                String type = req.getPaidAmount().compareTo(bill.getTotalAmount()) < 0 ? "Cọc" : "Thu";
+                String method = req.getPaymentMethod() != null && req.getPaymentMethod().startsWith("Tiền mặt") ? "Tiền mặt" : "Chuyển khoản";
+                paymentService.recordPayment(bookingId, req.getPaidAmount(), type, method);
+            }
             AdminBookingDTO saved = adminBookingService.getBookingById(bookingId);
             Map<String, Object> resp = new HashMap<>();
             resp.put("success", true);
@@ -596,7 +604,36 @@ public class AdminBookingController {
                     : "Lập phiếu đặt sân #" + bookingId + " tại quầy thành công!");
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
+            org.springframework.transaction.interceptor.TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi lập phiếu tại quầy: " + e.getMessage()));
+        }
+    }
+
+    // 4. API Bán Lẻ F&B & Dịch Vụ Tại Quầy (Không cần đặt sân - Khách vãng lai)
+    @PostMapping("/api/retail-order")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> createRetailOrder(
+            @RequestBody vn.edu.ute.sportute.dto.request.RetailOrderRequestDTO req,
+            Authentication authentication) {
+        try {
+            String employeeAccountId = (authentication != null) ? authentication.getName() : null;
+            AdminBookingDTO order = adminBookingService.createRetailOrder(req, employeeAccountId);
+
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("success", true);
+            resp.put("orderId", order.getId());
+            resp.put("bookingId", order.getId());
+            resp.put("customerName", order.getCustomerName());
+            resp.put("customerPhone", order.getCustomerPhone());
+            resp.put("courtName", order.getCourtName());
+            resp.put("totalAmount", order.getTotalAmount());
+            resp.put("paidAmount", order.getPaidAmount());
+            resp.put("remainingAmount", order.getRemainingAmount());
+            resp.put("status", order.getStatus());
+            resp.put("message", "Đã thanh toán thành công đơn bán lẻ F&B #" + order.getId() + "!");
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi tạo đơn bán lẻ: " + e.getMessage()));
         }
     }
 }

@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class EmployeeServiceImpl implements EmployeeService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final EmployeeRepository employeeRepository;
     private final AccountRepository accountRepository;
@@ -33,6 +36,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    private boolean administrator() {
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) throw new org.springframework.security.access.AccessDeniedException("Cần đăng nhập quản lý");
+        boolean admin = auth.getAuthorities().stream().anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+        if (!admin && auth.getAuthorities().stream().noneMatch(a -> "ROLE_MANAGER".equals(a.getAuthority())))
+            throw new org.springframework.security.access.AccessDeniedException("Không có quyền quản lý nhân viên");
+        return admin;
+    }
+    private void checkManageable(Employee e) {
+        if (administrator()) return;
+        if (!Set.of("Lễ tân", "Vận hành", "Kỹ thuật").contains(e.getPosition()) ||
+            (e.getAccount() != null && e.getAccount().getRoles().stream().anyMatch(r -> !Set.of("ROLE_RECEPTIONIST","ROLE_OPERATOR","ROLE_STAFF").contains(r.getName()))))
+            throw new IllegalArgumentException("Quản lý chỉ được thay đổi nhân viên lễ tân và vận hành");
     }
 
     private EmployeeDTO mapToDTO(Employee e) {
@@ -99,6 +117,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDTO saveEmployee(EmployeeDTO dto) {
+        boolean admin = administrator();
+        if (!admin) {
+            if (!Set.of("Lễ tân", "Vận hành", "Kỹ thuật").contains(java.util.Objects.toString(dto.getPosition(),"")))
+                throw new IllegalArgumentException("Chỉ Admin được cấp chức vụ quản lý");
+            if (dto.getRoleId() != null && !dto.getRoleId().isBlank()) {
+                Role role = roleRepository.findById(dto.getRoleId()).orElseThrow(() -> new IllegalArgumentException("Vai trò không tồn tại"));
+                if (!Set.of("ROLE_RECEPTIONIST","ROLE_OPERATOR","ROLE_STAFF").contains(role.getName()))
+                    throw new IllegalArgumentException("Không được cấp quyền quản trị hoặc quản lý");
+            }
+        }
         if (dto.getFullName() == null || dto.getFullName().trim().isEmpty()) {
             throw new IllegalArgumentException("Họ và tên nhân viên không được để trống");
         }
@@ -112,6 +140,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee = employeeRepository.findById(dto.getId().trim())
                     .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhân viên: " + dto.getId()));
 
+            checkManageable(employee);
             if (!dto.getPhone().trim().equals(employee.getPhone())) {
                 if (employeeRepository.findByPhone(dto.getPhone().trim()).isPresent()) {
                     throw new IllegalArgumentException("Số điện thoại này đã được sử dụng bởi nhân viên khác!");
@@ -123,7 +152,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 throw new IllegalArgumentException("Số điện thoại này đã tồn tại trong danh mục nhân sự!");
             }
             employee = new Employee();
-            employee.setId(IdGenerator.generateId("NV"));
+            employee.setId(idGenerator.generateId("NV"));
         }
 
         employee.setFullName(dto.getFullName().trim());
@@ -138,10 +167,12 @@ public class EmployeeServiceImpl implements EmployeeService {
             String uname = dto.getUsername().trim();
             Optional<Account> accOpt = accountRepository.findByUsername(uname);
             if (accOpt.isPresent()) {
+                if (account == null || !account.getId().equals(accOpt.get().getId()))
+                    throw new IllegalArgumentException("Tên đăng nhập đã thuộc tài khoản khác");
                 account = accOpt.get();
             } else if (account == null) {
                 account = Account.builder()
-                        .id(IdGenerator.generateId("TK"))
+                        .id(idGenerator.generateId("TK"))
                         .username(uname)
                         .password(passwordEncoder.encode("123456"))
                         .email(employee.getEmail())
@@ -186,6 +217,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee e = employeeRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhân viên: " + id));
 
+        checkManageable(e);
         // Ngừng hoạt động nhân viên / tài khoản (UC08)
         if ("Đang làm".equalsIgnoreCase(e.getStatus())) {
             e.setStatus("Đã nghỉ");

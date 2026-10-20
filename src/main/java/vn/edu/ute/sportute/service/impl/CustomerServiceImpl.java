@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CustomerServiceImpl implements CustomerService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final CustomerRepository customerRepository;
     private final BookingRepository bookingRepository;
@@ -136,7 +139,7 @@ public class CustomerServiceImpl implements CustomerService {
                 throw new IllegalArgumentException("Số điện thoại này đã tồn tại trong hệ thống!");
             }
             customer = new Customer();
-            customer.setId(IdGenerator.generateId("KH"));
+            customer.setId(idGenerator.generateId("KH"));
         }
 
         customer.setFullName(dto.getFullName().trim());

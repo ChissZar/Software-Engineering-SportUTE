@@ -68,13 +68,18 @@
     /* ==========================================================================
        1. TOP NAVBAR
        ========================================================================== */
+    html {
+      scrollbar-gutter: stable;
+    }
+
     .topbar {
       background: var(--white);
       border-bottom: 1px solid var(--gray-200);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
       box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
 
     .topbar-container {
@@ -85,22 +90,27 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      gap: 20px;
+      box-sizing: border-box;
     }
 
-    /* Left: Logo + Date & Greeting */
+    /* Left: Logo + Date & Greeting (Fixed width: 320px) */
     .topbar-left {
       display: flex;
       align-items: center;
-      gap: 20px;
-      flex-shrink: 0;
+      gap: 16px;
+      width: 320px;
+      flex: 0 0 320px;
       white-space: nowrap;
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     .brand-logo {
       display: flex;
       align-items: center;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
     .brand-logo img {
@@ -112,12 +122,15 @@
       width: 1px;
       height: 28px;
       background: var(--gray-200);
+      flex-shrink: 0;
     }
 
     .greeting-box {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      min-width: 0;
+      overflow: hidden;
       white-space: nowrap;
     }
 
@@ -128,34 +141,43 @@
       align-items: center;
       gap: 5px;
       font-weight: 500;
+      white-space: nowrap;
     }
 
     .greeting-name {
       font-size: 13.5px;
       font-weight: 700;
       color: var(--dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Center: Navigation Links */
     .topbar-nav {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
-      flex-shrink: 0;
+      flex: 1;
+      white-space: nowrap;
+      min-width: 0;
     }
 
     .nav-item {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 18px;
+      padding: 8px 16px;
       border-radius: 9999px;
       font-size: 13.5px;
       font-weight: 600;
       color: var(--gray-600);
+      text-decoration: none;
       transition: all 0.2s ease;
       white-space: nowrap;
       flex-shrink: 0;
+      box-sizing: border-box;
     }
 
     .nav-item:hover {
@@ -168,13 +190,17 @@
       color: var(--primary-dark);
     }
 
-    /* Right: Notification & User Avatar */
+    /* Right: Notification & User Avatar (Fixed width: 140px) */
     .topbar-right {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 16px;
-      flex-shrink: 0;
+      width: 140px;
+      flex: 0 0 140px;
       white-space: nowrap;
+      flex-shrink: 0;
+      box-sizing: border-box;
     }
 
     .btn-icon-circle {
@@ -191,6 +217,7 @@
       cursor: pointer;
       position: relative;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
 
     .btn-icon-circle:hover {
@@ -221,10 +248,11 @@
       border-radius: 9999px;
       padding: 0 14px;
       height: 38px;
-      width: 220px;
+      width: 210px;
       flex-shrink: 0;
       transition: all 0.2s ease;
       position: relative;
+      box-sizing: border-box;
     }
     .topbar-search-wrap:hover {
       background: #ffffff;
@@ -250,6 +278,7 @@
       font-size: 13px;
       color: var(--gray-900);
       width: 100%;
+      font-family: inherit;
     }
     .topbar-search-input::placeholder {
       color: var(--gray-400);
@@ -257,6 +286,10 @@
     }
 
     .btn-clear-search {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       background: transparent;
       border: none;
       color: var(--gray-400);
@@ -2630,6 +2663,7 @@
         <div class="filter-content">
           <span class="filter-label">Thời lượng</span>
           <select name="durationMinutes" class="filter-select" id="durationSelect">
+            <option value="30" th:selected="${filter != null and filter.durationMinutes == 30}">30 phút</option>
             <option value="60" th:selected="${filter == null or filter.durationMinutes == 60}">60 phút</option>
             <option value="90" th:selected="${filter != null and filter.durationMinutes == 90}">90 phút</option>
             <option value="120" th:selected="${filter != null and filter.durationMinutes == 120}">120 phút</option>
@@ -2922,7 +2956,7 @@
                 </div>
                 <div class="legend-box-item">
                   <span class="legend-chip chip-booked"></span>
-                  <span>Đã có lịch (Đã xác nhận)</span>
+                  <span>Đã có lịch (Chờ xác nhận chuyển khoản)</span>
                 </div>
               </div>
             </div>
@@ -3089,8 +3123,10 @@
                       <span>3. Mã ưu đãi / Voucher giảm giá</span>
                     </div>
                   </div>
-                  <div class="voucher-box">
-                    <input type="text" class="voucher-input" id="inputVoucherCode" placeholder="Nhập mã voucher (Ví dụ: SUMMER2026, GIAM50K, SPORTUTE10,...)">
+                  <p style="font-size:13px">Mỗi đơn dùng một mã, áp dụng theo ngày đặt; không cộng dồn ưu đãi thành viên.</p>
+                  <select id="promoPicker" class="voucher-input" onchange="document.getElementById('inputVoucherCode').value=this.value;applyVoucherCode()"><option value="">Chọn khuyến mãi còn hiệu lực</option></select>
+                  <datalist id="availablePromoCodes"></datalist><div class="voucher-box">
+                    <input type="text" class="voucher-input" id="inputVoucherCode" placeholder="Nhập mã khuyến mãi" list="availablePromoCodes">
                     <button type="button" class="btn-apply-voucher" onclick="applyVoucherCode()">
                       <i class="fa-solid fa-tag"></i> Áp dụng
                     </button>
@@ -3259,7 +3295,7 @@
                   </span>
                 </div>
                 <p style="font-size:13.5px;color:#64748B;margin-bottom:18px;">
-                  Khách hàng đặt trực tuyến vui lòng thanh toán tiền cọc giữ sân. Hệ thống sẽ tự động khóa lịch và gửi mã vé xác nhận ngay khi bạn thanh toán.
+                  Sau khi chuyển tiền, gửi yêu cầu xác nhận. Lễ tân sẽ đối soát và cập nhật trạng thái phiếu trong Lịch sử đặt sân.
                 </p>
 
                 <!-- Payment Methods Grid (VietQR, MoMo, VNPAY) -->
@@ -3440,9 +3476,9 @@
               <i class="fa-solid fa-check"></i>
             </div>
 
-            <h2 class="success-title">Đặt Sân Thành Công!</h2>
+            <h2 class="success-title">Đã Ghi Nhận Yêu Cầu!</h2>
             <p class="success-subtitle">
-              Yêu cầu đặt sân của bạn đã được hệ thống ghi nhận và khóa lịch bảo đảm 100%.
+              Phiếu đã được tạo và giữ khung giờ. Khoản chuyển tiền đang chờ lễ tân xác nhận.
             </p>
 
             <div class="success-ticket-box">
@@ -3473,7 +3509,7 @@
                 <span class="success-row-val" id="successDuration">30 phút</span>
               </div>
               <div class="success-row">
-                <span class="success-row-label"><i class="fa-solid fa-shield-halved"></i> Tiền đã thanh toán:</span>
+                <span class="success-row-label"><i class="fa-solid fa-shield-halved"></i> Tiền chuyển chờ xác nhận:</span>
                 <span class="success-row-val" id="successDepositPaid" style="color:#059669;font-size:15px;">30.000đ (VietQR)</span>
               </div>
               <div class="success-row" id="rowSuccessRemaining">
@@ -3484,7 +3520,7 @@
                 <span class="success-row-label"><i class="fa-solid fa-circle-check"></i> Trạng thái phiếu:</span>
                 <span class="success-row-val">
                   <span style="background:#ECFDF5;color:#047857;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12.5px;border:1px solid #A7F3D0;" id="successBookingStatusBadge">
-                    <i class="fa-solid fa-circle-check"></i> Đã xác nhận
+                    <i class="fa-solid fa-circle-check"></i> Chờ xác nhận chuyển khoản
                   </span>
                 </span>
               </div>
@@ -3492,7 +3528,7 @@
 
             <div class="success-email-notice">
               <i class="fa-regular fa-envelope"></i>
-              <span>Vé điện tử và hướng dẫn nhận sân đã được gửi tới email của bạn. Khung giờ sân đã được khóa giữ chỗ an toàn!</span>
+              <span>Theo dõi trạng thái xác nhận tại Lịch sử đặt sân. Khi cần đối soát, cung cấp mã phiếu và chứng từ chuyển tiền cho lễ tân.</span>
             </div>
 
             <div class="success-actions">
@@ -3580,7 +3616,7 @@
     const SERVER_FAVORITES = /*[[${userFavorites != null ? userFavorites : {}}]]*/ [];
     const FAVORITES_KEY = 'sporthub_favorites_' + CURRENT_USER_KEY;
     const AVATAR_KEY = 'sporthub_custom_avatar_' + CURRENT_USER_KEY;
-    const NOTIF_KEY = 'sporthub_notifications_' + CURRENT_USER_KEY;
+    const NOTIF_KEY = 'verified_v2_sporthub_notifications_' + CURRENT_USER_KEY;
 
     // Danh sách tất cả sân thể thao được Spring inject
     const ALL_COURTS = [
@@ -3728,7 +3764,8 @@
     }
 
     // Chuyển sang Bước 3 (Xác nhận thông tin & Mức cọc)
-    function goToStep3() {
+    async function goToStep3() {
+      if (currentVoucherCode) await applyVoucherCode();
       if (!selectedStartSlot || !selectedEndSlot) {
         showToast('Vui lòng click 2 khung giờ bất kỳ trên bảng để xác định giờ bắt đầu và kết thúc!', true);
         return;
@@ -3925,55 +3962,18 @@
           currentVoucherDiscount = Number(data.discountAmount) || 0;
           feedback.style.display = 'block';
           feedback.style.color = '#059669';
-          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + data.message;
+          feedback.textContent = data.message;
         } else {
           currentVoucherCode = '';
           currentVoucherDiscount = 0;
           feedback.style.display = 'block';
           feedback.style.color = '#EF4444';
-          feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + (data.message || 'Mã ưu đãi không hợp lệ!');
+          feedback.textContent = data.message || 'Mã ưu đãi không hợp lệ!';
         }
       } catch (err) {
-        // Fallback local
-        if (code === 'SUMMER2026') {
-          if (selectedTotalAmount < 300000) {
-            currentVoucherCode = '';
-            currentVoucherDiscount = 0;
-            feedback.style.display = 'block';
-            feedback.style.color = '#EF4444';
-            feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Đơn hàng chưa đạt giá trị tối thiểu 300.000đ để áp dụng voucher này';
-          } else {
-            currentVoucherCode = code;
-            currentVoucherDiscount = Math.min(50000, Math.round(selectedTotalAmount * 0.1));
-            feedback.style.display = 'block';
-            feedback.style.color = '#059669';
-            feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SUMMER2026: Giảm 10% (tối đa 50.000đ)!';
-          }
-        } else if (code === 'GIAM50K') {
-          currentVoucherCode = code;
-          currentVoucherDiscount = Math.min(selectedTotalAmount, 50000);
-          feedback.style.display = 'block';
-          feedback.style.color = '#059669';
-          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã GIAM50K: Giảm trực tiếp 50.000đ!';
-        } else if (code === 'SPORTUTE10') {
-          currentVoucherCode = code;
-          currentVoucherDiscount = Math.round(selectedTotalAmount * 0.1);
-          feedback.style.display = 'block';
-          feedback.style.color = '#059669';
-          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SPORTUTE10: Giảm 10%!';
-        } else if (code === 'SVUTE') {
-          currentVoucherCode = code;
-          currentVoucherDiscount = Math.min(selectedTotalAmount, 20000);
-          feedback.style.display = 'block';
-          feedback.style.color = '#059669';
-          feedback.innerHTML = '<i class="fa-solid fa-circle-check"></i> Đã áp dụng mã SVUTE: Giảm trực tiếp 20.000đ!';
-        } else {
-          currentVoucherCode = '';
-          currentVoucherDiscount = 0;
-          feedback.style.display = 'block';
-          feedback.style.color = '#EF4444';
-          feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Mã ưu đãi không tồn tại hoặc đã hết hạn!';
-        }
+        currentVoucherCode = ''; currentVoucherDiscount = 0;
+        feedback.style.display = 'block'; feedback.style.color = '#EF4444';
+        feedback.textContent = 'Không xác thực được mã. Vui lòng thử lại khi có kết nối.';
       }
 
       document.getElementById('finalVoucherCode').value = currentVoucherCode;
@@ -3984,7 +3984,7 @@
     // Cập nhật số tiền thanh toán hiển thị kết hợp cả ưu đãi thành viên và voucher
     function updateStep3Calculations() {
       // 1. Tính giảm giá hội viên theo cấp bậc
-      let tierDiscount = (CUSTOMER_TIER_PERCENT > 0) ? Math.round(selectedTotalAmount * (CUSTOMER_TIER_PERCENT / 100)) : 0;
+      let tierDiscount = 0; // Một mã mỗi đơn, không cộng dồn ưu đãi thành viên.
       
       // 2. Tổng giảm giá = giảm giá hội viên + voucher
       currentDiscountAmount = tierDiscount + currentVoucherDiscount;
@@ -4113,6 +4113,8 @@
         btn.disabled = false;
         btn.innerHTML = originalHtml;
         if (data.success) {
+          currentDiscountAmount = Number(data.discountAmount) || 0;
+          selectedTotalAmount = Number(data.totalAmount) + currentDiscountAmount;
           showSuccessView(data.bookingId || ('DS' + Date.now().toString().slice(-8)));
         } else {
           showToast(data.message || 'Đặt sân không thành công, vui lòng thử lại!', true);
@@ -4282,9 +4284,8 @@
           updateRightPanel();
         })
         .catch(err => {
-          console.warn('API slots fetch fallback:', err);
-          bookedSlotsSet = new Set();
-          renderTimeSlotsGrid();
+          selectedStartSlot = selectedEndSlot = null;
+          grid.textContent = 'Không tải được lịch sân. Vui lòng chọn lại ngày để thử lại.';
           updateRightPanel();
         });
     }
@@ -4309,7 +4310,8 @@
         const isBooked = bookedSlotsSet.has(time);
         const isPast = (selectedDate === todayStr && slotMinutes <= currentMinutesToday);
 
-        if (isBooked || isPast) {
+        const validEnd = selectedStartSlot && !selectedEndSlot && time > selectedStartSlot && !isRangeOccupied(selectedStartSlot, time);
+        if ((isBooked && !validEnd) || isPast || (time === '23:00' && !validEnd)) {
           btn.classList.add('slot-booked');
           btn.disabled = true;
           btn.title = isBooked ? 'Khung giờ này đã có lịch xác nhận' : 'Khung giờ đã qua';
@@ -4672,30 +4674,7 @@
     // =========================================================================
     // NOTIFICATION SYSTEM (Thông báo thời gian thực & Chi tiết)
     // =========================================================================
-    const DEFAULT_NOTIFICATIONS = [
-      {
-        id: 'notif_welcome',
-        type: 'system',
-        title: 'Chào mừng bạn đến với SportHub! 🎉',
-        time: 'Hôm nay',
-        dateStr: '17/10/2026',
-        desc: 'Hệ thống đặt sân thể thao trực tuyến SportHub chúc bạn có những trải nghiệm rèn luyện thể thao tuyệt vời.',
-        content: 'Chào mừng bạn đến với SportHub - Hệ thống đặt sân thể thao thông minh!\n\nTại SportHub, bạn có thể dễ dàng:\n• Tra cứu lịch sân trống trực quan theo thời gian thực\n• Đặt sân nhanh chóng với hình thức cọc 30% hoặc 100%\n• Quét mã VietQR chuyển khoản tức thì chuẩn xác\n• Lưu lại các sân yêu thích để đặt lại bất cứ lúc nào\n\nChúc bạn luôn tràn đầy năng lượng và có những giờ phút thể thao ý nghĩa!',
-        unread: false,
-        extraData: null
-      },
-      {
-        id: 'notif_promo',
-        type: 'promo',
-        title: 'Ưu đãi Giờ Vàng Thể Thao: Giảm 10%',
-        time: 'Hôm qua',
-        dateStr: '16/10/2026',
-        desc: 'Áp dụng cho khung giờ sáng từ 06:00 - 09:00 từ Thứ Hai đến Thứ Sáu tại tất cả các cụm sân.',
-        content: 'ƯU ĐÃI ĐẶC BIỆT: GIỜ VÀNG THỂ THAO 🏸\n\nNhằm khuyến khích tinh thần rèn luyện thể thao buổi sáng, SportHub áp dụng chương trình ưu đãi:\n• Giảm ngay 10% khi đặt sân khung giờ 06:00 - 09:00\n• Áp dụng từ Thứ Hai đến Thứ Sáu hàng tuần\n• Mã ưu đãi: GIOVANG10 (nhập tại bước thanh toán)\n\nSố lượng khung giờ ưu đãi có hạn, hãy nhanh tay giữ chỗ!',
-        unread: false,
-        extraData: null
-      }
-    ];
+    const DEFAULT_NOTIFICATIONS = [];
 
     function getNotifications() {
       try {
@@ -4842,7 +4821,7 @@
               <div><span style="color:#64748b;">Ngày thi đấu:</span> <strong style="color:#0f172a;">${notif.extraData.date || '--'}</strong></div>
               <div><span style="color:#64748b;">Khung giờ:</span> <strong style="color:#0f172a;">${notif.extraData.time || '--'}</strong></div>
               <div><span style="color:#64748b;">Tổng tiền:</span> <strong style="color:#059669;">${notif.extraData.amount ? formatVND(notif.extraData.amount) : '--'}</strong></div>
-              <div><span style="color:#64748b;">Trạng thái:</span> <strong style="color:#059669;">Đã xác nhận</strong></div>
+              <div><span style="color:#64748b;">Trạng thái:</span> <strong style="color:#059669;">Chờ xác nhận chuyển khoản</strong></div>
             </div>
           `;
         } else {
@@ -4981,5 +4960,11 @@
 
   <!-- Real-time SportBot AI Assistant -->
   <th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
-</body>
+<script src="/js/match-notifications.js" defer></script>
+<script>
+fetch('/customer/booking/api/promotions').then(r=>r.json()).then(items=>{for(const p of items){
+ const o=document.createElement('option');o.value=p.code;o.textContent=p.code+' • '+p.name+' • Giảm '+p.value+(p.type==='PERCENT'?'%':'đ')+' • Đến '+p.expires;document.getElementById('promoPicker').append(o);
+ const d=document.createElement('option');d.value=p.code;document.getElementById('availablePromoCodes').append(d);
+}}).catch(()=>{});
+</script></body>
 </html>

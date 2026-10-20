@@ -36,6 +36,7 @@ public class CustomerBookingServiceTest {
     @Mock private PriceRepository priceRepository;
     @Mock private BookingPolicyRepository bookingPolicyRepository;
     @Mock private PaymentRepository paymentRepository;
+    @Mock private PromotionRepository promotionRepository;
 
     private CustomerBookingServiceImpl customerBookingService;
 
@@ -50,8 +51,11 @@ public class CustomerBookingServiceTest {
                 customerRepository,
                 priceRepository,
                 bookingPolicyRepository,
-                paymentRepository
+                paymentRepository, promotionRepository
         );
+        TestIds.inject(customerBookingService);
+        org.springframework.test.util.ReflectionTestUtils.setField(customerBookingService,"amounts",new BookingAmounts(new BookingPricingService(priceRepository,courtRepository,promotionRepository)));
+        org.springframework.test.util.ReflectionTestUtils.setField(customerBookingService, "pricing", new BookingPricingService(priceRepository,courtRepository,promotionRepository));
     }
 
     @Test
@@ -87,6 +91,7 @@ public class CustomerBookingServiceTest {
 
         when(accountRepository.findByUsernameOrEmail("minhanh", "minhanh")).thenReturn(Optional.of(account));
         when(customerRepository.findByAccount_Id("TK01")).thenReturn(Optional.of(customer));
+        when(courtRepository.findForUpdate("S01")).thenReturn(Optional.of(court));
         when(courtRepository.findById("S01")).thenReturn(Optional.of(court));
         when(maintenanceRepository.existsOverlappingMaintenance(eq("S01"), any(), any())).thenReturn(false);
         when(bookingDetailRepository.existsOverlappingBooking(eq("S01"), any(), any())).thenReturn(false);

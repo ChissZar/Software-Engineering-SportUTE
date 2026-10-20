@@ -13,8 +13,11 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
+@lombok.AllArgsConstructor
 public class PromotionDTO {
 
+    @Builder.Default
+    private String discountType = "AMOUNT";
     private String id;
 
     @NotBlank(message = "Vui lòng nhập tên chương trình khuyến mãi")

@@ -58,13 +58,19 @@
     /* ==========================================================================
        1. TOP NAVBAR (UNIFIED ACROSS ALL CUSTOMER PAGES)
        ========================================================================== */
+    /* Unified Customer Topbar System */
+    html {
+      scrollbar-gutter: stable;
+    }
+
     .topbar {
       background: var(--white);
       border-bottom: 1px solid var(--gray-200);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
       box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
 
     .topbar-container {
@@ -75,19 +81,27 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 24px;
+      gap: 20px;
+      box-sizing: border-box;
     }
 
+    /* Left: Logo + Date & Greeting (Fixed width: 320px) */
     .topbar-left {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
+      width: 320px;
+      flex: 0 0 320px;
+      white-space: nowrap;
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     .brand-logo {
       display: flex;
       align-items: center;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
     .brand-logo img {
@@ -99,12 +113,16 @@
       width: 1px;
       height: 28px;
       background: var(--gray-200);
+      flex-shrink: 0;
     }
 
     .greeting-box {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
     .greeting-date {
@@ -114,32 +132,43 @@
       align-items: center;
       gap: 5px;
       font-weight: 500;
+      white-space: nowrap;
     }
 
     .greeting-name {
       font-size: 13.5px;
       font-weight: 700;
       color: var(--dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
+    /* Center: Navigation Links */
     .topbar-nav {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      flex: 1;
+      white-space: nowrap;
+      min-width: 0;
     }
 
     .nav-item {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 18px;
+      padding: 8px 16px;
       border-radius: 9999px;
       font-size: 13.5px;
       font-weight: 600;
       color: var(--gray-600);
+      text-decoration: none;
       transition: all 0.2s ease;
       white-space: nowrap;
       flex-shrink: 0;
+      box-sizing: border-box;
     }
 
     .nav-item:hover {
@@ -152,6 +181,54 @@
       color: var(--primary-dark);
     }
 
+    /* Right: Notification & User Avatar (Fixed width: 140px) */
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      width: 140px;
+      flex: 0 0 140px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+
+    .btn-icon-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-700);
+      font-size: 16px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-icon-circle:hover {
+      background: var(--gray-100);
+      color: var(--dark);
+    }
+
+    .badge-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 9px;
+      height: 9px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+      display: none;
+    }
+
     /* Topbar Search Input */
     .topbar-search-wrap {
       display: inline-flex;
@@ -162,10 +239,11 @@
       border-radius: 9999px;
       padding: 0 14px;
       height: 38px;
-      width: 220px;
+      width: 210px;
       flex-shrink: 0;
       transition: all 0.2s ease;
       position: relative;
+      box-sizing: border-box;
     }
     .topbar-search-wrap:hover {
       background: #ffffff;
@@ -191,43 +269,11 @@
       font-size: 13px;
       color: var(--gray-900);
       width: 100%;
+      font-family: inherit;
     }
     .topbar-search-input::placeholder {
       color: var(--gray-400);
       font-size: 12.5px;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .btn-icon-circle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1px solid var(--gray-200);
-      background: var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--gray-700);
-      font-size: 16px;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.2s;
-    }
-
-    .badge-dot {
-      position: absolute;
-      top: 9px;
-      right: 9px;
-      width: 8px;
-      height: 8px;
-      background: #ef4444;
-      border-radius: 50%;
-      border: 2px solid var(--white);
     }
 
     /* Notification Wrap & Dropdown */
@@ -1015,7 +1061,14 @@
     }
 
 </style>
-</head>
+<style>
+.table-actions{display:grid!important;grid-template-columns:120px 94px 134px 94px;gap:8px;align-items:center}
+.table-actions .btn-action{min-height:38px;width:100%;white-space:nowrap;justify-content:center;box-sizing:border-box}
+.table-actions .match-action{grid-column:1;grid-row:1}.table-actions .detail-action{grid-column:2;grid-row:1}
+.table-actions .invoice-action{grid-column:3;grid-row:1}.table-actions .cancel-action,.table-actions .rebook-action{grid-column:4;grid-row:1}
+.status-badge{white-space:nowrap!important;display:inline-flex!important;gap:4px}
+@media(max-width:700px){.table-actions{grid-template-columns:110px 120px}.table-actions .match-action{grid-column:1;grid-row:1}.table-actions .detail-action{grid-column:2;grid-row:1}.table-actions .invoice-action{grid-column:1;grid-row:2}.table-actions .cancel-action,.table-actions .rebook-action{grid-column:2;grid-row:2}}
+</style></head>
 <body>
 
   <!-- ========================================================================
@@ -1281,7 +1334,7 @@
               <div class="table-actions" style="justify-content: flex-end;">
                 <!-- Tìm đối thủ (Chỉ hiển thị cho các phiếu trước giờ thi đấu và chưa có bài đăng tìm đối) -->
                 <button th:if="${eligibleMatchmakingBookingIds != null and eligibleMatchmakingBookingIds.contains(b.id)}"
-                        type="button" class="btn-action"
+                        type="button" class="btn-action match-action"
                         style="color:#059669; border-color:#a7f3d0; background:#ecfdf5; font-weight:700;"
                         th:data-id="${b.id}"
                         th:data-sport="${b.sportName}"
@@ -1294,8 +1347,9 @@
                   <i class="fa-solid fa-handshake-angle"></i> Tìm đối thủ
                 </button>
 
+                <a th:if="${bookingMatchPostMap != null and bookingMatchPostMap.containsKey(b.id)}" th:href="@{/customer/community/mine}" class="btn-action match-action">Xem kèo</a>
                 <!-- Chi tiết -->
-                <button type="button" class="btn-action"
+                <button type="button" class="btn-action detail-action"
                         th:data-id="${b.id}"
                         th:data-court="${b.courtName}"
                         th:data-date="${b.bookingDate != null ? #temporals.format(b.bookingDate, 'dd/MM/yyyy') : ''}"
@@ -1307,13 +1361,13 @@
                 </button>
 
                 <!-- Hóa đơn PDF -->
-                <a th:href="@{'/customer/booking/export-pdf/' + ${b.id}}" target="_blank" class="btn-action" style="color:#b91c1c; border-color:#fecaca; background:#fff5f5; text-decoration:none;" title="Tải hóa đơn PDF">
+                <a th:href="@{'/customer/booking/export-pdf/' + ${b.id}}" target="_blank" class="btn-action invoice-action" style="color:#b91c1c; border-color:#fecaca; background:#fff5f5; text-decoration:none;" title="Tải hóa đơn PDF">
                   <i class="fa-solid fa-file-pdf"></i> Hóa đơn PDF
                 </a>
 
                 <!-- Hủy phiếu (chỉ hiển thị khi Chờ xác nhận hoặc Đã xác nhận) -->
                 <form th:if="${b.status == 'Chờ xác nhận' or b.status == 'Đã xác nhận'}"
-                      th:action="@{'/customer/history/cancel/' + ${b.id}}" method="post" style="margin:0">
+                      th:action="@{'/customer/history/cancel/' + ${b.id}}" method="post" class="cancel-action" style="margin:0">
                   <button type="button" class="btn-action danger" th:data-id="${b.id}" onclick="showCancelModal(this.form, this.getAttribute('data-id'))">
                     <i class="fa-solid fa-xmark"></i> Hủy
                   </button>
@@ -1321,7 +1375,7 @@
 
                 <!-- Đặt lại -->
                 <a th:if="${b.status == 'Hoàn thành' or b.status == 'Hoàn tất' or b.status == 'Đã hủy'}"
-                   href="/customer/booking" class="btn-action primary">
+                   href="/customer/booking" class="btn-action primary rebook-action">
                   <i class="fa-solid fa-rotate-right"></i> Đặt lại
                 </a>
               </div>
@@ -1531,7 +1585,7 @@
     // Khóa định danh bất biến theo Khóa chính Database (Customer ID - Primary Key)
     const CURRENT_USER_KEY = /*[[${currentUser != null and currentUser.customerId != null ? currentUser.customerId : (currentUser != null ? currentUser.username : 'guest')}]]*/ 'guest';
     const AVATAR_KEY = 'sporthub_custom_avatar_' + CURRENT_USER_KEY;
-    const NOTIF_KEY = 'sporthub_notifications_' + CURRENT_USER_KEY;
+    const NOTIF_KEY = 'verified_v2_sporthub_notifications_' + CURRENT_USER_KEY;
     function showDetailModal(btn) {
       document.getElementById('modalId').textContent = btn.getAttribute('data-id');
       document.getElementById('modalCourt').textContent = btn.getAttribute('data-court');
@@ -1562,30 +1616,7 @@
     // =========================================================================
     // NOTIFICATION SYSTEM (Shared via localStorage)
     // =========================================================================
-    const DEFAULT_NOTIFICATIONS = [
-      {
-        id: 'notif_welcome',
-        type: 'system',
-        title: 'Chào mừng bạn đến với SportHub! 🎉',
-        time: 'Hôm nay',
-        dateStr: '17/10/2026',
-        desc: 'Hệ thống đặt sân thể thao trực tuyến SportHub chúc bạn có những trải nghiệm rèn luyện thể thao tuyệt vời.',
-        content: 'Chào mừng bạn đến với SportHub - Hệ thống đặt sân thể thao thông minh!\n\nTại SportHub, bạn có thể dễ dàng:\n• Tra cứu lịch sân trống trực quan theo thời gian thực\n• Đặt sân nhanh chóng với hình thức cọc 30% hoặc 100%\n• Quét mã VietQR chuyển khoản tức thì chuẩn xác\n• Lưu lại các sân yêu thích để đặt lại bất cứ lúc nào\n\nChúc bạn luôn tràn đầy năng lượng và có những giờ phút thể thao ý nghĩa!',
-        unread: false,
-        extraData: null
-      },
-      {
-        id: 'notif_promo',
-        type: 'promo',
-        title: 'Ưu đãi Giờ Vàng Thể Thao: Giảm 10%',
-        time: 'Hôm qua',
-        dateStr: '16/10/2026',
-        desc: 'Áp dụng cho khung giờ sáng từ 06:00 - 09:00 từ Thứ Hai đến Thứ Sáu tại tất cả các cụm sân.',
-        content: 'ƯU ĐÃI ĐẶC BIỆT: GIỜ VÀNG THỂ THAO 🏸\n\nNhằm khuyến khích tinh thần rèn luyện thể thao buổi sáng, SportHub áp dụng chương trình ưu đãi:\n• Giảm ngay 10% khi đặt sân khung giờ 06:00 - 09:00\n• Áp dụng từ Thứ Hai đến Thứ Sáu hàng tuần\n• Mã ưu đãi: GIOVANG10 (nhập tại bước thanh toán)\n\nSố lượng khung giờ ưu đãi có hạn, hãy nhanh tay giữ chỗ!',
-        unread: false,
-        extraData: null
-      }
-    ];
+    const DEFAULT_NOTIFICATIONS = [];
 
     function getNotifications() {
       try {
@@ -1864,15 +1895,15 @@
         });
         const data = await res.json();
         if (data.success) {
-          alert(data.message || 'Đăng tin tìm đối thủ thành công!');
+          appNotice(data.message || 'Đăng tin tìm đối thủ thành công!');
           window.location.reload();
         } else {
-          alert(data.message || 'Không thể tạo bài đăng tìm đối.');
+          appNotice(data.message || 'Không thể tạo bài đăng tìm đối.');
           btn.disabled = false;
           btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Đăng tin tìm đối';
         }
       } catch (err) {
-        alert('Lỗi kết nối máy chủ: ' + err.message);
+        appNotice('Lỗi kết nối máy chủ: ' + err.message);
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Đăng tin tìm đối';
       }
@@ -1898,5 +1929,7 @@
 
   <!-- Real-time SportBot AI Assistant -->
   <th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
+<script src="/js/match-notifications.js" defer></script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

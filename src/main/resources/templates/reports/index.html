@@ -250,7 +250,7 @@
       </div>
 
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -653,5 +653,6 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

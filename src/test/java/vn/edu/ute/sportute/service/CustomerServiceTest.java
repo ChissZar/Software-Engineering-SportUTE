@@ -40,6 +40,7 @@ public class CustomerServiceTest {
 
     @BeforeEach
     void setUp() {
+        TestIds.inject(customerService);
         sampleCustomer = Customer.builder()
                 .id("KH001")
                 .fullName("Nguyễn Minh Anh")

@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class SportServiceImpl implements SportService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final SportRepository sportRepository;
     private final CourtRepository courtRepository;
@@ -64,7 +67,7 @@ public class SportServiceImpl implements SportService {
         Sport sport;
         if (dto.getId() == null || dto.getId().trim().isEmpty()) {
             sport = Sport.builder()
-                    .id(IdGenerator.generateId("M"))
+                    .id(idGenerator.generateId("M"))
                     .name(trimmedName)
                     .description(dto.getDescription())
                     .status(dto.getStatus() != null ? dto.getStatus() : "Hoạt động")

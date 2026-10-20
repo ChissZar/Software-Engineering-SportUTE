@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PriceServiceImpl implements PriceService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final PriceRepository priceRepository;
     private final CourtRepository courtRepository;
@@ -85,7 +88,7 @@ public class PriceServiceImpl implements PriceService {
         Price price;
         if (dto.getId() == null || dto.getId().trim().isEmpty()) {
             price = Price.builder()
-                    .id(IdGenerator.generateId("BG"))
+                    .id(idGenerator.generateId("BG"))
                     .court(court)
                     .fromDate(dto.getFromDate())
                     .toDate(dto.getToDate())
@@ -104,7 +107,7 @@ public class PriceServiceImpl implements PriceService {
         if (dto.getDetails() != null) {
             for (PriceDTO.DetailDTO detailDTO : dto.getDetails()) {
                 PriceDetail detail = PriceDetail.builder()
-                        .id(IdGenerator.generateId("CT"))
+                        .id(idGenerator.generateId("CTG"))
                         .price(savedPrice)
                         .timeSlot(detailDTO.getTimeSlot())
                         .priceAmount(detailDTO.getPriceAmount())

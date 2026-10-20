@@ -53,6 +53,10 @@ public class BookingServiceTest {
                 bookingPolicyRepository,
                 promotionRepository
         );
+        TestIds.inject(adminBookingService);
+        var pricing = new BookingPricingService(priceRepository,courtRepository,promotionRepository);
+        org.springframework.test.util.ReflectionTestUtils.setField(adminBookingService, "pricing", pricing);
+        org.springframework.test.util.ReflectionTestUtils.setField(adminBookingService, "amounts", new BookingAmounts(pricing));
     }
 
     @Test
@@ -85,6 +89,7 @@ public class BookingServiceTest {
                 .endTime(LocalDateTime.now())
                 .build();
         Booking booking = Booking.builder().id("DS01").status("Đang sử dụng")
+                .quotedAmount(BigDecimal.valueOf(300000))
                 .bookingDetails(new ArrayList<>())
                 .payments(new ArrayList<>())
                 .build();

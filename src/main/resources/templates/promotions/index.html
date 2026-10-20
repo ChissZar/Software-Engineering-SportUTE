@@ -58,7 +58,7 @@
         </form>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -187,7 +187,7 @@
                 <td style="font-weight:800; color:var(--primary);" th:text="${p.id}">KM001</td>
                 <td><b th:text="${p.name}">Ưu đãi hè</b></td>
                 <td>
-                  <b style="color:var(--primary);" th:text="${#numbers.formatDecimal(p.discountAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}">50.000 đ</b>
+                  <b style="color:var(--primary);" th:text="${#numbers.formatDecimal(p.discountAmount, 0, 'COMMA', 0, 'POINT') + (p.discountType == 'PERCENT' ? ' %' : ' đ')}">50.000 đ</b>
                 </td>
                 <td>
                   <span class="badge" style="background:var(--gray-100); color:var(--gray-800); border:1px solid var(--line);">
@@ -204,14 +204,14 @@
                   <button type="button" class="btn btn-sm"
                           th:data-id="${p.id}"
                           th:data-name="${p.name}"
-                          th:data-discount="${p.discountAmount}"
+                          th:data-discount="${p.discountAmount}" th:data-discount-type="${p.discountType}"
                           th:data-from="${p.fromDate}"
                           th:data-to="${p.toDate}"
                           onclick="openPromoEditModal(this)"
                           title="Chỉnh sửa">
                     <i class="fa-solid fa-pen"></i> Sửa
                   </button>
-                  <form th:action="@{/admin/promotions/delete/{id}(id=${p.id})}" method="post" style="display:inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa / ngừng chương trình khuyến mãi này?');">
+                  <form th:action="@{/admin/promotions/delete/{id}(id=${p.id})}" method="post" style="display:inline" data-confirm="Bạn có chắc chắn muốn xóa / ngừng chương trình khuyến mãi này?">
                     <button type="submit" class="btn btn-sm btn-danger" title="Xóa / Ngừng áp dụng"><i class="fa-regular fa-trash-can"></i></button>
                   </form>
                 </td>
@@ -255,8 +255,9 @@
           <input type="text" id="promoFieldName" name="name" placeholder="Ví dụ: Ưu đãi tân sinh viên hè 2026" required>
         </div>
         <div class="field" style="margin-bottom:14px;">
-          <label>Mức giảm giá (VNĐ) (*)</label>
-          <input type="number" id="promoFieldDiscount" name="discountAmount" placeholder="Ví dụ: 50000" min="0" step="1000" required>
+          <label>Loại giảm</label><select id="promoFieldType" name="discountType"><option value="AMOUNT">Số tiền (VNĐ)</option><option value="PERCENT">Phần trăm (%)</option></select>
+          <label>Giá trị giảm (*)</label>
+          <input type="number" id="promoFieldDiscount" name="discountAmount" placeholder="Ví dụ: 50000" min="0" step="1" required>
         </div>
         <div class="form-grid-2" style="margin-bottom:14px;">
           <div class="field" style="margin:0;">
@@ -270,7 +271,7 @@
         </div>
         <div style="padding:12px; border-radius:10px; background:var(--gray-50); border:1px solid var(--line); font-size:12px; color:var(--gray-600); line-height:1.5;">
           <b style="color:var(--gray-900); display:block; margin-bottom:2px;"><i class="fa-solid fa-circle-info me-1" style="color:var(--primary);"></i> Quy định khuyến mãi:</b>
-          <span>Mức giảm giá được trừ trực tiếp vào tổng tiền khi lập phiếu đặt sân. Tự động hết hạn khi qua ngày kết thúc.</span>
+          <span>Khách nhập/chọn mã hoặc lễ tân chọn chương trình. Ngày hiệu lực tính theo ngày tạo phiếu. Mỗi đơn áp dụng một mã; không cộng dồn ưu đãi thành viên.</span>
         </div>
       </div>
       <div class="modal-foot">
@@ -294,6 +295,7 @@ function openPromoCreateModal() {
 }
 
 function openPromoEditModal(btn) {
+  document.getElementById("promoFieldType").value = btn.dataset.discountType || "AMOUNT";
   const id = btn.getAttribute('data-id');
   const name = btn.getAttribute('data-name') || '';
   const discount = btn.getAttribute('data-discount') || '';
@@ -339,5 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </main>
 </div>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

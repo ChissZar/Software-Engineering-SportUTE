@@ -10,7 +10,16 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class Payment {
+
+    @Column(name = "CreatedAt", updatable = false)
+    private java.time.LocalDateTime createdAt;
+    @Column(name = "PaymentStatus", length = 30)
+    @Builder.Default
+    private String paymentStatus = "CONFIRMED";
+    @PrePersist
+    void timestamp() { if (createdAt == null) createdAt = java.time.LocalDateTime.now(); }
 
     @Id
     @Column(name = "MaGD", length = 10, nullable = false)

@@ -16,7 +16,18 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CourtServiceImpl implements CourtService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
 
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private vn.edu.ute.sportute.repository.MaintenanceRepository maintenanceRepository;
+    private String displayStatus(Court c) {
+        var now = java.time.LocalDateTime.now();
+        if (maintenanceRepository.existsOverlappingMaintenance(c.getId(),now,now.plusNanos(1))) return "Bảo trì";
+        if (courtRepository.hasCurrentUsage(c.getId(),now,"Đang sử dụng")) return "Đang sử dụng";
+        return "Đang sử dụng".equals(c.getStatus()) ? "Hoạt động" : c.getStatus();
+    }
     private final CourtRepository courtRepository;
     private final SportRepository sportRepository;
 
@@ -34,7 +45,7 @@ public class CourtServiceImpl implements CourtService {
                 .sportId(c.getSport().getId())
                 .sportName(c.getSport().getName())
                 .location(c.getLocation())
-                .status(c.getStatus())
+                .status(displayStatus(c))
                 .build()).collect(Collectors.toList());
     }
 
@@ -49,7 +60,7 @@ public class CourtServiceImpl implements CourtService {
                 .sportId(c.getSport().getId())
                 .sportName(c.getSport().getName())
                 .location(c.getLocation())
-                .status(c.getStatus())
+                .status(displayStatus(c))
                 .build();
     }
 
@@ -61,7 +72,7 @@ public class CourtServiceImpl implements CourtService {
         Court court;
         if (dto.getId() == null || dto.getId().trim().isEmpty()) {
             court = Court.builder()
-                    .id(IdGenerator.generateId("SAN"))
+                    .id(idGenerator.generateId("S"))
                     .name(dto.getName())
                     .sport(sport)
                     .location(dto.getLocation())
@@ -96,9 +107,9 @@ public class CourtServiceImpl implements CourtService {
         List<Court> courts = courtRepository.findAll();
         Map<String, Long> stats = new HashMap<>();
         stats.put("total", (long) courts.size());
-        stats.put("active", courts.stream().filter(c -> "Hoạt động".equalsIgnoreCase(c.getStatus())).count());
-        stats.put("inUse", courts.stream().filter(c -> "Đang sử dụng".equalsIgnoreCase(c.getStatus())).count());
-        stats.put("maintenance", courts.stream().filter(c -> "Bảo trì".equalsIgnoreCase(c.getStatus())).count());
+        stats.put("active", courts.stream().filter(c -> "Hoạt động".equalsIgnoreCase(displayStatus(c))).count());
+        stats.put("inUse", courts.stream().filter(c -> "Đang sử dụng".equalsIgnoreCase(displayStatus(c))).count());
+        stats.put("maintenance", courts.stream().filter(c -> "Bảo trì".equalsIgnoreCase(displayStatus(c))).count());
         return stats;
     }
 }

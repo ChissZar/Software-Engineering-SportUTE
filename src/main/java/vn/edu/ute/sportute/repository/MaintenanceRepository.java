@@ -17,6 +17,7 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, String
     // Kiểm tra xem sân có đang trong thời gian bảo trì hay không
     @Query("SELECT COUNT(m) > 0 FROM Maintenance m " +
            "WHERE m.court.id = :courtId " +
+           "AND (m.lifecycleStatus IS NULL OR m.lifecycleStatus = 'SCHEDULED') " +
            "AND m.startDate < :endTime AND m.endDate > :startTime")
     boolean existsOverlappingMaintenance(@Param("courtId") String courtId,
                                         @Param("startTime") LocalDateTime startTime,

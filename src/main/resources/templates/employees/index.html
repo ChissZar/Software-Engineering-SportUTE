@@ -41,7 +41,7 @@
         </form>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -180,7 +180,7 @@
                   <span class="badge" th:classappend="${e.status == 'Đang làm' ? 'status-active' : (e.status == 'Nghỉ phép' ? 'status-maint' : 'status-disabled')}" th:text="${e.status}">Đang làm</span>
                 </td>
                 <td style="text-align:right; white-space:nowrap;">
-                  <button type="button" class="btn btn-sm"
+                  <button th:if="${currentUser != null and (currentUser.admin or ((e.position == 'Lễ tân' or e.position == 'Vận hành' or e.position == 'Kỹ thuật') and e.roleName != 'ROLE_ADMIN' and e.roleName != 'ROLE_MANAGER'))}" type="button" class="btn btn-sm"
                           th:data-id="${e.id}"
                           th:data-fullname="${e.fullName}"
                           th:data-phone="${e.phone}"
@@ -192,7 +192,7 @@
                           title="Sửa thông tin">
                     <i class="fa-solid fa-pen"></i> Sửa
                   </button>
-                  <form th:action="@{/admin/employees/toggle/{id}(id=${e.id})}" method="post" style="display:inline" onsubmit="return confirm('Xác nhận đổi trạng thái làm việc nhân viên #' + '[[${e.id}]]' + '?');">
+                  <form th:if="${currentUser != null and (currentUser.admin or ((e.position == 'Lễ tân' or e.position == 'Vận hành' or e.position == 'Kỹ thuật') and e.roleName != 'ROLE_ADMIN' and e.roleName != 'ROLE_MANAGER'))}" th:action="@{/admin/employees/toggle/{id}(id=${e.id})}" method="post" style="display:inline" data-confirm="Xác nhận đổi trạng thái làm việc nhân viên ?" th:data-confirm-item="${e.id}">
                     <button type="submit" class="btn btn-sm" th:classappend="${e.status == 'Đang làm' ? 'btn-danger' : 'btn-success'}" th:title="${e.status == 'Đang làm' ? 'Ngừng hoạt động / Khóa tài khoản' : 'Kích hoạt lại'}">
                       <i th:class="${e.status == 'Đang làm' ? 'fa-solid fa-user-xmark' : 'fa-solid fa-user-check'}"></i>
                     </button>
@@ -252,7 +252,7 @@
             <label>Chức vụ (*)</label>
             <select id="empFieldPosition" name="position">
               <option value="Lễ tân">Nhân viên Lễ tân</option>
-              <option value="Quản lý">Quản lý trung tâm</option>
+              <option th:if="${currentUser != null and currentUser.admin}" value="Quản lý">Quản lý trung tâm</option>
               <option value="Vận hành">Nhân viên Vận hành sân</option>
               <option value="Kỹ thuật">Kỹ thuật bảo trì</option>
             </select>
@@ -343,5 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </main>
 </div>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

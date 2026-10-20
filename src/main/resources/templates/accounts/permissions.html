@@ -549,31 +549,38 @@
       width: 0;
     }
     .perm-box {
-      width: 24px;
-      height: 24px;
-      border-radius: 7px;
-      border: 1.5px solid #cbd5e1;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 1.8px solid #cbd5e1;
       display: grid;
       place-items: center;
-      background: #fff;
-      transition: all 0.18s ease;
+      background: #ffffff;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
       color: transparent;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
     }
     .perm-check:hover .perm-box {
-      border-color: var(--emerald-600);
+      border-color: #059669;
+      background: #f0fdf4;
+      transform: scale(1.06);
     }
     .perm-check input:checked ~ .perm-box {
-      background: linear-gradient(135deg, var(--emerald-700), var(--emerald-600));
-      border-color: transparent;
-      color: #fff;
-      box-shadow: 0 3px 8px rgba(5, 150, 105, 0.35);
+      background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+      border-color: #047857 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.42), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+      transform: scale(1.1);
     }
     .perm-box svg {
-      width: 14px;
-      height: 14px;
+      width: 15px;
+      height: 15px;
       stroke: currentColor;
       fill: none;
-      stroke-width: 2.5;
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
     }
 
     /* Bottom Grid: Audit Log & Security Rules */
@@ -852,7 +859,7 @@
       </div>
 
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="showToast('Không có thông báo bảo mật mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="showToast('Không có thông báo bảo mật mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -1884,7 +1891,7 @@ function submitNewRole() {
   const code = document.getElementById('newRoleCode').value.trim();
   const name = document.getElementById('newRoleName').value.trim();
   if (!code || !name) {
-    alert('Vui lòng nhập đầy đủ mã vai trò và tên vai trò!');
+    appNotice('Vui lòng nhập đầy đủ mã vai trò và tên vai trò!');
     return;
   }
   closeModal('newRoleModal');
@@ -1936,5 +1943,6 @@ window.onclick = function(event) {
   }
 };
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

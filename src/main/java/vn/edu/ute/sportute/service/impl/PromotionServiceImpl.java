@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PromotionServiceImpl implements PromotionService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final PromotionRepository promotionRepository;
 
@@ -37,6 +40,7 @@ public class PromotionServiceImpl implements PromotionService {
         return PromotionDTO.builder()
                 .id(p.getId())
                 .name(p.getName())
+                .discountType(p.getDiscountType())
                 .discountAmount(p.getDiscountAmount())
                 .fromDate(p.getFromDate())
                 .toDate(p.getToDate())
@@ -90,9 +94,16 @@ public class PromotionServiceImpl implements PromotionService {
         } else {
             // Thêm khuyến mãi mới (UC15)
             promotion = new Promotion();
-            promotion.setId(IdGenerator.generateId("KM"));
+            promotion.setId(idGenerator.generateId("KM"));
         }
 
+        String type = dto.getDiscountType() == null ? "AMOUNT" : dto.getDiscountType();
+        if (!Set.of("AMOUNT", "PERCENT").contains(type) || dto.getDiscountAmount().signum() < 0 ||
+            ("PERCENT".equals(type) && dto.getDiscountAmount().compareTo(java.math.BigDecimal.valueOf(100)) > 0))
+            throw new IllegalArgumentException("Loại hoặc giá trị giảm không hợp lệ");
+        if (dto.getFromDate() != null && dto.getToDate() != null && dto.getFromDate().isAfter(dto.getToDate()))
+            throw new IllegalArgumentException("Ngày kết thúc phải từ ngày bắt đầu trở đi");
+        promotion.setDiscountType(type);
         promotion.setName(dto.getName().trim());
         promotion.setDiscountAmount(dto.getDiscountAmount());
         promotion.setFromDate(dto.getFromDate());

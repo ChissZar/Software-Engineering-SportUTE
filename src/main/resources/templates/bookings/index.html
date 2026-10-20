@@ -370,6 +370,52 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   color: var(--primary-dark);
   border-color: var(--primary-border);
 }
+.pos-mode-tab-btn {
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-600);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pos-mode-tab-btn.active {
+  background: #ffffff;
+  color: var(--emerald-700);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  font-weight: 800;
+}
+.pos-pay-method-btn {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+.pos-pay-method-btn:hover {
+  border-color: #94a3b8;
+}
+.pos-pay-method-btn.active {
+  border-color: #059669;
+  background: #ecfdf5;
+  color: #047857;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.15);
+}
 
 /* ==================== RECEPTIONIST WORKSTATION & WIZARD STYLES ==================== */
 .receptionist-bar {
@@ -732,18 +778,18 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
 /* Action buttons inside table: fixed-column grid to ensure 100% vertical alignment across all rows */
 .tablewrap table {
   width: 100%;
-  min-width: 1400px;
+  min-width: 1040px;
 }
 .col-actions {
-  width: 510px !important;
-  min-width: 510px !important;
+  width: 335px !important;
+  min-width: 335px !important;
   text-align: left !important;
-  padding: 8px 10px !important;
+  padding: 6px 6px !important;
 }
 .action-grid {
   display: grid !important;
-  grid-template-columns: 88px 92px 64px 86px 62px 34px 34px !important;
-  gap: 6px !important;
+  grid-template-columns: 76px 76px 48px 70px 48px !important;
+  gap: 4px !important;
   align-items: center !important;
   width: 100% !important;
 }
@@ -751,7 +797,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-height: 31px !important;
+  min-height: 29px !important;
   width: 100% !important;
 }
 .action-slot .w-100 {
@@ -759,16 +805,16 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   justify-content: center !important;
 }
 .action-btn {
-  height: 31px !important;
-  padding: 0 8px !important;
-  font-size: 11.5px !important;
+  height: 29px !important;
+  padding: 0 6px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  border-radius: 7px !important;
+  border-radius: 6px !important;
   white-space: nowrap !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 5px !important;
+  gap: 4px !important;
   box-sizing: border-box !important;
   text-decoration: none !important;
   border: 1px solid transparent;
@@ -780,8 +826,10 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
 }
 .action-btn.btn-icon-only {
   padding: 0 !important;
-  width: 34px !important;
+  width: 28px !important;
+  height: 29px !important;
   justify-content: center !important;
+  font-size: 11.5px !important;
 }
 .btn-fnb { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
 .btn-fnb:hover { background: #dcfce7; color: #166534; }
@@ -821,7 +869,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
         </form>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -1004,14 +1052,14 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
           <table>
             <thead>
               <tr>
-                <th style="width: 95px; min-width: 95px;">Mã đặt</th>
-                <th style="width: 200px; min-width: 200px;">Khách hàng</th>
-                <th style="width: 170px; min-width: 170px;">Sân thể thao</th>
-                <th style="width: 105px; min-width: 105px;">Ngày</th>
-                <th style="width: 125px; min-width: 125px;">Khung giờ</th>
-                <th style="width: 130px; min-width: 130px;">Tổng tiền</th>
-                <th style="width: 125px; min-width: 125px;">Trạng thái</th>
-                <th class="col-actions" style="width: 510px; min-width: 510px; text-align: left !important;">Thao tác</th>
+                <th style="width: 82px; min-width: 82px;">Mã đặt</th>
+                <th style="width: 155px; min-width: 140px;">Khách hàng</th>
+                <th style="width: 135px; min-width: 125px;">Sân thể thao</th>
+                <th style="width: 85px; min-width: 80px; text-align: center;">Ngày</th>
+                <th style="width: 95px; min-width: 90px; text-align: center;">Khung giờ</th>
+                <th style="width: 105px; min-width: 100px;">Tổng tiền</th>
+                <th style="width: 92px; min-width: 88px; text-align: center;">Trạng thái</th>
+                <th class="col-actions" style="width: 335px; min-width: 335px; text-align: left !important;">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -1110,20 +1158,6 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                               th:data-fee="${b.cancellationFeeRate}"
                               onclick="openCancelModal(this)" title="Hủy phiếu theo chính sách (UC20)">
                         <i class="fa-solid fa-ban"></i> Hủy
-                      </button>
-                    </div>
-
-                    <!-- Slot 6: XUẤT HÓA ĐƠN PDF -->
-                    <div class="action-slot">
-                      <a th:href="@{/admin/bookings/export-pdf/{id}(id=${b.id})}" target="_blank" class="btn action-btn btn-icon-only w-100" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca;" title="Tải / In hóa đơn PDF">
-                        <i class="fa-solid fa-file-pdf"></i>
-                      </a>
-                    </div>
-
-                    <!-- Slot 7: XEM CHI TIẾT & IN PHIẾU -->
-                    <div class="action-slot">
-                      <button type="button" class="btn action-btn btn-icon-only w-100" style="background:var(--gray-50); border-color:var(--line); color:var(--gray-700);" th:data-id="${b.id}" onclick="openDetailModal(this.getAttribute('data-id'))" title="Xem chi tiết & in phiếu">
-                        <i class="fa-regular fa-eye"></i>
                       </button>
                     </div>
                   </div>
@@ -2207,24 +2241,36 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
 <div class="modal-overlay" id="modalAddService">
   <div class="modal-card" style="max-width: 980px; width: 95%; max-height: 92vh; display: flex; flex-direction: column;">
     <!-- Modal Head -->
-    <div class="modal-head" style="padding: 14px 22px; border-bottom: 1px solid var(--line); display:flex; justify-content:space-between; align-items:center; background: #fafbfc;">
+    <div class="modal-head" style="padding: 12px 22px; border-bottom: 1.5px solid var(--line); display:flex; justify-content:space-between; align-items:center; background: #fafbfc; flex-wrap:wrap; gap:10px;">
       <div style="display:flex; align-items:center; gap:12px;">
         <div style="width:38px; height:38px; border-radius:10px; background:var(--primary-subtle); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:18px;">
           <i class="fa-solid fa-mug-hot"></i>
         </div>
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--dark);">Quầy POS Gọi Nước & Thuê Dụng Cụ Tại Sân</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--dark);" id="posModalMainTitle">Quầy POS Bán Lẻ & Gọi Nước F&B</h3>
           <div style="font-size:12px; color:var(--gray-500); margin-top:2px;">
-            Phiếu: <b id="posBookingIdTxt" style="color:var(--primary); font-size:13px;">#---</b> • Khách: <strong id="posCustomerName" style="color:var(--dark);">---</strong> • Sân: <span id="posCourtName" style="color:var(--primary-dark); font-weight:700;">---</span>
+            <span id="posModeSubtitle">Bán lẻ trực tiếp cho khách vãng lai hoặc người nhà cổ vũ</span>
           </div>
         </div>
       </div>
-      <button type="button" class="modal-close" onclick="closeModal('modalAddService')">&times;</button>
+
+      <!-- Mode Switcher Tabs -->
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div style="display:flex; background:#e2e8f0; border-radius:10px; padding:3px; gap:4px;">
+          <button type="button" id="posModeRetailTab" class="pos-mode-tab-btn active" onclick="switchPosMode('RETAIL')">
+            <i class="fa-solid fa-cash-register me-1"></i> Bán lẻ tại quầy
+          </button>
+          <button type="button" id="posModeBookingTab" class="pos-mode-tab-btn" onclick="switchPosMode('BOOKING')">
+            <i class="fa-solid fa-receipt me-1"></i> Ghi vào phiếu sân
+          </button>
+        </div>
+        <button type="button" class="modal-close" onclick="closeModal('modalAddService')">&times;</button>
+      </div>
     </div>
 
     <input type="hidden" id="posBookingId">
 
-    <!-- Modal Body: Split 2 columns (Catalog on left, Cart & History on right) -->
+    <!-- Modal Body: Split 2 columns (Catalog on left, Cart & Checkout on right) -->
     <div class="modal-body" style="padding: 16px 22px; overflow-y: auto; flex: 1;">
       <div style="display: grid; grid-template-columns: 1.28fr 1fr; gap: 18px; align-items: start;">
         
@@ -2295,6 +2341,60 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
 
         <!-- CỘT PHẢI: GIỎ ORDER MÓN & XÁC NHẬN SIÊU TỐC -->
         <div style="display:flex; flex-direction:column; gap:12px;">
+          
+          <!-- A. Thông tin khách & Thanh toán khi ở chế độ BÁN LẺ (Mặc định) -->
+          <div id="posRetailCustomerBox" style="background:#ffffff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+            <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+              <span style="display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-user-tag text-emerald" style="color:#059669;"></i>
+                <span>Thông tin khách mua lẻ</span>
+              </span>
+              <span class="badge" style="background:#ecfdf5; color:#047857; font-size:10px; font-weight:700;">Không cần đặt sân</span>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
+              <div>
+                <label style="font-size:11px; font-weight:600; color:#64748b; display:block; margin-bottom:3px;">Tên khách:</label>
+                <input type="text" id="posRetailCustomerName" value="Khách vãng lai" 
+                       style="height:32px; font-size:12px; font-weight:700; border-radius:6px; border:1px solid var(--line); padding:0 8px; width:100%; background:#f8fafc;">
+              </div>
+              <div>
+                <label style="font-size:11px; font-weight:600; color:#64748b; display:block; margin-bottom:3px;">SĐT (Tùy chọn):</label>
+                <input type="text" id="posRetailCustomerPhone" placeholder="SĐT nếu có..." 
+                       style="height:32px; font-size:12px; font-weight:600; border-radius:6px; border:1px solid var(--line); padding:0 8px; width:100%; background:#f8fafc;">
+              </div>
+            </div>
+
+            <!-- Phương thức thanh toán bán lẻ -->
+            <label style="font-size:11px; font-weight:600; color:#64748b; display:block; margin-bottom:4px;">Hình thức thanh toán:</label>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="pos-pay-method-btn active" id="posPayMethodCashBtn" onclick="selectPosRetailPayMethod('Tiền mặt', this)">
+                <i class="fa-solid fa-money-bill-wave" style="color:#059669;"></i>
+                <span>Tiền mặt</span>
+              </button>
+              <button type="button" class="pos-pay-method-btn" id="posPayMethodQrBtn" onclick="selectPosRetailPayMethod('Chuyển khoản QR', this)">
+                <i class="fa-solid fa-qrcode" style="color:#2563eb;"></i>
+                <span>Quét VietQR</span>
+              </button>
+            </div>
+            <input type="hidden" id="posRetailPaymentMethod" value="Tiền mặt">
+          </div>
+
+          <!-- B. Thông tin khi ở chế độ GHI VÀO PHIẾU ĐẶT SÂN -->
+          <div id="posBookingCustomerBox" style="display:none; background:#ffffff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+            <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-receipt text-primary"></i>
+              <span>Chọn phiếu đặt sân để ghi nợ món:</span>
+            </div>
+            <select id="posLinkedBookingSelect" onchange="onPosLinkedBookingChange(this.value)" 
+                    style="height:34px; border-radius:8px; border:1.5px solid #38bdf8; font-size:12px; font-weight:700; width:100%; background:#f0f9ff; color:#0369a1; padding:0 8px;">
+              <option value="">-- Chọn phiếu đặt sân đang sử dụng / đã duyệt --</option>
+              <option th:each="b : ${bookings}" 
+                      th:if="${b.status == 'Đang sử dụng' or b.status == 'Đã xác nhận' or b.status == 'Chờ xác nhận'}"
+                      th:value="${b.id}" 
+                      th:text="'#' + ${b.id} + ' • ' + ${b.customerName} + ' (' + ${b.courtName} + ' - ' + ${b.status} + ')'"></option>
+            </select>
+          </div>
+
           <!-- Cart Box -->
           <div style="background:#ffffff; border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid var(--line); padding-bottom:8px;">
@@ -2306,9 +2406,9 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
             </div>
 
             <!-- Cart Items Container -->
-            <div id="posCartList" style="max-height:170px; min-height:100px; overflow-y:auto; margin-bottom:10px;">
-              <div id="posCartEmpty" style="text-align:center; padding:24px 10px; color:var(--gray-400); font-size:12.5px;">
-                <i class="fa-solid fa-basket-shopping" style="font-size:26px; color:var(--gray-300); margin-bottom:6px; display:block;"></i>
+            <div id="posCartList" style="max-height:160px; min-height:90px; overflow-y:auto; margin-bottom:10px;">
+              <div id="posCartEmpty" style="text-align:center; padding:20px 10px; color:var(--gray-400); font-size:12.5px;">
+                <i class="fa-solid fa-basket-shopping" style="font-size:24px; color:var(--gray-300); margin-bottom:6px; display:block;"></i>
                 Chưa có món nào. Bấm vào thực đơn bên trái để thêm ngay!
               </div>
             </div>
@@ -2327,18 +2427,23 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
 
             <!-- Financial Subtotal -->
             <div style="background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span style="font-size:12px; color:var(--gray-600); font-weight:600;">Tạm tính các món mới:</span>
-              <strong id="posCartTotal" style="font-size:15px; color:var(--primary);">0 đ</strong>
+              <span style="font-size:12px; color:var(--gray-600); font-weight:600;">Tổng tiền thanh toán:</span>
+              <strong id="posCartTotal" style="font-size:16px; color:#047857; font-weight:800;">0 đ</strong>
             </div>
 
-            <!-- Submit Button (Batch AJAX) -->
-            <button type="button" id="btnConfirmPosOrder" class="btn primary" style="width:100%; height:38px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="submitPosBatchOrder()">
-              <i class="fa-solid fa-check"></i> Xác nhận gọi món (F8)
+            <!-- Submit Button for Retail Mode -->
+            <button type="button" id="btnConfirmRetailOrder" class="btn" style="width:100%; height:40px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; background:#059669; color:#fff; border-radius:8px; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(5,150,105,0.25);" onclick="submitPosRetailOrder()">
+              <i class="fa-solid fa-circle-check"></i> Thanh toán bán lẻ & In hóa đơn (F8)
+            </button>
+
+            <!-- Submit Button for Booking Mode -->
+            <button type="button" id="btnConfirmPosOrder" class="btn primary" style="display:none; width:100%; height:40px; font-size:13px; font-weight:800; align-items:center; justify-content:center; gap:8px;" onclick="submitPosBatchOrder()">
+              <i class="fa-solid fa-plus-circle"></i> Thêm món vào phiếu sân (F8)
             </button>
           </div>
 
-          <!-- History of Already Ordered Services in this Booking -->
-          <div style="background:#ffffff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+          <!-- History of Already Ordered Services in this Booking (Only shown in BOOKING mode) -->
+          <div id="posOrderedHistoryBox" style="display:none; background:#ffffff; border:1px solid var(--line); border-radius:12px; padding:12px 14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <h5 style="margin:0; font-size:12px; font-weight:800; color:var(--gray-700); display:flex; align-items:center; gap:6px;">
                 <i class="fa-solid fa-clock-rotate-left" style="color:var(--emerald-600);"></i>
@@ -2346,7 +2451,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
               </h5>
               <b id="posTotalServiceSum" style="color:var(--primary); font-size:12.5px;">0 đ</b>
             </div>
-            <div id="posOrderedList" style="max-height:130px; overflow-y:auto; border:1px solid var(--line); border-radius:6px; background:var(--gray-50);">
+            <div id="posOrderedList" style="max-height:120px; overflow-y:auto; border:1px solid var(--line); border-radius:6px; background:var(--gray-50);">
               <div style="padding:10px; text-align:center; color:var(--gray-400); font-size:11.5px;">Đang nạp danh sách...</div>
             </div>
           </div>
@@ -2659,6 +2764,83 @@ function openCancelModal(btn) {
 // ==================== F&B / POS SERVICES JAVASCRIPT ====================
 let posCart = []; // Array of { id, name, category, price, unit, stock, quantity }
 let currentPosCategory = 'ALL';
+let currentPosMode = 'RETAIL'; // 'RETAIL' or 'BOOKING'
+
+function switchPosMode(mode) {
+  currentPosMode = mode;
+  const retailTab = document.getElementById('posModeRetailTab');
+  const bookingTab = document.getElementById('posModeBookingTab');
+  const retailCustBox = document.getElementById('posRetailCustomerBox');
+  const bookingCustBox = document.getElementById('posBookingCustomerBox');
+  const btnRetail = document.getElementById('btnConfirmRetailOrder');
+  const btnBooking = document.getElementById('btnConfirmPosOrder');
+  const historyBox = document.getElementById('posOrderedHistoryBox');
+  const subtitle = document.getElementById('posModeSubtitle');
+  const title = document.getElementById('posModalMainTitle');
+
+  if (mode === 'RETAIL') {
+    if (retailTab) retailTab.classList.add('active');
+    if (bookingTab) bookingTab.classList.remove('active');
+    if (retailCustBox) retailCustBox.style.display = 'block';
+    if (bookingCustBox) bookingCustBox.style.display = 'none';
+    if (btnRetail) btnRetail.style.display = 'flex';
+    if (btnBooking) btnBooking.style.display = 'none';
+    if (historyBox) historyBox.style.display = 'none';
+    if (title) title.innerText = 'Quầy Bán Lẻ F&B & Nước Uống Tại Chỗ';
+    if (subtitle) subtitle.innerText = 'Bán lẻ trực tiếp cho khách vãng lai hoặc người nhà cổ vũ (Không cần đặt sân)';
+    const bookingInput = document.getElementById('posBookingId');
+    if (bookingInput) bookingInput.value = '';
+  } else {
+    if (retailTab) retailTab.classList.remove('active');
+    if (bookingTab) bookingTab.classList.add('active');
+    if (retailCustBox) retailCustBox.style.display = 'none';
+    if (bookingCustBox) bookingCustBox.style.display = 'block';
+    if (btnRetail) btnRetail.style.display = 'none';
+    if (btnBooking) btnBooking.style.display = 'flex';
+    if (historyBox) historyBox.style.display = 'block';
+    if (title) title.innerText = 'Gọi Thêm Nước Uống & Đồ Ăn Vào Sân';
+    if (subtitle) subtitle.innerText = 'Ghi nợ đồ uống, thức ăn vào phiếu sân đang chơi để quyết toán khi trả sân';
+
+    const selectEl = document.getElementById('posLinkedBookingSelect');
+    const bookingInput = document.getElementById('posBookingId');
+    if (bookingInput && bookingInput.value) {
+      if (selectEl) selectEl.value = bookingInput.value;
+      loadBookingServices(bookingInput.value);
+    } else if (selectEl && selectEl.value) {
+      bookingInput.value = selectEl.value;
+      loadBookingServices(selectEl.value);
+    }
+  }
+}
+
+function selectPosRetailPayMethod(method, btnEl) {
+  const input = document.getElementById('posRetailPaymentMethod');
+  if (input) input.value = method;
+  document.querySelectorAll('.pos-pay-method-btn').forEach(btn => btn.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+}
+
+function onPosLinkedBookingChange(bookingId) {
+  document.getElementById('posBookingId').value = bookingId;
+  if (bookingId) {
+    loadBookingServices(bookingId);
+  } else {
+    document.getElementById('posOrderedList').innerHTML = '<div style="padding:10px; text-align:center; color:var(--gray-400); font-size:11.5px;">Vui lòng chọn một phiếu đặt sân ở trên.</div>';
+    document.getElementById('posTotalServiceSum').innerText = '0 đ';
+  }
+}
+
+function openPosModalRetail() {
+  posCart = [];
+  const searchInput = document.getElementById('posCatalogSearch');
+  if (searchInput) searchInput.value = '';
+  const noteInput = document.getElementById('posOrderNote');
+  if (noteInput) noteInput.value = '';
+  filterPosCategory('ALL');
+  renderPosCart();
+  switchPosMode('RETAIL');
+  openModal('modalAddService');
+}
 
 function openAddServiceModal(btn) {
   const id = btn.getAttribute('data-id');
@@ -2666,10 +2848,9 @@ function openAddServiceModal(btn) {
   const court = btn.getAttribute('data-court');
 
   document.getElementById('posBookingId').value = id;
-  document.getElementById('posBookingIdTxt').innerText = '#' + id;
-  document.getElementById('posCustomerName').innerText = customer || 'Khách vãng lai';
-  document.getElementById('posCourtName').innerText = court || '';
-  
+  const selectEl = document.getElementById('posLinkedBookingSelect');
+  if (selectEl) selectEl.value = id;
+
   // Reset cart, note & category
   posCart = [];
   const searchInput = document.getElementById('posCatalogSearch');
@@ -2679,6 +2860,7 @@ function openAddServiceModal(btn) {
   filterPosCategory('ALL');
   renderPosCart();
 
+  switchPosMode('BOOKING');
   loadBookingServices(id);
   openModal('modalAddService');
 }
@@ -2855,10 +3037,76 @@ function filterPosCatalog() {
   });
 }
 
+function submitPosRetailOrder() {
+  if (posCart.length === 0) {
+    showPosToast('Vui lòng chọn ít nhất 1 món từ thực đơn bên trái!', 'warning');
+    return;
+  }
+
+  const custName = (document.getElementById('posRetailCustomerName').value || '').trim() || 'Khách vãng lai tại quầy';
+  const custPhone = (document.getElementById('posRetailCustomerPhone').value || '').trim();
+  const payMethod = document.getElementById('posRetailPaymentMethod').value || 'Tiền mặt';
+  const commonNote = (document.getElementById('posOrderNote').value || '').trim();
+
+  const req = {
+    customerName: custName,
+    customerPhone: custPhone,
+    paymentMethod: payMethod,
+    note: commonNote,
+    items: posCart.map(it => ({
+      serviceId: it.id,
+      quantity: it.quantity,
+      note: commonNote
+    }))
+  };
+
+  const btnConfirm = document.getElementById('btnConfirmRetailOrder');
+  const originalHtml = btnConfirm ? btnConfirm.innerHTML : '';
+  if (btnConfirm) {
+    btnConfirm.disabled = true;
+    btnConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang thanh toán...';
+  }
+
+  fetch('/admin/bookings/api/retail-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req)
+  })
+  .then(res => res.json())
+  .then(async data => {
+    if (btnConfirm) {
+      btnConfirm.disabled = false;
+      btnConfirm.innerHTML = originalHtml;
+    }
+
+    if (data.success) {
+      showPosToast(data.message || 'Đã thanh toán đơn bán lẻ thành công!', 'success');
+      posCart = [];
+      renderPosCart();
+      closeModal('modalAddService');
+
+      if (await appConfirm('Thanh toán bán lẻ thành công đơn #' + (data.orderId || data.bookingId) + '!\nBạn có muốn xem chi tiết và in phiếu thu / hóa đơn bán lẻ ngay không?')) {
+        openDetailModal(data.orderId || data.bookingId);
+      } else {
+        setTimeout(() => { location.reload(); }, 600);
+      }
+    } else {
+      appNotice('Lỗi: ' + (data.message || 'Không thể tạo đơn bán lẻ.'));
+    }
+  })
+  .catch(err => {
+    if (btnConfirm) {
+      btnConfirm.disabled = false;
+      btnConfirm.innerHTML = originalHtml;
+    }
+    appNotice('Lỗi kết nối bán lẻ: ' + err);
+  });
+}
+
 function submitPosBatchOrder() {
   const bookingId = document.getElementById('posBookingId').value;
   if (!bookingId) {
-    alert('Không xác định được mã phiếu đặt sân!');
+    appNotice('Không xác định được mã phiếu đặt sân! Vui lòng chọn một phiếu đặt sân ở menu chọn phiếu.');
     return;
   }
 
@@ -2901,18 +3149,18 @@ function submitPosBatchOrder() {
       // Update UI in bookings table if possible
       updateBookingRowFinances(bookingId, data.totalAmount, data.paidAmount, data.remainingAmount);
     } else {
-      alert('Lỗi: ' + (data.message || 'Không thể thêm món.'));
+      appNotice('Lỗi: ' + (data.message || 'Không thể thêm món.'));
     }
   })
   .catch(err => {
     btnConfirm.disabled = false;
     btnConfirm.innerHTML = originalHtml;
-    alert('Lỗi kết nối khi gọi món: ' + err);
+    appNotice('Lỗi kết nối khi gọi món: ' + err);
   });
 }
 
-function deletePosServiceAjax(detailId, bookingId) {
-  if (!confirm('Bạn có chắc muốn hủy món này khỏi phiếu đặt?')) return;
+async function deletePosServiceAjax(detailId, bookingId) {
+  if (!await appConfirm('Bạn có chắc muốn hủy món này khỏi phiếu đặt?')) return;
 
   fetch('/admin/bookings/api/delete-service/' + encodeURIComponent(detailId) + '?bookingId=' + encodeURIComponent(bookingId), {
     method: 'POST'
@@ -2924,11 +3172,11 @@ function deletePosServiceAjax(detailId, bookingId) {
       loadBookingServices(bookingId);
       updateBookingRowFinances(bookingId, data.totalAmount, data.paidAmount, data.remainingAmount);
     } else {
-      alert('Lỗi hủy món: ' + (data.message || 'Không rõ nguyên nhân'));
+      appNotice('Lỗi hủy món: ' + (data.message || 'Không rõ nguyên nhân'));
     }
   })
   .catch(err => {
-    alert('Lỗi kết nối khi hủy món: ' + err);
+    appNotice('Lỗi kết nối khi hủy món: ' + err);
   });
 }
 
@@ -2987,13 +3235,17 @@ function showPosToast(message, type) {
   }, 2800);
 }
 
-// Shortcut F8 to confirm POS order
+// Shortcut F8 to confirm POS order (Retail or Booking mode)
 window.addEventListener('keydown', (e) => {
   if (e.key === 'F8') {
     const modal = document.getElementById('modalAddService');
     if (modal && modal.classList.contains('active')) {
       e.preventDefault();
-      submitPosBatchOrder();
+      if (currentPosMode === 'RETAIL') {
+        submitPosRetailOrder();
+      } else {
+        submitPosBatchOrder();
+      }
     }
   }
 });
@@ -3115,7 +3367,7 @@ function openDetailModal(bookingId) {
 
       openModal('modalDetail');
     })
-    .catch(err => alert('Không thể tải chi tiết phiếu đặt sân: ' + err));
+    .catch(err => appNotice('Không thể tải chi tiết phiếu đặt sân: ' + err));
 }
 
 let currentDetailBookingData = null;
@@ -3179,7 +3431,7 @@ function openQuickPosForCourt(btn) {
     };
     openAddServiceModal(dummyBtn);
   } else {
-    alert('Sân ' + courtName + ' hiện chưa có lịch đặt nào trong ngày được chọn để liên kết gọi món F&B.');
+    appNotice('Sân ' + courtName + ' hiện chưa có lịch đặt nào trong ngày được chọn để liên kết gọi món F&B.');
   }
 }
 
@@ -3370,12 +3622,12 @@ function receptionFastCheckIn(bookingId, btnEl) {
           }
         }
       } else {
-        alert(data.message || 'Không thể nhận sân.');
+        appNotice(data.message || 'Không thể nhận sân.');
         if (btnEl) btnEl.disabled = false;
       }
     })
     .catch(err => {
-      alert('Lỗi nhận sân: ' + err);
+      appNotice('Lỗi nhận sân: ' + err);
       if (btnEl) btnEl.disabled = false;
     });
 }
@@ -3411,15 +3663,7 @@ function receptionOpenPos(id, cust, court) {
 }
 
 function openQuickPosModalFromBar() {
-  const firstRow = document.querySelector('tr.clickable-row');
-  if (firstRow) {
-    const id = firstRow.getAttribute('data-id');
-    const cust = firstRow.querySelector('strong') ? firstRow.querySelector('strong').innerText : 'Khách';
-    const court = firstRow.children[2] ? firstRow.children[2].innerText : '';
-    receptionOpenPos(id, cust, court);
-  } else {
-    alert('Vui lòng chọn hoặc tạo phiếu đặt sân trước khi mở quầy nước.');
-  }
+  openPosModalRetail();
 }
 
 // 2. RECEPTIONIST MULTI-STEP BOOKING WIZARD
@@ -4013,13 +4257,13 @@ function wizardSubmitBooking() {
         setTimeout(printSuccessBooking, 500);
       }
     } else {
-      alert('Không thể hoàn tất đặt sân: ' + (data.message || 'Lỗi không xác định'));
+      appNotice('Không thể hoàn tất đặt sân: ' + (data.message || 'Lỗi không xác định'));
     }
   })
   .catch(err => {
     btnSubmit.disabled = false;
     btnSubmit.innerHTML = originalHtml;
-    alert('Lỗi kết nối khi lập phiếu đặt sân: ' + err);
+    appNotice('Lỗi kết nối khi lập phiếu đặt sân: ' + err);
   });
 }
 
@@ -4092,7 +4336,7 @@ function handleSlotClick(el) {
   } else if (isFree) {
     const isOperatorOnly = document.body.getAttribute('data-role') === 'ROLE_OPERATOR';
     if (isOperatorOnly) {
-      alert('Tài khoản Kỹ thuật/Vận hành chỉ kiểm tra khung giờ sân trống để bảo dưỡng cơ sở vật chất. Vui lòng liên hệ Lễ tân để lập phiếu đặt sân.');
+      appNotice('Tài khoản Kỹ thuật/Vận hành chỉ kiểm tra khung giờ sân trống để bảo dưỡng cơ sở vật chất. Vui lòng liên hệ Lễ tân để lập phiếu đặt sân.');
       return;
     }
 
@@ -4180,5 +4424,6 @@ function filterBookingsClient(query) {
   });
 }
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

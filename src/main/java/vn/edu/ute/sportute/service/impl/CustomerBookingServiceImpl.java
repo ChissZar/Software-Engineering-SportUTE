@@ -25,6 +25,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CustomerBookingServiceImpl implements CustomerBookingService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+    @org.springframework.beans.factory.annotation.Autowired
+    private vn.edu.ute.sportute.service.BookingAmounts amounts;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private vn.edu.ute.sportute.service.BookingPricingService pricing;
+
 
     @Autowired(required = false)
     private EmailService emailService;
@@ -182,9 +190,14 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
 
     @Override
     public Booking bookCourtOnline(CustomerBookingRequestDTO request, String accountUsernameOrEmail) {
+        if (request.getBookingDate() == null || request.getStartTime() == null || request.getDurationMinutes() < 30 || request.getDurationMinutes() > 1080)
+            throw new IllegalArgumentException("Vui lòng chọn ngày, giờ và thời lượng hợp lệ");
         LocalDateTime startDateTime = LocalDateTime.of(request.getBookingDate(), request.getStartTime());
         LocalDateTime endDateTime = startDateTime.plusMinutes(request.getDurationMinutes());
+        if (!endDateTime.toLocalDate().equals(request.getBookingDate())) throw new IllegalArgumentException("Phiếu đặt phải kết thúc trong cùng ngày");
 
+        Court lockedCourt = courtRepository.findForUpdate(request.getCourtId()).orElseThrow(() -> new IllegalArgumentException("Sân không tồn tại"));
+        if (!java.util.Set.of("Hoạt động", "Đang sử dụng").contains(lockedCourt.getStatus())) throw new IllegalArgumentException("Sân đang ngừng hoạt động hoặc bảo trì thủ công");
         // 1. Kiểm tra lại lịch trống và bảo trì nguyên tử (UC41)
         if (maintenanceRepository.existsOverlappingMaintenance(request.getCourtId(), startDateTime, endDateTime)) {
             throw new IllegalArgumentException("Rất tiếc! Sân đã được xếp lịch bảo trì trong khung giờ này.");
@@ -196,36 +209,28 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         // 2. Tìm thông tin khách hàng từ tài khoản đang đăng nhập
         Customer customer = resolveCustomer(accountUsernameOrEmail);
 
-        Court court = courtRepository.findById(request.getCourtId())
-                .orElseThrow(() -> new IllegalArgumentException("Sân không tồn tại"));
+        Court court = lockedCourt;
 
         // Lấy chính sách cọc mặc định
         BookingPolicy defaultPolicy = bookingPolicyRepository.findAll().stream().findFirst().orElse(null);
 
-        // Tìm khuyến mãi / voucher nếu có
-        vn.edu.ute.sportute.entity.Promotion promotion = null;
-        if (request.getVoucherCode() != null && !request.getVoucherCode().trim().isEmpty()) {
-            String vCode = request.getVoucherCode().trim();
-            promotion = promotionRepository.findById(vCode).orElse(null);
-            if (promotion == null) {
-                promotion = promotionRepository.findAll().stream()
-                        .filter(p -> p.getId().equalsIgnoreCase(vCode) || p.getName().equalsIgnoreCase(vCode))
-                        .findFirst().orElse(null);
-            }
-        }
-
+        if (!startDateTime.isAfter(LocalDateTime.now())) throw new IllegalArgumentException("Không thể đặt giờ đã qua");
+        var quote = pricing.quote(request.getCourtId(), request.getBookingDate(), request.getStartTime(), endDateTime.toLocalTime(), request.getVoucherCode());
+        Promotion promotion = quote.promotion();
         // 3. Tạo phiếu đặt sân trực tuyến
         Booking booking = Booking.builder()
-                .id(IdGenerator.generateId("DS"))
+                .id(idGenerator.generateId("DS"))
                 .customer(customer)
                 .employee(null) // Đặt online không qua nhân viên lễ tân lập
                 .bookingPolicy(defaultPolicy)
                 .promotion(promotion)
-                .status("Đã xác nhận") // Thanh toán thành công -> chuyển thẳng sang Đã xác nhận giữ sân
+                .quotedAmount(quote.total())
+                .discountApplied(quote.discount())
+                .status("Chờ xác nhận") // Chờ nhân viên xác nhận khoản chuyển tiền
                 .build();
 
         BookingDetail detail = BookingDetail.builder()
-                .id(IdGenerator.generateId("CT"))
+                .id(idGenerator.generateId("CT"))
                 .booking(booking)
                 .court(court)
                 .startTime(startDateTime)
@@ -236,20 +241,12 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         Booking savedBooking = bookingRepository.save(booking);
 
         // 4. Lưu nghĩa vụ thanh toán (Cọc hoặc Toàn phần)
-        BigDecimal total = request.getTotalAmount();
-        if (total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
-            BigDecimal hourlyRate = getCourtHourlyRate(court.getId(), request.getBookingDate(), court.getSport());
-            total = hourlyRate.multiply(BigDecimal.valueOf(request.getDurationMinutes()))
-                    .divide(BigDecimal.valueOf(60), 0, RoundingMode.HALF_UP);
-        }
-
-        if (request.getDiscountAmount() != null && request.getDiscountAmount().compareTo(BigDecimal.ZERO) > 0) {
-            total = total.subtract(request.getDiscountAmount());
-            if (total.compareTo(BigDecimal.ZERO) < 0) total = BigDecimal.ZERO;
-        }
+        BigDecimal total = quote.total();
 
         BigDecimal payAmount = total;
         String transType = "Thanh toán";
+        if (!java.util.Set.of("DEPOSIT_30", "FULL_100", "FULL", "FULL_PAYMENT").contains(java.util.Objects.toString(request.getDepositChoice(), "")))
+            throw new IllegalArgumentException("Lựa chọn thanh toán không hợp lệ");
         if ("DEPOSIT_30".equalsIgnoreCase(request.getDepositChoice())) {
             payAmount = total.multiply(BigDecimal.valueOf(30)).divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_UP);
             transType = "Cọc";
@@ -260,16 +257,17 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         if (pMethod.length() > 30) pMethod = pMethod.substring(0, 30);
 
         Payment payment = Payment.builder()
-                .id(IdGenerator.generateId("GD"))
+                .id(idGenerator.generateId("GD"))
                 .booking(savedBooking)
                 .transactionType(transType)
                 .amount(payAmount)
+                .paymentStatus("PENDING")
                 .paymentMethod(pMethod)
                 .build();
         paymentRepository.save(payment);
 
         // 5. Tự động gửi Vé điện tử chính thức qua Email cho khách hàng (chạy bất đồng bộ để phản hồi web tức thì)
-        if (emailService != null) {
+        if (emailService != null && "Đã xác nhận".equals(savedBooking.getStatus())) {
             String custEmail = (customer != null && customer.getEmail() != null) ? customer.getEmail().trim() : null;
             if (custEmail == null || custEmail.isBlank()) {
                 if (customer != null && customer.getAccount() != null && customer.getAccount().getEmail() != null) {
@@ -314,6 +312,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                         .startTime(request.getStartTime().format(timeFmt))
                         .endTime(request.getStartTime().plusMinutes(request.getDurationMinutes()).format(timeFmt))
                         .durationMinutes(request.getDurationMinutes())
+                        .creatorAccountId(customer.getAccount() != null ? customer.getAccount().getId() : null)
                         .creatorName(customer != null ? customer.getFullName() : "Khách thể thao")
                         .creatorPhone(customer != null ? customer.getPhone() : "")
                         .creatorEmail(customer != null ? customer.getEmail() : "")
@@ -323,6 +322,8 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                         .status("WAITING")
                         .build();
 
+                bookingRepository.flush();
+                bookingDetailRepository.flush();
                 matchmakingService.createPost(post);
             } catch (Exception ex) {
                 System.err.println("[CustomerBookingService] Lỗi tự động tạo tin ghép đối: " + ex.getMessage());
@@ -353,7 +354,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                     }
                     return true;
                 })
-                .sorted((b1, b2) -> b2.getId().compareTo(b1.getId()))
+                .sorted(Comparator.comparing(Booking::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())).thenComparing(Booking::getId))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -398,6 +399,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         }
 
         BigDecimal totalPaid = booking.getPayments().stream()
+                .filter(vn.edu.ute.sportute.service.BookingAmounts::counted)
                 .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
                 .map(Payment::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -406,6 +408,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         BigDecimal refundAmount = totalPaid.subtract(cancellationFee);
         if (refundAmount.compareTo(BigDecimal.ZERO) < 0) refundAmount = BigDecimal.ZERO;
 
+        for (Payment pending : booking.getPayments()) if ("PENDING".equals(pending.getPaymentStatus()) && !"Hoàn tiền".equals(pending.getTransactionType())) pending.setPaymentStatus("VOID");
         booking.setStatus("Đã hủy");
         bookingRepository.save(booking);
 
@@ -419,9 +422,10 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         // Ghi nhận hoàn tiền
         if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
             Payment refund = Payment.builder()
-                    .id(IdGenerator.generateId("GD"))
+                    .id(idGenerator.generateId("GD"))
                     .booking(booking)
                     .transactionType("Hoàn tiền")
+                    .paymentStatus("PENDING")
                     .amount(refundAmount)
                     .paymentMethod("Chuyển khoản")
                     .build();
@@ -437,33 +441,12 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
     }
 
     private Customer resolveCustomer(String accountUsernameOrEmail) {
-        if (accountUsernameOrEmail == null || accountUsernameOrEmail.isBlank()) {
-            return customerRepository.findAll().stream().findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Chưa có hồ sơ khách hàng trong hệ thống"));
-        }
-
-        Optional<Account> accountOpt = accountRepository.findByUsernameOrEmail(accountUsernameOrEmail, accountUsernameOrEmail);
-        if (accountOpt.isPresent()) {
-            Optional<Customer> custOpt = customerRepository.findByAccount_Id(accountOpt.get().getId());
-            if (custOpt.isPresent()) return custOpt.get();
-        }
-
-        Optional<Customer> byEmail = customerRepository.findByEmail(accountUsernameOrEmail);
-        if (byEmail.isPresent()) return byEmail.get();
-
-        Optional<Customer> byPhone = customerRepository.findByPhone(accountUsernameOrEmail);
-        if (byPhone.isPresent()) return byPhone.get();
-
-        // Tự động tạo hồ sơ khách hàng nếu tài khoản chưa gắn hồ sơ
-        Customer newCust = Customer.builder()
-                .id(IdGenerator.generateId("KH"))
-                .fullName(accountUsernameOrEmail)
-                .phone("09" + String.format("%08d", new Random().nextInt(100000000)))
-                .email(accountUsernameOrEmail.contains("@") ? accountUsernameOrEmail : accountUsernameOrEmail + "@sporthub.vn")
-                .account(accountOpt.orElse(null))
-                .status("Hoạt động")
-                .build();
-        return customerRepository.save(newCust);
+        if (accountUsernameOrEmail == null || accountUsernameOrEmail.isBlank())
+            throw new IllegalArgumentException("Vui lòng đăng nhập bằng tài khoản khách hàng");
+        Account account = accountRepository.findByUsernameOrEmail(accountUsernameOrEmail, accountUsernameOrEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại"));
+        return customerRepository.findByAccount_Id(account.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản chưa liên kết hồ sơ khách hàng. Vui lòng hoàn thiện hồ sơ trước khi đặt sân."));
     }
 
     private BigDecimal getCourtHourlyRate(String courtId, LocalDate date, Sport sport) {
@@ -486,13 +469,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
         BookingDetail detail = (b.getBookingDetails() != null && !b.getBookingDetails().isEmpty()) 
                 ? b.getBookingDetails().get(0) : null;
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        if (b.getPayments() != null && !b.getPayments().isEmpty()) {
-            totalAmount = b.getPayments().stream()
-                    .filter(p -> !"Hoàn tiền".equalsIgnoreCase(p.getTransactionType()))
-                    .map(Payment::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
+        BigDecimal totalAmount = amounts.total(b);
 
         LocalDate bDate = LocalDate.now();
         LocalTime sTime = LocalTime.of(8, 0);
@@ -530,6 +507,7 @@ public class CustomerBookingServiceImpl implements CustomerBookingService {
                 .startTime(sTime)
                 .endTime(eTime)
                 .totalAmount(totalAmount)
+                .paidAmount(vn.edu.ute.sportute.service.BookingAmounts.paid(b))
                 .status(b.getStatus() != null ? b.getStatus() : "Chờ xác nhận")
                 .build();
     }

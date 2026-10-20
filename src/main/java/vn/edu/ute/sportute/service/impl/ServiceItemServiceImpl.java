@@ -20,6 +20,9 @@ import java.util.List;
 @Service
 @Transactional
 public class ServiceItemServiceImpl implements ServiceItemService {
+    @org.springframework.beans.factory.annotation.Autowired
+    private IdGenerator idGenerator;
+
 
     private final ServiceItemRepository serviceItemRepository;
     private final BookingServiceDetailRepository bookingServiceDetailRepository;
@@ -73,7 +76,7 @@ public class ServiceItemServiceImpl implements ServiceItemService {
                     });
         } else {
             item = new ServiceItem();
-            item.setId(IdGenerator.generateId("DV"));
+            item.setId(idGenerator.generateId("DV"));
         }
 
         item.setName(dto.getName().trim());
@@ -127,7 +130,7 @@ public class ServiceItemServiceImpl implements ServiceItemService {
         }
 
         BookingServiceDetail detail = BookingServiceDetail.builder()
-                .id(IdGenerator.generateId("CT"))
+                .id(idGenerator.generateId("CTDV"))
                 .booking(booking)
                 .serviceItem(item)
                 .quantity(request.getQuantity())

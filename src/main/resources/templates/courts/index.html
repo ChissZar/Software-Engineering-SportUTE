@@ -46,7 +46,7 @@
         </div>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -186,19 +186,23 @@
                         th:classappend="${c.status == 'Hoạt động' ? 'status-active' : (c.status == 'Đang sử dụng' ? 'status-inuse' : (c.status == 'Bảo trì' ? 'status-maint' : 'status-disabled'))}"
                         th:text="${c.status}"></span>
                 </td>
-                <td style="text-align:right; white-space:nowrap; vertical-align:middle;">
-                  <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:8px;">
+                <td style="text-align:right; white-space:nowrap; vertical-align:middle; width: 175px;">
+                  <div style="display:inline-grid; grid-template-columns: 74px 74px; gap:8px; justify-content:flex-end; align-items:center;">
                     <button type="button" class="btn btn-sm"
                             th:data-id="${c.id}"
                             th:data-name="${c.name}"
                             th:data-sportid="${c.sportId}"
                             th:data-status="${c.status}"
                             onclick="openCourtEditModal(this)"
-                            title="Sửa thông tin sân">
+                            title="Sửa thông tin sân"
+                            style="width: 74px; height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-sizing: border-box;">
                       <i class="fa-solid fa-pen" style="color:var(--primary);"></i> Sửa
                     </button>
-                    <form th:action="@{/admin/courts/toggle/{id}(id=${c.id})}" method="post" style="display:inline; margin:0;">
-                      <button type="submit" class="btn btn-sm" th:classappend="${c.status == 'Hoạt động' ? 'btn-danger' : 'btn-success'}" th:text="${c.status == 'Hoạt động' ? 'Khóa' : 'Mở'}">Khóa</button>
+                    <form th:action="@{/admin/courts/toggle/{id}(id=${c.id})}" method="post" style="display:block; margin:0; width: 74px;">
+                      <button type="submit" class="btn btn-sm" 
+                              th:classappend="${c.status == 'Hoạt động' ? 'btn-danger' : 'btn-success'}" 
+                              style="width: 100%; height: 32px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;"
+                              th:text="${c.status == 'Hoạt động' ? 'Khóa' : 'Mở'}">Khóa</button>
                     </form>
                   </div>
                 </td>
@@ -420,5 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>

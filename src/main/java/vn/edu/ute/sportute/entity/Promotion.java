@@ -11,7 +11,12 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class Promotion {
+
+    @Column(name = "DiscountType", length = 10)
+    @Builder.Default
+    private String discountType = "AMOUNT";
 
     @Id
     @Column(name = "MaKM", length = 10, nullable = false)

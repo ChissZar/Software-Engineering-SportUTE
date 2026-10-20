@@ -34,10 +34,15 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/admin/bookings/api/**", "/customer/booking/api/**", "/customer/community/api/**", "/customer/api/**", "/admin/services/api/**", "/admin/permissions/**", "/v3/api-docs/**", "/swagger-ui/**")) 
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/customer/community/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_MANAGER")
+                .requestMatchers("/customer/community/mine").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_MANAGER")
                 .requestMatchers("/favicon.ico", "/favicon.png", "/login", "/register/**", "/forgot-password/**", "/otp-action", "/auth/**", "/error", "/css/**", "/js/**", "/images/**", "/uploads/**", "/customer/api/avatar/**", "/api/chat", "/customer/api/chat", "/customer/community/**", "/v3/api-docs/**", "/v3/api-docs", "/swagger-ui/**", "/swagger-ui", "/swagger-ui.html").permitAll()
                 .requestMatchers("/customer/**").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_ADMIN", "ROLE_MANAGER")
                 // Chỉ Quản trị viên và Quản lý mới có quyền vào quản lý môn thể thao, nhân sự, báo cáo, giá và dịch vụ
                 .requestMatchers("/admin/sports/**", "/admin/employees/**", "/admin/reports/**", "/admin/prices/**", "/admin/policies/**", "/admin/services/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER")
+                .requestMatchers("/admin/permissions/**", "/admin/accounts/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/admin/payments/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_RECEPTIONIST")
+                .requestMatchers("/admin/maintenance/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_OPERATOR")
                 .requestMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_RECEPTIONIST", "ROLE_OPERATOR", "ROLE_STAFF")
                 .anyRequest().authenticated()
             )

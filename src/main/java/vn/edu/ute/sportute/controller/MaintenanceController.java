@@ -28,7 +28,7 @@ public class MaintenanceController {
         model.addAttribute("maintenances", maintenanceService.getAllMaintenances());
         model.addAttribute("courts", courtService.getAllCourts());
         model.addAttribute("stats", maintenanceService.getMaintenanceStatistics());
-        model.addAttribute("maintenanceDTO", new MaintenanceDTO());
+        if (!model.containsAttribute("maintenanceDTO")) model.addAttribute("maintenanceDTO", new MaintenanceDTO());
         return "maintenance/index";
     }
 
@@ -37,13 +37,15 @@ public class MaintenanceController {
                        BindingResult result,
                        Authentication authentication,
                        RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("maintenanceDTO", dto);
         if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng nhập đầy đủ các trường bắt buộc!");
+            redirectAttributes.addFlashAttribute("errorMessage", result.getAllErrors().stream().map(org.springframework.validation.ObjectError::getDefaultMessage).collect(java.util.stream.Collectors.joining("; ")));
             return "redirect:/admin/maintenance";
         }
         try {
             String accountId = authentication != null ? authentication.getName() : null;
             maintenanceService.createMaintenance(dto, accountId);
+            redirectAttributes.addFlashAttribute("maintenanceDTO", new MaintenanceDTO());
             redirectAttributes.addFlashAttribute("successMessage", "Tạo lịch bảo trì thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -51,11 +53,18 @@ public class MaintenanceController {
         return "redirect:/admin/maintenance";
     }
 
+    @PostMapping("/complete/{id}")
+    public String complete(@PathVariable String id, RedirectAttributes flash) {
+        try { maintenanceService.completeMaintenance(id); flash.addFlashAttribute("successMessage", "Đã hoàn tất bảo trì"); }
+        catch (IllegalArgumentException ex) { flash.addFlashAttribute("errorMessage", ex.getMessage()); }
+        return "redirect:/admin/maintenance";
+    }
+
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
         try {
             maintenanceService.deleteMaintenance(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa lịch bảo trì và hoàn tất trạng thái sân!");
+            redirectAttributes.addFlashAttribute("successMessage", "Đã hủy lịch bảo trì; lịch sử được giữ lại.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }

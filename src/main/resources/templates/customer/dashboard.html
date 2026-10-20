@@ -321,13 +321,13 @@ main{min-width:0}
     <input placeholder="Tìm sân theo môn thể thao hoặc mã sân...">
   </div>
   <div class="account">
-    <button class="icon-btn" type="button" aria-label="Thông báo" onclick="alert('Không có thông báo mới')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7M10 19h4"/></svg></button>
+    <button class="icon-btn" type="button" aria-label="Thông báo" onclick="appNotice('Không có thông báo mới')"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7M10 19h4"/></svg></button>
     <div class="avatar" th:text="${customer != null and customer.fullName != null and customer.fullName.length() >= 2 ? customer.fullName.substring(0,2).toUpperCase() : 'MA'}">MA</div>
     <div class="account-text">
       <b th:text="${customer != null and customer.fullName != null ? customer.fullName : (currentUserName != null ? currentUserName : 'Nguyễn Minh Anh')}">Nguyễn Minh Anh</b>
       <small>Khách hàng</small>
     </div>
-    <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống SportHub?');">
+    <form th:action="@{/logout}" method="post" class="logout-form" data-confirm="Bạn có chắc chắn muốn đăng xuất khỏi hệ thống SportHub?">
       <button type="submit" class="btn-logout" title="Đăng xuất khỏi hệ thống">
         <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span>Đăng xuất</span>
@@ -468,5 +468,7 @@ document.querySelectorAll('.sport').forEach(btn => btn.addEventListener('click',
 }));
 </script>
 <th:block th:replace="~{fragments/chatbot :: chatbot}"></th:block>
+<script src="/js/app-dialog.js" defer></script>
+<script src="/js/match-notifications.js" defer></script>
 </body>
 </html>

@@ -15,11 +15,17 @@
 	<name>SportUTE</name>
 	<description>Khung suon he thong quan ly trung tam the thao</description>
 	<properties>
+		<sportute.build.directory>target</sportute.build.directory>
 		<java.version>17</java.version>
 		<cloudinary.version>2.5.0</cloudinary.version>
 		<bootstrap.version>5.3.8</bootstrap.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -109,6 +115,7 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<directory>${sportute.build.directory}</directory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

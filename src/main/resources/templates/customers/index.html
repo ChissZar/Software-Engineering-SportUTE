@@ -99,7 +99,7 @@
         </form>
       </div>
       <div class="topbar-right">
-        <button class="bell" type="button" title="Thông báo" onclick="alert('Không có thông báo mới')">
+        <button th:if="${currentUser == null or !currentUser.horizontalNav}" class="bell" type="button" title="Thông báo" onclick="appNotice('Không có thông báo mới')">
           <i class="fa-regular fa-bell"></i>
         </button>
         <div class="topbar-user">
@@ -255,7 +255,7 @@
                     <i class="fa-solid fa-pen"></i> Sửa
                   </button>
                   <button type="button" class="btn btn-sm" th:data-id="${c.id}" th:data-name="${c.fullName}" onclick="openHistoryModal(this)" title="Lịch sử thuê"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử</button>
-                  <form th:action="@{/admin/customers/toggle/{id}(id=${c.id})}" method="post" style="display:inline" onsubmit="return confirm('Xác nhận đổi trạng thái khách hàng #' + '[[${c.id}]]' + '?');">
+                  <form th:action="@{/admin/customers/toggle/{id}(id=${c.id})}" method="post" style="display:inline" data-confirm="Xác nhận đổi trạng thái khách hàng ?" th:data-confirm-item="${c.id}">
                     <button type="submit" class="btn btn-sm" th:classappend="${c.status == 'Hoạt động' ? 'btn-danger' : 'btn-success'}" th:title="${c.status == 'Hoạt động' ? 'Ngừng hoạt động' : 'Kích hoạt lại'}">
                       <i th:class="${c.status == 'Hoạt động' ? 'fa-solid fa-user-slash' : 'fa-solid fa-user-check'}"></i>
                     </button>
@@ -475,5 +475,6 @@ function filterCustomersClient(query) {
   });
 }
 </script>
+<script src="/js/app-dialog.js" defer></script>
 </body>
 </html>
