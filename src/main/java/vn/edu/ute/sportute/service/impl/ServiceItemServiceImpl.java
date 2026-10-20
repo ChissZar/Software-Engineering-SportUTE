@@ -139,7 +139,10 @@ public class ServiceItemServiceImpl implements ServiceItemService {
                 .orderTime(LocalDateTime.now())
                 .build();
 
-        return bookingServiceDetailRepository.save(detail);
+        BookingServiceDetail saved = bookingServiceDetailRepository.save(detail);
+        // Keep the managed booking current for payment validation in the same transaction.
+        booking.getServiceDetails().add(saved);
+        return saved;
     }
 
     @Override

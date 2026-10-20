@@ -61,6 +61,18 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
+
+.schedule-selection-bar {display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:20px;padding:14px 18px;margin-bottom:14px;border:1px solid #dbe5e2;border-radius:12px;background:#f8fafc;}
+.schedule-selection-info h3 {margin:0 0 5px;font-size:12px;font-weight:600;color:#64748b;}
+.schedule-selection-info p {margin:0;font-size:14px;font-weight:750;color:#0f172a;}
+.schedule-estimate-status {display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;background:transparent!important;border:0!important;}
+.schedule-selection-price {display:flex;flex-direction:column;gap:4px;text-align:right;white-space:nowrap;}
+.schedule-selection-price span {font-size:11px;color:#64748b;}
+.schedule-selection-price b {font-size:21px;color:#047857;}
+#scheduleBookButton {white-space:nowrap;min-height:42px;}
+#scheduleBookButton:disabled {background:#e2e8f0;color:#94a3b8;box-shadow:none;cursor:not-allowed;opacity:1;}
+@media(max-width:700px){.schedule-selection-bar{grid-template-columns:1fr auto;gap:12px;}.schedule-selection-info{grid-column:1/-1;}.schedule-selection-price{text-align:left;}}
+
 /* Timeline Matrix View: 30-minute intervals (36 slots + SÂN + THAO TÁC = 38 columns) */
 .timeline-view {
   display: none;
@@ -155,7 +167,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   scrollbar-width: thin;
 }
 .timeline-slots-inner {
-  min-width: 2304px;
+  min-width: 2452px;
   display: flex;
   flex-direction: column;
 }
@@ -167,7 +179,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   grid-template-columns: repeat(36, minmax(64px, 1fr));
   background: #f8fafc;
   border-bottom: 2px solid #cbd5e1;
-  gap: 2px;
+  gap: 4px;
   padding: 0 4px;
   box-sizing: border-box;
 }
@@ -223,6 +235,14 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   transform: scale(1.02);
 }
 
+.slot-free {position:relative;}
+.slot-free.slot-past,.slot-free.slot-past:hover {background:#e2e8f0;color:#94a3b8;border-color:#cbd5e1;cursor:not-allowed;}
+.slot-free.slot-selected {background:#d1fae5;border-color:#a7f3d0;}
+.slot-free.slot-start {background:#047857;color:white;border:2px solid #065f46;}
+.slot-free.slot-end {background:#fee2e2;color:#b91c1c;border:2px solid #dc2626;}
+.slot-booked-span.slot-end,.slot-maint.slot-end {outline:3px solid #dc2626;outline-offset:-3px;}
+.schedule-end-option {cursor:pointer;box-shadow:inset 3px 0 #dc2626;}
+.schedule-end-boundary {position:absolute;right:0;bottom:0;z-index:2;background:#b91c1c;color:white;border:0;border-radius:4px;padding:2px;font-size:10px;cursor:pointer;}
 /* Khối chữ nhật liên tục trải dài các slot được đặt */
 .slot-booked-span {
   padding: 4px 8px !important;
@@ -252,6 +272,8 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   color: #ffffff !important;
   border: 1px solid #1d4ed8 !important;
 }
+.slot-pending {background:#fff7ed!important;color:#9a3412!important;border:1px solid #fb923c!important;}
+.slot-completed {background:#e2e8f0!important;color:#475569!important;border:1px solid #94a3b8!important;}
 .slot-maint {
   background: #fef3c7 !important;
   color: #92400e !important;
@@ -664,6 +686,8 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
 #modalReceptionistWizard.windowed-mode .pos-fnb-catalog-grid {
   max-height: 380px;
 }
+.pos-item-card.out-of-stock {opacity:0.55;cursor:not-allowed;filter:grayscale(1);}
+.wiz-fnb-card button:disabled {opacity:0.4;cursor:not-allowed!important;}
 .wiz-fnb-card {
   background: #ffffff;
   border: 1.5px solid #e2e8f0;
@@ -716,6 +740,25 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
   justify-content: center;
   padding: 18px;
 }
+
+/* Retail POS stays above the navigation, with checkout always visible. */
+#modalAddService {z-index:11000;padding:16px;box-sizing:border-box;}
+#modalAddService > .modal-card {width:min(1120px,100%)!important;max-width:1120px!important;max-height:calc(100dvh - 32px)!important;margin:0;}
+#modalAddService .modal-head {flex-shrink:0;}
+#modalAddService .modal-body {min-height:0;overscroll-behavior:contain;}
+#modalAddService .pos-checkout-footer {flex-shrink:0;display:flex;align-items:center;gap:16px;padding:12px 22px;border-top:1px solid #e2e8f0;background:#fff;}
+#modalAddService .pos-checkout-footer > div {flex:1;margin:0!important;}
+#modalAddService .pos-checkout-footer > button {width:auto!important;min-width:280px;height:auto!important;min-height:42px;padding:10px 16px;white-space:normal;}
+#modalAddService .pos-columns > div {min-width:0;}
+@media(max-width:760px){
+ #modalAddService {padding:8px;}
+ #modalAddService > .modal-card {max-height:calc(100dvh - 16px)!important;}
+ #modalAddService .pos-columns {grid-template-columns:minmax(0,1fr)!important;}
+ #modalAddService .modal-head,#modalAddService .modal-body {padding:12px!important;}
+ #modalAddService .pos-checkout-footer {padding:10px 12px;flex-wrap:wrap;gap:8px;}
+ #modalAddService .pos-checkout-footer > div,#modalAddService .pos-checkout-footer > button {width:100%!important;min-width:0;flex-basis:100%;}
+}
+
 .modal-overlay.active {
   display: flex;
 }
@@ -1223,22 +1266,18 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
             </div>
             <div class="wizard-step-line" id="wizStepLine1"></div>
             <div class="wizard-step-node" id="wizStepNode2" onclick="goToWizardStep(2)">
-              <div class="wizard-step-num"><i class="fa-solid fa-table-tennis-paddle-ball"></i></div>
-              <span>2. Sân & Khung Giờ</span>
+              <div class="wizard-step-num"><i class="fa-solid fa-mug-hot"></i></div>
+              <span>2. Nước & F&B</span>
             </div>
             <div class="wizard-step-line" id="wizStepLine2"></div>
             <div class="wizard-step-node" id="wizStepNode3" onclick="goToWizardStep(3)">
-              <div class="wizard-step-num"><i class="fa-solid fa-mug-hot"></i></div>
-              <span>3. Nước & F&B</span>
-            </div>
-            <div class="wizard-step-line" id="wizStepLine3"></div>
-            <div class="wizard-step-node" id="wizStepNode4" onclick="goToWizardStep(4)">
               <div class="wizard-step-num"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-              <span>4. Thanh Toán & Bàn Giao</span>
+              <span>3. Thanh Toán & Bàn Giao</span>
             </div>
           </div>
 
-          <!-- Wizard Body: 4 Step Views -->
+          <div id="wizardSelectedRange" style="padding:10px 36px;background:#ecfdf5;color:#065f46;font-weight:700;"></div>
+          <!-- Wizard Body: 3 Step Views -->
           <div class="modal-body" style="padding: 24px 36px; overflow-y: auto; flex: 1; background: #f8fafc;">
 
             <!-- ================= BƯỚC 1: TIẾP NHẬN KHÁCH HÀNG ================= -->
@@ -1334,110 +1373,15 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
               <input type="hidden" id="wizFinalCustomerPhone" value="">
             </div>
 
-            <!-- ================= BƯỚC 2: CHỌN MÔN, SÂN & KHUNG GIỜ ================= -->
-            <div id="wizStepView2" class="wizard-step-content" style="display:none; max-width: 1200px; margin: 0 auto;">
-              <div style="margin-bottom: 16px;">
-                <h4 style="margin:0 0 6px; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
-                  <i class="fa-solid fa-table-tennis-paddle-ball text-emerald" style="color:#059669;"></i>
-                  <span>Bước 2: Chọn Môn Thể Thao, Sân & Khung Giờ Thuê</span>
-                </h4>
-                <p style="margin:0; font-size:13px; color:#64748b;">Hệ thống tự động kiểm tra trùng lịch với timeline và tính giá thời gian thực theo chính sách.</p>
-              </div>
-
-              <!-- Sport Filter Tabs -->
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;" id="wizSportTabs">
-                <button type="button" class="pos-cat-btn active" onclick="wizardFilterSport('ALL', this)" style="padding:7px 16px; font-size:13px;">
-                  <i class="fa-solid fa-layer-group"></i> Tất cả môn
-                </button>
-                <button th:each="s : ${sports}" type="button" class="pos-cat-btn"
-                        th:data-sport-id="${s.id}"
-                        onclick="wizardFilterSport(this.getAttribute('data-sport-id'), this)"
-                        style="padding:7px 16px; font-size:13px;">
-                  <span th:text="${s.name}"></span>
-                </button>
-              </div>
-
-              <!-- Court Pick Grid -->
-              <div class="court-pick-grid" id="wizCourtGrid" style="margin-bottom:18px; max-height: calc(100vh - 460px); grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:12px;">
-                <div th:each="c : ${courts}" 
-                     class="court-pick-card"
-                     th:data-court-id="${c.id}"
-                     th:data-court-name="${c.name}"
-                     th:data-sport-id="${c.sportId}"
-                     th:data-sport-name="${c.sportName}"
-                     data-price="100000"
-                     onclick="wizardSelectCourt(this)">
-                  <i class="fa-solid fa-circle-check selected-badge"></i>
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                    <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:10.5px; font-weight:700;" th:text="${c.sportName}"></span>
-                    <strong style="font-size:13.5px; color:#0f172a;" th:text="${c.name}"></strong>
-                  </div>
-                  <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">
-                    <span th:text="${c.location != null ? c.location : 'Khu vực sân tiêu chuẩn'}"></span>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:8px;">
-                    <span style="font-size:11px; color:#64748b;">Trạng thái:</span>
-                    <b style="font-size:12px; color:#059669;" th:text="${c.status != null ? c.status : 'Sẵn sàng'}"></b>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Time & Date Setup Box -->
-              <div style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:14px; padding:18px 22px; margin-bottom:16px; box-shadow:0 4px 16px rgba(0,0,0,0.03);">
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px; margin-bottom:14px;">
-                  <div>
-                    <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Ngày thi đấu (*)</label>
-                    <input type="date" id="wizBookingDate" style="height:40px; border-radius:8px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13.5px; font-weight:600; width:100%; background:#fff;" onchange="wizardTriggerPriceEstimate()">
-                  </div>
-                  <div>
-                    <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Giờ bắt đầu (*)</label>
-                    <input type="time" id="wizStartTime" style="height:40px; border-radius:8px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13.5px; font-weight:600; width:100%; background:#fff;" onchange="wizardOnStartTimeChange()">
-                  </div>
-                  <div>
-                    <label style="font-size:12px; font-weight:800; color:#334155; margin-bottom:6px; display:block;">Giờ kết thúc (*)</label>
-                    <input type="time" id="wizEndTime" style="height:40px; border-radius:8px; border:1.5px solid #cbd5e1; padding:0 12px; font-size:13.5px; font-weight:600; width:100%; background:#fff;" onchange="wizardTriggerPriceEstimate()">
-                  </div>
-                </div>
-
-                <!-- Quick Duration Chips -->
-                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                  <span style="font-size:12px; font-weight:700; color:#64748b;">Chọn nhanh thời lượng:</span>
-                  <button type="button" class="wizard-quick-duration-btn active" onclick="wizardSetDuration(1.0, this)">1.0 Giờ (60 phút)</button>
-                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(1.5, this)">1.5 Giờ (90 phút)</button>
-                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(2.0, this)">2.0 Giờ (120 phút)</button>
-                  <button type="button" class="wizard-quick-duration-btn" onclick="wizardSetDuration(3.0, this)">3.0 Giờ (180 phút)</button>
-                </div>
-              </div>
-
-              <!-- Live Conflict & Price Banner -->
-              <div id="wizEstimateNoticeBox" style="background:#ecfdf5; border:1.5px solid #a7f3d0; border-radius:12px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <i class="fa-solid fa-circle-check text-success" id="wizEstimateIcon" style="font-size:18px;"></i>
-                  <span id="wizEstimateMessage" style="font-size:13.5px; font-weight:700; color:#065f46;">
-                    Vui lòng chọn sân và khung giờ để hệ thống tính giá tự động.
-                  </span>
-                </div>
-                <div style="text-align:right;">
-                  <span style="font-size:12px; color:#047857; font-weight:600;">Tạm tính tiền sân:</span>
-                  <b id="wizCourtPriceDisplay" style="font-size:17px; color:#047857; margin-left:8px;">0 đ</b>
-                </div>
-              </div>
-
-              <!-- Hidden State for Selected Court -->
-              <input type="hidden" id="wizSelectedCourtId" value="">
-              <input type="hidden" id="wizSelectedCourtName" value="">
-              <input type="hidden" id="wizCalculatedCourtAmount" value="0">
-            </div>
-
-            <!-- ================= BƯỚC 3: DỊCH VỤ & NƯỚC UỐNG ĐI KÈM (F&B CHUYÊN NGHIỆP) ================= -->
-            <div id="wizStepView3" class="wizard-step-content" style="display:none; max-width: 1300px; margin: 0 auto;">
+            <!-- ================= BƯỚC 2: DỊCH VỤ & NƯỚC UỐNG ĐI KÈM ================= -->
+            <div id="wizStepView2" class="wizard-step-content" style="display:none; max-width: 1300px; margin: 0 auto;">
               
               <!-- F&B Header Controls -->
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:14px;">
                 <div>
                   <h4 style="margin:0 0 4px; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
                     <i class="fa-solid fa-mug-hot text-emerald" style="color:#059669;"></i>
-                    <span>Bước 3: Gọi Thêm Nước Uống, Đồ Ăn & Thuê Dụng Cụ (F&B)</span>
+                    <span>Bước 2: Gọi Thêm Nước Uống, Đồ Ăn & Thuê Dụng Cụ (F&B)</span>
                   </h4>
                   <p style="margin:0; font-size:13px; color:#64748b;">Lựa chọn theo từng danh mục hoặc tìm kiếm nhanh. Hình ảnh sản phẩm trực quan, cập nhật tồn kho tức thì.</p>
                 </div>
@@ -1486,6 +1430,12 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                 </div>
               </div>
 
+              <style>
+                #wizFnbCatalogGrid {grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));}
+                #wizFnbCatalogGrid .wiz-fnb-card {display:grid;grid-template-columns:68px minmax(0,1fr);align-items:start;}
+                #wizFnbCatalogGrid .wiz-fnb-card > div:last-child {grid-column:2;justify-self:end;}
+                #wizFnbCatalogGrid .wiz-fnb-card > div:nth-child(2) > div:first-child {flex-wrap:wrap;}
+              </style>
               <!-- Rich F&B Product Catalog Grid -->
               <div class="pos-fnb-catalog-grid" id="wizFnbCatalogGrid">
                 <div th:each="s : ${activeServices}" 
@@ -1515,7 +1465,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                       <span th:if="${s.stock != null and s.stock > 0}" style="font-size:10.5px; color:#059669; font-weight:600;">Còn [[${s.stock}]] [[${s.unit}]]</span>
                       <span th:if="${s.stock == null or s.stock <= 0}" style="font-size:10.5px; color:#dc2626; font-weight:700;">Hết hàng</span>
                     </div>
-                    <div style="font-size:13.5px; font-weight:800; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" th:text="${s.name}">Tên dịch vụ</div>
+                    <div style="font-size:14px; line-height:1.5; font-weight:800; color:#0f172a; white-space:normal; overflow-wrap:anywhere;" th:text="${s.name}">Tên dịch vụ</div>
                     <div style="font-size:12.5px; color:#059669; font-weight:800; margin-top:3px;">
                       <span th:text="${#numbers.formatDecimal(s.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
                       <span style="font-size:11px; color:#64748b; font-weight:500;" th:text="'/ ' + ${s.unit}"></span>
@@ -1526,18 +1476,18 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                   <div style="display:flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:20px; padding:3px 6px;">
                     <button type="button" onclick="wizardChangeFnbQty(this, -1)" style="width:26px; height:26px; border-radius:50%; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; color:#334155; transition:0.15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#fff'">-</button>
                     <span class="wiz-fnb-item-qty" style="font-weight:800; font-size:13px; min-width:22px; text-align:center; color:#0f172a;">0</span>
-                    <button type="button" onclick="wizardChangeFnbQty(this, 1)" style="width:26px; height:26px; border-radius:50%; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; color:#334155; transition:0.15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#fff'">+</button>
+                    <button type="button" th:disabled="${s.stock == null or s.stock <= 0}" onclick="wizardChangeFnbQty(this, 1)" style="width:26px; height:26px; border-radius:50%; border:1px solid #cbd5e1; background:#ffffff; cursor:pointer; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; color:#334155; transition:0.15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#fff'">+</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- ================= BƯỚC 4: THANH TOÁN & BÀN GIAO SÂN ================= -->
-            <div id="wizStepView4" class="wizard-step-content" style="display:none; max-width: 1200px; margin: 0 auto;">
+            <!-- ================= BƯỚC 3: THANH TOÁN & BÀN GIAO SÂN ================= -->
+            <div id="wizStepView3" class="wizard-step-content" style="display:none; max-width: 1200px; margin: 0 auto;">
               <div style="margin-bottom: 18px;">
                 <h4 style="margin:0 0 6px; font-size:18px; font-weight:800; color:#0f172a; display:flex; align-items:center; gap:8px;">
                   <i class="fa-solid fa-file-invoice-dollar text-emerald" style="color:#059669;"></i>
-                  <span>Bước 4: Xác Nhận Hóa Đơn & Bàn Giao Nhận Sân Ngay</span>
+                  <span>Bước 3: Xác Nhận Hóa Đơn & Bàn Giao Nhận Sân Ngay</span>
                 </h4>
                 <p style="margin:0; font-size:13px; color:#64748b;">Kiểm tra thông tin lần cuối, thu tiền mặt hoặc quét VietQR, và bàn giao sân cho khách xách vợt vào chơi ngay.</p>
               </div>
@@ -1580,7 +1530,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                       <span style="color:#64748b;">Khuyến mãi / Giảm giá:</span>
                       <select id="wizPromotionSelect" onchange="wizardRecalculateTotal()" style="height:34px; font-size:12.5px; border-radius:6px; border:1px solid #cbd5e1; padding:0 8px; max-width:200px;">
                         <option value="">Không áp dụng</option>
-                        <option th:each="pm : ${promotions}" th:value="${pm.id}" th:text="${pm.name} + ' (-' + ${#numbers.formatDecimal(pm.discountAmount,0,'COMMA',0,'POINT')} + 'đ)'" th:data-discount="${pm.discountAmount}"></option>
+                        <option th:each="pm : ${promotions}" th:value="${pm.id}" th:text="${pm.name} + ' (-' + ${#numbers.formatDecimal(pm.discountAmount,0,'COMMA',0,'POINT')} + ${pm.discountType == 'PERCENT' ? '%)' : 'đ)'}" th:data-discount="${pm.discountAmount}" th:data-discount-type="${pm.discountType}"></option>
                       </select>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:15px; background:#eff6ff; padding:12px 14px; border-radius:10px; border:1.5px solid #bfdbfe; margin-top:6px;">
@@ -1798,7 +1748,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                   <label>Mã khuyến mãi</label>
                   <select th:field="*{promotionId}" id="promoSelect" onchange="triggerEstimate()">
                     <option value="">Không áp dụng</option>
-                    <option th:each="pm : ${promotions}" th:value="${pm.id}" th:text="${pm.name} + ' (-' + ${#numbers.formatDecimal(pm.discountAmount,0,'COMMA',0,'POINT')} + 'đ)'"></option>
+                    <option th:each="pm : ${promotions}" th:value="${pm.id}" th:text="${pm.name} + ' (-' + ${#numbers.formatDecimal(pm.discountAmount,0,'COMMA',0,'POINT')} + ${pm.discountType == 'PERCENT' ? '%)' : 'đ)'}"></option>
                   </select>
                 </div>
               </div>
@@ -1845,7 +1795,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
               <h2 style="margin:0 0 4px; font-size:16px; font-weight:800; color:var(--gray-900);">
                 <i class="fa-solid fa-calendar-week text-success me-1"></i> Bảng điều phối lịch sân thời gian thực
               </h2>
-              <p style="margin:0; font-size:12px; color:var(--gray-500);">Xem trạng thái chi tiết từng sân từ 05:00 đến 23:00. Click vào ô trống để lập phiếu đặt sân nhanh.</p>
+              <p style="margin:0; font-size:12px; color:var(--gray-500);">Xem trạng thái chi tiết từng sân từ 05:00 đến 23:00. Bấm ô giờ bắt đầu rồi bấm mốc kết thúc trên cùng hàng sân. Ô xám đã qua giờ; ô xanh là khoảng đã chọn.</p>
             </div>
 
             <!-- Bộ lọc ngày & môn -->
@@ -1865,6 +1815,56 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
             </form>
           </div>
 
+<div id="scheduleSelection" class="schedule-selection-bar">
+  <div class="schedule-selection-info">
+    <h3>Khung giờ đặt sân</h3>
+    <p id="scheduleSelectionLabel">Chọn giờ bắt đầu trên lịch sân</p>
+    <div id="wizEstimateNoticeBox" class="schedule-estimate-status">
+      <i class="fa-solid fa-circle-info" id="wizEstimateIcon"></i>
+      <span id="wizEstimateMessage">Chọn mốc kết thúc để kiểm tra giá.</span>
+    </div>
+  </div>
+  <input type="hidden" id="wizBookingDate">
+  <input type="hidden" id="wizStartTime">
+  <input type="hidden" id="wizEndTime">
+  <div hidden><div class="court-pick-grid" id="wizCourtGrid" style="margin-bottom:18px; max-height: calc(100vh - 460px); grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap:12px;">
+                <div th:each="c : ${courts}"
+                     class="court-pick-card"
+                     th:data-court-id="${c.id}"
+                     th:data-court-name="${c.name}"
+                     th:data-sport-id="${c.sportId}"
+                     th:data-sport-name="${c.sportName}"
+                     data-price="100000"
+                     onclick="wizardSelectCourt(this)">
+                  <i class="fa-solid fa-circle-check selected-badge"></i>
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                    <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:10.5px; font-weight:700;" th:text="${c.sportName}"></span>
+                    <strong style="font-size:13.5px; color:#0f172a;" th:text="${c.name}"></strong>
+                  </div>
+                  <div style="font-size:11.5px; color:#64748b; margin-bottom:8px;">
+                    <span th:text="${c.location != null ? c.location : 'Khu vực sân tiêu chuẩn'}"></span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:8px;">
+                    <span style="font-size:11px; color:#64748b;">Trạng thái:</span>
+                    <b style="font-size:12px; color:#059669;" th:text="${c.status != null ? c.status : 'Sẵn sàng'}"></b>
+                  </div>
+                </div>
+              </div>
+
+</div>
+  <div class="schedule-selection-price"><span>Tạm tính tiền sân</span><b id="wizCourtPriceDisplay">—</b></div>
+              <!-- Hidden State for Selected Court -->
+              <input type="hidden" id="wizSelectedCourtId" value="">
+              <input type="hidden" id="wizSelectedCourtName" value="">
+              <input type="hidden" id="wizCalculatedCourtAmount" value="0">
+
+  <button type="button" id="scheduleBookButton" class="btn primary" disabled onclick="openReceptionistWizard()" >Đặt sân <i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;font-size:12px;">
+            <span style="color:#9a3412;">● Chờ xác nhận</span><span style="color:#2563eb;">● Đã xác nhận</span>
+            <span style="color:#059669;">● Đang sử dụng</span><span style="color:#64748b;">● Hoàn tất</span><span style="color:#92400e;">● Bảo trì</span>
+          </div>
           <!-- Timeline Split Layout: Cột sân bên trái hoàn toàn tách biệt ngoài khung giờ, không bị đè hay dính vào các ô giờ -->
           <div class="timeline-split-wrapper">
             <!-- CỘT 1: BẢNG SÂN (CỐ ĐỊNH HOÀN TOÀN BÊN TRÁI, NẰM NGOÀI KHUNG CUỘN GIỜ) -->
@@ -1951,7 +1951,9 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                              th:classappend="${slot.cssClass}"
                              th:style="'grid-column: span ' + ${slot.span} + ';'"
                              th:data-booking-id="${slot.bookingId}"
-                             onclick="openDetailModal(this.getAttribute('data-booking-id'))"
+                             th:data-court-id="${row.courtId}"
+                             th:data-time="${slot.time}"
+                             onclick="handleSlotClick(this)"
                              th:title="'Mã: #' + ${slot.bookingId} + ' | Khách: ' + ${slot.customerName} + (${slot.customerPhone != null ? ' (' + slot.customerPhone + ')' : ''}) + ' | Khung giờ: ' + ${slot.timeRange} + ' | Trạng thái: ' + ${slot.statusLabel} + ' • Bấm để xem chi tiết'">
                           <div class="span-inner">
                             <div class="span-cust-name">
@@ -1965,6 +1967,9 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                         <!-- 3. Bảo trì sân -->
                         <div th:if="${slot.status == 'MAINT'}"
                              class="grid-cell slot-maint"
+                             th:data-court-id="${row.courtId}"
+                             th:data-time="${slot.time}"
+                             onclick="handleSlotClick(this)"
                              th:style="'grid-column: span ' + ${slot.span} + ';'"
                              th:title="'Bảo trì sân: ' + ${slot.note}">
                           <div class="span-inner">
@@ -2091,6 +2096,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
       <button type="button" class="modal-close" onclick="closeModal('modalCheckout')">&times;</button>
     </div>
     <form id="formCheckout" method="post" action="">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
       <div class="modal-body" style="padding: 18px 22px;">
         <!-- Card thông tin khách & sân -->
         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
@@ -2272,7 +2278,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
 
     <!-- Modal Body: Split 2 columns (Catalog on left, Cart & Checkout on right) -->
     <div class="modal-body" style="padding: 16px 22px; overflow-y: auto; flex: 1;">
-      <div style="display: grid; grid-template-columns: 1.28fr 1fr; gap: 18px; align-items: start;">
+      <div class="pos-columns" style="display: grid; grid-template-columns: 1.28fr 1fr; gap: 18px; align-items: start;">
         
         <!-- CỘT TRÁI: DANH MỤC THỰC ĐƠN & TÌM KIẾM NHANH -->
         <div style="background:#ffffff; border:1px solid var(--line); border-radius:12px; padding:14px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
@@ -2309,6 +2315,8 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
           <div id="posCatalogGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap:10px; max-height:430px; overflow-y:auto; padding-right:4px;">
             <div th:each="s : ${activeServices}"
                  class="pos-item-card"
+                 th:classappend="${s.stock == null or s.stock <= 0} ? 'out-of-stock' : ''"
+                 th:attr="aria-disabled=${s.stock == null or s.stock <= 0}"
                  th:data-id="${s.id}"
                  th:data-name="${s.name}"
                  th:data-cat="${s.category}"
@@ -2325,7 +2333,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
                 <div style="flex:1; min-width:0;">
                   <div class="pos-card-title" th:text="${s.name}"></div>
                   <div style="font-size:11px; color:var(--gray-500); margin-top:3px;">
-                    <span th:text="${s.unit}"></span> • <span th:text="'Còn ' + ${s.stock}" style="color:var(--emerald-600); font-weight:700;"></span>
+                    <span th:text="${s.unit}"></span> • <span th:text="${s.stock != null and s.stock > 0 ? 'Còn ' + s.stock : 'Hết hàng'}" style="color:var(--emerald-600); font-weight:700;"></span>
                   </div>
                 </div>
               </div>
@@ -2425,21 +2433,7 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
               </div>
             </div>
 
-            <!-- Financial Subtotal -->
-            <div style="background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-              <span style="font-size:12px; color:var(--gray-600); font-weight:600;">Tổng tiền thanh toán:</span>
-              <strong id="posCartTotal" style="font-size:16px; color:#047857; font-weight:800;">0 đ</strong>
-            </div>
 
-            <!-- Submit Button for Retail Mode -->
-            <button type="button" id="btnConfirmRetailOrder" class="btn" style="width:100%; height:40px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; background:#059669; color:#fff; border-radius:8px; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(5,150,105,0.25);" onclick="submitPosRetailOrder()">
-              <i class="fa-solid fa-circle-check"></i> Thanh toán bán lẻ & In hóa đơn (F8)
-            </button>
-
-            <!-- Submit Button for Booking Mode -->
-            <button type="button" id="btnConfirmPosOrder" class="btn primary" style="display:none; width:100%; height:40px; font-size:13px; font-weight:800; align-items:center; justify-content:center; gap:8px;" onclick="submitPosBatchOrder()">
-              <i class="fa-solid fa-plus-circle"></i> Thêm món vào phiếu sân (F8)
-            </button>
           </div>
 
           <!-- History of Already Ordered Services in this Booking (Only shown in BOOKING mode) -->
@@ -2458,6 +2452,22 @@ html, body, button, input, select, textarea, .btn, span, div, h1, h2, h3, h4, h5
         </div>
 
       </div>
+    </div>
+    <div class="pos-checkout-footer">            <!-- Financial Subtotal -->
+            <div style="background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span style="font-size:12px; color:var(--gray-600); font-weight:600;">Tổng tiền thanh toán:</span>
+              <strong id="posCartTotal" style="font-size:16px; color:#047857; font-weight:800;">0 đ</strong>
+            </div>
+
+            <!-- Submit Button for Retail Mode -->
+            <button type="button" id="btnConfirmRetailOrder" class="btn" style="width:100%; height:40px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; background:#059669; color:#fff; border-radius:8px; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(5,150,105,0.25);" onclick="submitPosRetailOrder()">
+              <i class="fa-solid fa-circle-check"></i> Thanh toán bán lẻ & In hóa đơn (F8)
+            </button>
+
+            <!-- Submit Button for Booking Mode -->
+            <button type="button" id="btnConfirmPosOrder" class="btn primary" style="display:none; width:100%; height:40px; font-size:13px; font-weight:800; align-items:center; justify-content:center; gap:8px;" onclick="submitPosBatchOrder()">
+              <i class="fa-solid fa-plus-circle"></i> Thêm món vào phiếu sân (F8)
+            </button>
     </div>
   </div>
 </div>
@@ -2871,7 +2881,8 @@ function addItemToPosCart(cardEl) {
   const category = cardEl.getAttribute('data-cat');
   const price = parseFloat(cardEl.getAttribute('data-price') || '0');
   const unit = cardEl.getAttribute('data-unit') || '';
-  const stock = parseInt(cardEl.getAttribute('data-stock') || '999', 10);
+  const stock = Math.max(0, Number(cardEl.getAttribute('data-stock')) || 0);
+  if (stock < 1) { showPosToast('Sản phẩm đã hết hàng, không thể thêm vào giỏ.', 'warning'); return; }
 
   // Micro-animation click feedback
   cardEl.style.transform = 'scale(0.96)';
@@ -3493,6 +3504,8 @@ function triggerEstimate() {
 
   if (!courtId || !date || !start || !end) return;
 
+  msgEl.innerText='Đang kiểm tra lịch và giá…';
+  priceEl.innerText='…';
   fetch('/admin/bookings/api/estimate-price', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -3668,8 +3681,18 @@ function openQuickPosModalFromBar() {
 
 // 2. RECEPTIONIST MULTI-STEP BOOKING WIZARD
 function openReceptionistWizard() {
+  if (scheduleSlotPast(document.getElementById('wizStartTime').value)) clearScheduleRange();
+  if (!scheduleRangeReady) {
+    switchView('schedule');
+    document.getElementById('scheduleSelection').scrollIntoView({behavior:'smooth', block:'center'});
+    showPosToast('Chọn sân, giờ bắt đầu và giờ kết thúc trên lịch trước khi đặt sân.', 'warning');
+    return;
+  }
+  document.getElementById('wizardSelectedRange').textContent =
+    document.getElementById('wizSelectedCourtName').value + ' • ' +
+    document.getElementById('wizBookingDate').value + ' • ' +
+    document.getElementById('wizStartTime').value + ' – ' + document.getElementById('wizEndTime').value;
   currentWizStep = 1;
-  wizSelectedCourt = null;
   wizFnbItems = {};
   wizPaymentMethod = 'Tiền mặt';
   wizPayRate = 1.0;
@@ -3684,25 +3707,7 @@ function openReceptionistWizard() {
   document.getElementById('wizPhoneStatusNotice').innerText = 'Nhập số điện thoại để hệ thống tự động nhận diện khách cũ hoặc khách mới.';
   document.getElementById('wizPhoneStatusNotice').style.color = '#64748b';
 
-  // Step 2 reset
-  const todayStr = new Date().toISOString().split('T')[0];
-  document.getElementById('wizBookingDate').value = todayStr;
-
-  const now = new Date();
-  const nextHour = (now.getHours() + 1) % 24;
-  const startStr = String(nextHour).padStart(2, '0') + ':00';
-  const endStr = String((nextHour + 1) % 24).padStart(2, '0') + ':00';
-  document.getElementById('wizStartTime').value = startStr;
-  document.getElementById('wizEndTime').value = endStr;
-
-  document.querySelectorAll('#wizCourtGrid .court-pick-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('wizSelectedCourtId').value = '';
-  document.getElementById('wizSelectedCourtName').value = '';
-  document.getElementById('wizCalculatedCourtAmount').value = '0';
-  document.getElementById('wizCourtPriceDisplay').innerText = '0 đ';
-  wizardFilterSport('ALL');
-
-  // Step 3 (F&B) reset
+  // Step 2 (F&B) reset
   document.querySelectorAll('#wizFnbCatalogGrid .wiz-fnb-item-qty').forEach(q => q.innerText = '0');
   document.querySelectorAll('#wizFnbCatalogGrid .wiz-fnb-card').forEach(c => {
     c.classList.remove('has-qty');
@@ -3715,10 +3720,10 @@ function openReceptionistWizard() {
   if (countBadge) countBadge.innerText = '0 món';
   document.getElementById('wizFnbTotalDisplay').innerText = '0 đ';
 
-  // Step 4 reset
+  // Step 3 reset
   const promoSel = document.getElementById('wizPromotionSelect');
   if (promoSel) promoSel.selectedIndex = 0;
-  document.getElementById('wizAutoCheckInCheckbox').checked = true;
+  document.getElementById('wizAutoCheckInCheckbox').checked = false;
 
   updatePosLiveClock();
   goToWizardStep(1);
@@ -3743,25 +3748,12 @@ function goToWizardStep(stepNum) {
     }
   }
 
-  if (stepNum > 2 && (currentWizStep === 2 || currentWizStep === 1)) {
-    const courtId = document.getElementById('wizSelectedCourtId').value;
-    const start = document.getElementById('wizStartTime').value;
-    const end = document.getElementById('wizEndTime').value;
-
-    if (!courtId) {
-      showPosToast('Vui lòng click chọn 1 sân thể thao khả dụng ở Bước 2!', 'warning');
-      return;
-    }
-    if (!start || !end || start >= end) {
-      showPosToast('Khung giờ bắt đầu phải trước giờ kết thúc!', 'warning');
-      return;
-    }
-  }
+  if (stepNum < 1 || stepNum > 3 || !scheduleRangeReady) return;
 
   currentWizStep = stepNum;
 
   // Toggle views
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 3; i++) {
     const v = document.getElementById('wizStepView' + i);
     if (v) v.style.display = (i === stepNum) ? 'block' : 'none';
 
@@ -3772,25 +3764,25 @@ function goToWizardStep(stepNum) {
     }
   }
 
-  for (let l = 1; l <= 3; l++) {
+  for (let l = 1; l <= 2; l++) {
     const line = document.getElementById('wizStepLine' + l);
     if (line) line.classList.toggle('active', l < stepNum);
   }
 
   // Footer buttons state
   document.getElementById('wizBtnBack').style.display = (stepNum > 1) ? 'inline-flex' : 'none';
-  document.getElementById('wizBtnSkipFnb').style.display = (stepNum === 3) ? 'inline-flex' : 'none';
-  document.getElementById('wizBtnNext').style.display = (stepNum < 4) ? 'inline-flex' : 'none';
-  document.getElementById('wizBtnSubmit').style.display = (stepNum === 4) ? 'inline-flex' : 'none';
+  document.getElementById('wizBtnSkipFnb').style.display = (stepNum === 2) ? 'inline-flex' : 'none';
+  document.getElementById('wizBtnNext').style.display = (stepNum < 3) ? 'inline-flex' : 'none';
+  document.getElementById('wizBtnSubmit').style.display = (stepNum === 3) ? 'inline-flex' : 'none';
 
-  // Prepare Step 4 Summary if reaching Step 4
-  if (stepNum === 4) {
+  // Prepare the final checkout summary.
+  if (stepNum === 3) {
     wizardPrepareSummaryStep();
   }
 }
 
 function wizardGoNext() {
-  if (currentWizStep < 4) {
+  if (currentWizStep < 3) {
     goToWizardStep(currentWizStep + 1);
   }
 }
@@ -3836,7 +3828,7 @@ function wizardSkipFnb() {
   const countBadge = document.getElementById('wizFnbItemCount');
   if (countBadge) countBadge.innerText = '0 món';
   document.getElementById('wizFnbTotalDisplay').innerText = '0 đ';
-  goToWizardStep(4);
+  goToWizardStep(3);
 }
 
 // STEP 1 LOGIC
@@ -3993,6 +3985,10 @@ function wizardOnStartTimeChange() {
 }
 
 function wizardTriggerPriceEstimate() {
+  const version=++scheduleEstimateVersion;
+  scheduleRangeReady=false;
+  document.getElementById('scheduleBookButton').disabled=true;
+  document.getElementById('wizCalculatedCourtAmount').value='0';
   const courtId = document.getElementById('wizSelectedCourtId').value;
   const date = document.getElementById('wizBookingDate').value;
   const start = document.getElementById('wizStartTime').value;
@@ -4003,13 +3999,13 @@ function wizardTriggerPriceEstimate() {
   const priceEl = document.getElementById('wizCourtPriceDisplay');
   const boxEl = document.getElementById('wizEstimateNoticeBox');
 
-  if (!courtId || !date || !start || !end) {
-    msgEl.innerText = 'Vui lòng chọn sân và khung giờ để kiểm tra lịch trống và tính giá.';
+  if (!courtId || !date || !start || !end || start >= end) {
+    msgEl.innerText = start ? 'Bấm mốc kết thúc trên cùng hàng sân.' : 'Bấm ô trống để chọn giờ bắt đầu.';
     msgEl.style.color = '#065f46';
     iconEl.className = 'fa-solid fa-circle-info text-primary';
     boxEl.style.background = '#f0fdf4';
     boxEl.style.borderColor = '#bbf7d0';
-    priceEl.innerText = '0 đ';
+    priceEl.innerText = '—';
     return;
   }
 
@@ -4020,7 +4016,10 @@ function wizardTriggerPriceEstimate() {
   })
   .then(r => r.json())
   .then(data => {
+    if(version!==scheduleEstimateVersion)return;
     if (data.valid) {
+      scheduleRangeReady=true;
+      document.getElementById('scheduleBookButton').disabled=false;
       msgEl.innerText = '✓ Sân trống khả dụng! ' + (data.policyName ? 'Chính sách: ' + data.policyName : '');
       msgEl.style.color = '#065f46';
       iconEl.className = 'fa-solid fa-circle-check text-success';
@@ -4036,11 +4035,13 @@ function wizardTriggerPriceEstimate() {
       iconEl.className = 'fa-solid fa-triangle-exclamation text-danger';
       boxEl.style.background = '#fef2f2';
       boxEl.style.borderColor = '#fecaca';
-      priceEl.innerText = '0 đ';
+      priceEl.innerText = '—';
     }
   })
   .catch(err => {
-    console.error('Estimate error:', err);
+    if(version!==scheduleEstimateVersion)return;
+    msgEl.innerText='Không kiểm tra được lịch sân. Vui lòng chọn lại giờ để thử lại.';
+    msgEl.style.color='#b91c1c';
   });
 }
 
@@ -4081,7 +4082,7 @@ function wizardChangeFnbQty(btnEl, delta) {
   const card = btnEl.closest('.wiz-fnb-card');
   const qtyEl = card.querySelector('.wiz-fnb-item-qty');
   let currentQty = parseInt(qtyEl.innerText || '0', 10);
-  const stock = parseInt(card.getAttribute('data-service-stock') || '999', 10);
+  const stock = Math.max(0, Number(card.getAttribute('data-service-stock')) || 0);
   const sId = card.getAttribute('data-service-id');
   const sName = card.getAttribute('data-service-name');
   const sPrice = parseFloat(card.getAttribute('data-service-price') || '0');
@@ -4132,6 +4133,15 @@ function wizardPrepareSummaryStep() {
   wizardRecalculateTotal();
 }
 
+function wizardDiscount(courtFee) {
+  const select=document.getElementById('wizPromotionSelect');
+  if(!select || select.selectedIndex<=0)return 0;
+  const option=select.selectedOptions[0];
+  const value=Number(option.dataset.discount || 0);
+  // Match BookingPricingService: discount applies to court rental, not F&B.
+  return Math.min(courtFee, Math.max(0, option.dataset.discountType==='PERCENT' ? Math.round(courtFee*value/100) : value));
+}
+
 function wizardRecalculateTotal() {
   const courtFee = parseFloat(document.getElementById('wizCalculatedCourtAmount').value || '0');
   let fnbFee = 0;
@@ -4139,13 +4149,7 @@ function wizardRecalculateTotal() {
     fnbFee += wizFnbItems[k].price * wizFnbItems[k].qty;
   }
 
-  const promoSel = document.getElementById('wizPromotionSelect');
-  let discount = 0;
-  if (promoSel && promoSel.selectedIndex > 0) {
-    const opt = promoSel.selectedOptions[0];
-    discount = parseFloat(opt.getAttribute('data-discount') || '0');
-  }
-
+  const discount = wizardDiscount(courtFee);
   const grandTotal = Math.max(0, courtFee + fnbFee - discount);
   document.getElementById('wizSummaryCourtFee').innerText = courtFee.toLocaleString('vi-VN') + ' đ';
   document.getElementById('wizSummaryFnbFee').innerText = fnbFee.toLocaleString('vi-VN') + ' đ';
@@ -4154,17 +4158,23 @@ function wizardRecalculateTotal() {
 
 function wizardSelectPaymentMethod(method, btnEl) {
   wizPaymentMethod = method;
-  document.querySelectorAll('#wizStepView4 .pos-cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#wizStepView3 .pos-cat-btn').forEach(b => b.classList.remove('active'));
   if (btnEl) btnEl.classList.add('active');
 }
 
 function wizardSetPayRate(rate, btnEl) {
   wizPayRate = rate;
-  document.querySelectorAll('#wizStepView4 .wizard-quick-duration-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#wizStepView3 .wizard-quick-duration-btn').forEach(b => b.classList.remove('active'));
   if (btnEl) btnEl.classList.add('active');
 }
 
 function wizardSubmitBooking() {
+  if (scheduleSlotPast(document.getElementById('wizStartTime').value)) {
+    clearScheduleRange();
+    showPosToast('Giờ bắt đầu đã qua. Vui lòng chọn lại trên lịch sân.', 'warning');
+    return;
+  }
+  if (!scheduleRangeReady || currentWizStep !== 3) return;
   const custId = document.getElementById('wizSelectedCustomerId').value;
   const newName = document.getElementById('wizFinalCustomerName').value;
   const newPhone = document.getElementById('wizFinalCustomerPhone').value;
@@ -4188,11 +4198,7 @@ function wizardSubmitBooking() {
     serviceList.push({ serviceId: item.id, quantity: item.qty, note: 'Gọi kèm khi nhận sân' });
   }
 
-  const promoSel = document.getElementById('wizPromotionSelect');
-  let discount = 0;
-  if (promoSel && promoSel.selectedIndex > 0) {
-    discount = parseFloat(promoSel.selectedOptions[0].getAttribute('data-discount') || '0');
-  }
+  const discount = wizardDiscount(courtFee);
   const total = Math.max(0, courtFee + fnbFee - discount);
   const paid = Math.round(total * wizPayRate);
 
@@ -4303,7 +4309,7 @@ window.addEventListener('keydown', (e) => {
   // F9: Submit Wizard
   if (e.key === 'F9') {
     const wizardModal = document.getElementById('modalReceptionistWizard');
-    if (wizardModal && wizardModal.classList.contains('active') && currentWizStep === 4) {
+    if (wizardModal && wizardModal.classList.contains('active') && currentWizStep === 3) {
       e.preventDefault();
       wizardSubmitBooking();
     }
@@ -4315,49 +4321,101 @@ function openBookingCreateModal() {
   openReceptionistWizard();
 }
 
-// Quick Book button in timeline
-function quickBookCourt(courtId) {
-  openReceptionistWizard();
-  const card = document.querySelector('#wizCourtGrid .court-pick-card[data-court-id="' + courtId + '"]');
-  if (card) {
-    wizardSelectCourt(card);
-    goToWizardStep(2);
-  }
+// Timeline selection uses half-open intervals: the end may equal the next booking's start.
+let scheduleRangeReady = false;
+let scheduleEstimateVersion = 0;
+let scheduleFreeTimes = [];
+function scheduleTime(minutes) {
+  return String(Math.floor(minutes / 60)).padStart(2,'0') + ':' + String(minutes % 60).padStart(2,'0');
 }
-
-// Click vào Timeline Slot
-function handleSlotClick(el) {
-  const isFree = el.classList.contains('slot-free');
-  const isBusy = el.classList.contains('slot-busy') || el.classList.contains('slot-inuse') || el.classList.contains('slot-booked-span');
-  const bookingId = el.getAttribute('data-booking-id');
-
-  if (isBusy && bookingId) {
-    openDetailModal(bookingId);
-  } else if (isFree) {
-    const isOperatorOnly = document.body.getAttribute('data-role') === 'ROLE_OPERATOR';
-    if (isOperatorOnly) {
-      appNotice('Tài khoản Kỹ thuật/Vận hành chỉ kiểm tra khung giờ sân trống để bảo dưỡng cơ sở vật chất. Vui lòng liên hệ Lễ tân để lập phiếu đặt sân.');
-      return;
+function scheduleMinutes(time) { const [h,m]=time.split(':').map(Number); return h*60+m; }
+function scheduleSlotPast(time) {
+  const date=document.querySelector('[name="scheduleDate"]').value;
+  if(!date || !time)return false;
+  return new Date(date+'T'+time+':00').getTime()<Date.now();
+}
+function renderScheduleChoices() {
+  const start=document.getElementById('wizStartTime').value;
+  const end=document.getElementById('wizEndTime').value;
+  const courtId=document.getElementById('wizSelectedCourtId').value;
+  document.querySelectorAll('.schedule-end-boundary').forEach(b=>b.remove());
+  document.querySelectorAll('.slot-booked-span,.slot-maint').forEach(el=>{
+    const same=el.dataset.courtId===courtId;
+    el.classList.toggle('slot-end',same && !!end && el.dataset.time===end);
+    let reachable=same && !!start && !end && el.dataset.time>start;
+    for(let m=scheduleMinutes(start);reachable && m<scheduleMinutes(el.dataset.time);m+=30)
+      reachable=scheduleFreeTimes.includes(scheduleTime(m));
+    el.classList.toggle('schedule-end-option',reachable);
+    if(!el.dataset.originalTitle)el.dataset.originalTitle=el.title;
+    el.title=reachable?'Bấm để kết thúc lúc '+el.dataset.time+' (không đặt vào lịch tiếp theo)':el.dataset.originalTitle;
+  });
+  document.querySelectorAll('.slot-free').forEach(el=>{
+    const past=scheduleSlotPast(el.dataset.time);
+    el.classList.toggle('slot-past',past);
+    el.setAttribute('aria-disabled',String(past));
+    const same=el.dataset.courtId===courtId;
+    el.classList.toggle('slot-selected',same && el.dataset.time>=start && el.dataset.time<end);
+    el.classList.toggle('slot-start',same && !!start && el.dataset.time===start);
+    el.classList.toggle('slot-end',same && !!end && el.dataset.time===end);
+    el.title=past?'Đã qua giờ':el.dataset.time+' • Bấm chọn giờ bắt đầu / kết thúc';
+  });
+  if(start) {
+    let m=scheduleMinutes(start);
+    while(scheduleFreeTimes.includes(scheduleTime(m)))m+=30;
+    const last=Array.from(document.querySelectorAll('.slot-free')).find(el=>el.dataset.courtId===courtId && el.dataset.time===scheduleTime(m-30));
+    if(last && (!end || end===scheduleTime(m))) {
+      const button=document.createElement('button');button.type='button';button.className='schedule-end-boundary';
+      button.textContent='Đến '+scheduleTime(m);button.title='Chọn giờ kết thúc '+scheduleTime(m);
+      button.onclick=e=>{e.stopPropagation();selectScheduleEnd(scheduleTime(m));};last.append(button);
     }
-
-    const courtId = el.getAttribute('data-court-id');
-    const time = el.getAttribute('data-time');
-
-    openReceptionistWizard();
-    if (courtId) {
-      const card = document.querySelector('#wizCourtGrid .court-pick-card[data-court-id="' + courtId + '"]');
-      if (card) wizardSelectCourt(card);
-    }
-    if (time) {
-      document.getElementById('wizStartTime').value = time;
-      const parts = time.split(':');
-      const h = parseInt(parts[0], 10);
-      const m = parseInt(parts[1], 10);
-      const endH = h + 1;
-      document.getElementById('wizEndTime').value = String(endH).padStart(2, '0') + ':' + String(m).padStart(2, '0');
-    }
-    wizardTriggerPriceEstimate();
   }
+  if(courtId)document.getElementById('scheduleSelectionLabel').textContent=
+    document.getElementById('wizSelectedCourtName').value+' • '+document.getElementById('wizBookingDate').value.split('-').reverse().join('/')+
+    (start?' • '+start+(end?' – '+end:' → Chọn giờ kết thúc'):' • Chọn giờ bắt đầu');
+}
+function selectScheduleEnd(time) {
+  const start=document.getElementById('wizStartTime').value;
+  if(scheduleSlotPast(start)){clearScheduleRange();return;}
+  if(!start || time<=start)return;
+  for(let m=scheduleMinutes(start);m<scheduleMinutes(time);m+=30) {
+    if(!scheduleFreeTimes.includes(scheduleTime(m))){showPosToast('Khoảng giờ này có lịch đặt hoặc bảo trì.','warning');return;}
+  }
+  document.getElementById('wizEndTime').value=time;
+  renderScheduleChoices();wizardTriggerPriceEstimate();
+}
+function clearScheduleRange() {
+  document.getElementById('wizStartTime').value='';document.getElementById('wizEndTime').value='';
+  renderScheduleChoices();wizardTriggerPriceEstimate();
+}
+function quickBookCourt(courtId) {
+  const cell=Array.from(document.querySelectorAll('.slot-free')).find(el=>el.dataset.courtId===courtId && !scheduleSlotPast(el.dataset.time));
+  if(cell)handleSlotClick(cell);else showPosToast('Không còn giờ trống để đặt sân.','warning');
+}
+function handleSlotClick(el) {
+  const selectedStart=document.getElementById('wizStartTime').value;
+  if(!el.classList.contains('slot-free') &&
+     el.dataset.courtId===document.getElementById('wizSelectedCourtId').value &&
+     selectedStart && !document.getElementById('wizEndTime').value && el.dataset.time>selectedStart) {
+    selectScheduleEnd(el.dataset.time);
+    return;
+  }
+  if(el.dataset.bookingId){openDetailModal(el.dataset.bookingId);return;}
+  if(!el.classList.contains('slot-free') || scheduleSlotPast(el.dataset.time))return;
+  if(document.body.dataset.role==='ROLE_OPERATOR'){appNotice('Vui lòng liên hệ lễ tân để lập phiếu đặt sân.');return;}
+  const courtId=el.dataset.courtId;
+  const start=document.getElementById('wizStartTime').value;
+  const end=document.getElementById('wizEndTime').value;
+  if(courtId===document.getElementById('wizSelectedCourtId').value && start && !end) {
+    if(el.dataset.time===start){clearScheduleRange();return;}
+    if(el.dataset.time>start){selectScheduleEnd(el.dataset.time);return;}
+  }
+  const card=Array.from(document.querySelectorAll('#wizCourtGrid .court-pick-card')).find(c=>c.dataset.courtId===courtId);
+  if(!card)return;
+  document.getElementById('wizBookingDate').value=document.querySelector('[name="scheduleDate"]').value;
+  document.getElementById('wizStartTime').value=el.dataset.time;
+  document.getElementById('wizEndTime').value='';
+  scheduleFreeTimes=Array.from(el.closest('.timeline-slots-row').querySelectorAll('.slot-free')).filter(c=>!scheduleSlotPast(c.dataset.time)).map(c=>c.dataset.time);
+  wizardSelectCourt(card);renderScheduleChoices();
 }
 
 // Khởi chạy khi tải trang
@@ -4370,6 +4428,11 @@ window.addEventListener('DOMContentLoaded', () => {
     openReceptionistWizard();
   }
 
+  renderScheduleChoices();
+  setInterval(()=>{
+    const start=document.getElementById('wizStartTime').value;
+    if(start && scheduleSlotPast(start))clearScheduleRange();else renderScheduleChoices();
+  },30000);
   // Initialize POS live clock
   updatePosLiveClock();
   setInterval(updatePosLiveClock, 1000);

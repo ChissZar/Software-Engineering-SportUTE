@@ -89,8 +89,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentMethod(paymentMethod != null ? paymentMethod : "Tiền mặt")
                 .build();
 
-        paymentRepository.save(payment);
-        booking.getPayments().add(payment);
+        booking.getPayments().add(paymentRepository.save(payment));
         confirmBookingAfterReceipt(booking);
     }
 

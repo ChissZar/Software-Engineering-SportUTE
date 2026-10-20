@@ -669,11 +669,17 @@ public class AdminBookingServiceImpl implements AdminBookingService {
                     if (span < 1) span = 1;
 
                     boolean isInUse = "Đang sử dụng".equalsIgnoreCase(bStatus);
+                    String timelineClass = switch (bStatus) {
+                        case "Đang sử dụng" -> "slot-inuse";
+                        case "Chờ xác nhận" -> "slot-pending";
+                        case "Hoàn tất", "Hoàn thành" -> "slot-completed";
+                        default -> "slot-busy";
+                    };
                     slots.add(TimelineSlotDTO.builder()
                             .time(timeStr)
                             .status(isInUse ? "IN_USE" : "BUSY")
-                            .statusLabel(isInUse ? "Đang dùng" : "Đã đặt")
-                            .cssClass(isInUse ? "slot-inuse" : "slot-busy")
+                            .statusLabel(bStatus)
+                            .cssClass(timelineClass)
                             .bookingId(b.getId())
                             .customerId(customerId)
                             .customerName(fullName)

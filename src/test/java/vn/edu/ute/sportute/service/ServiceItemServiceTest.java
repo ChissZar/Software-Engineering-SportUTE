@@ -65,6 +65,8 @@ public class ServiceItemServiceTest {
     @Test
     @DisplayName("Thêm món/dịch vụ thành công và tự động trừ tồn kho")
     void testAddServiceToBooking_Success_InventoryDeducted() {
+        when(bookingServiceDetailRepository.save(any(BookingServiceDetail.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
         Booking booking = Booking.builder().id("DS01").status("Đã xác nhận").build();
         ServiceItem serviceItem = ServiceItem.builder()
                 .id("DV01")
@@ -89,6 +91,10 @@ public class ServiceItemServiceTest {
 
         // Tồn kho phải giảm từ 100 xuống 97
         assertEquals(97, serviceItem.getStock());
+        assertEquals(1, booking.getServiceDetails().size());
+        booking.setQuotedAmount(BigDecimal.valueOf(1200000));
+        assertEquals(0, new BookingAmounts(mock(BookingPricingService.class)).total(booking)
+                .compareTo(BigDecimal.valueOf(1245000)));
         verify(serviceItemRepository, times(1)).save(serviceItem);
         verify(bookingServiceDetailRepository, times(1)).save(any(BookingServiceDetail.class));
     }
